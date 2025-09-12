@@ -1,7 +1,8 @@
 import { pgTable, uuid, text, integer } from 'drizzle-orm/pg-core'
 import { createdAt, updatedAt } from '../timestamps'
+import type { InferInsertModel , InferSelectModel} from 'drizzle-orm'
 
-export const products = pgTable('product', {
+export const products = pgTable('products', {
   id: uuid().primaryKey(),
   name: text().notNull(),
   slug: text().notNull(),
@@ -12,3 +13,9 @@ export const products = pgTable('product', {
   createdAt,
   updatedAt,
 })
+
+
+
+export type IProduct = InferInsertModel<typeof products>
+
+export type SProduct = InferSelectModel<typeof products>

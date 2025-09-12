@@ -1,90 +1,85 @@
-import type { Request, Response, NextFunction } from "express"
-import { products, type Product } from "../models/product"
+import type { Request, Response, NextFunction } from 'express'
+import { db } from '../db'
+import { products } from '../db/schemas/product-schema'
+import { eq } from 'drizzle-orm'
 
-// Create an item
-export const createItem = (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const { name } = req.body
-        const newItem: Product = { id: Date.now(), name }
-        products.push(newItem)
-        res.status(201).json(newItem)
-    } catch (error) {
-        next(error)
-    }
-}
-
-// Read all items
-export const getItems = (req: Request, res: Response, next: NextFunction) => {
-    try {
-        res.json(products)
-    } catch (error) {
-        next(error)
-    }
-}
-
-// Read single item
-export const getItemById = (
-    req: Request,
-    res: Response,
-    next: NextFunction
+// Add one product
+export const addProduct = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
 ) => {
-    try {
-        if (req.params.id) {
-            const id = parseInt(req.params.id, 10)
-            const item = products.find((i) => i.id === id)
-            if (!item) {
-                res.status(404).json({ message: "Item not found" })
-                return
-            }
-            res.json(item)
-        } else {
-            throw new Error("Pruduct ID is missing")
-        }
-    } catch (error) {
-        next(error)
-    }
+  try {
+    const [product] = await db.insert(products).values(req.body).returning()
+    res.status(201).json({ product })
+  } catch {
+    next({ message: 'Failed to add product', status: 500 })
+  }
 }
 
-// Update an item
-export const updateItem = (req: Request, res: Response, next: NextFunction) => {
-    try {
-        if (req.params.id) {
-            const id = parseInt(req.params.id, 10)
-            const { name } = req.body
-            const productIndex = products.findIndex((i) => i.id === id)
-            if (productIndex === -1) {
-                res.status(404).json({ message: "Item not found" })
-                return
-            }
-            const product = products[productIndex]
-            if (product) {
-                product.name = name
-            }
-            res.json(products[productIndex])
-        } else {
-            throw new Error("Pruduct ID is missing")
-        }
-    } catch (error) {
-        next(error)
-    }
+// Read all products
+export const getProducts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const allProducts = await db.query.products.findMany()
+    res.status(200).json(allProducts)
+  } catch (error) {
+    next(error)
+  }
+}
+
+// Read single product
+export const getProductById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const product = await db.query.products.findFirst({
+      where: (products, { eq }) => eq(products.id, req.params.id!),
+    })
+    res.status(200).json({ product })
+  } catch {
+    next({ message: 'Failed to fetch product', status: 500 })
+  }
+}
+
+// Update a product
+export const updateProduct = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const product = await db
+      .update(products)
+      .set(req.body)
+      .where(eq(products.id, req.params.id!))
+      .returning()
+    res.status(201).json({ product })
+  } catch {
+    next({ message: 'Failed to update product', status: 500 })
+  }
 }
 
 // Delete an item
-export const deleteItem = (req: Request, res: Response, next: NextFunction) => {
-    try {
-        if (req.params.id) {
-            const id = parseInt(req.params.id, 10)
-            const itemIndex = products.findIndex((i) => i.id === id)
-            if (itemIndex === -1) {
-                res.status(404).json({ message: "Item not found" })
-                return
-            }
-            const deletedItem = products.splice(itemIndex, 1)[0]
-            res.json(deletedItem)
-        } else {
-            throw new Error("Pruduct ID is missing")
-        }
-    } catch (error) {
-        next(error)
-    }
+export const deleteProduct = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const [product] = await db
+      .delete(products)
+      .where(eq(products.id, req.params.id!))
+      .returning({
+        id: products.id,
+      })
+    res.status(200).json({ productId: product?.id })
+  } catch {
+    next({ message: 'Failed to delete product', status: 500 })
+  }
 }
