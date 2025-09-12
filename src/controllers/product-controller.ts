@@ -26,8 +26,8 @@ export const getProducts = async (
   try {
     const allProducts = await db.query.products.findMany()
     res.status(200).json(allProducts)
-  } catch (error) {
-    next(error)
+  } catch {
+    next({ message: 'Failed to fetch products', status: 500 })
   }
 }
 
