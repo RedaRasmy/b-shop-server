@@ -17,9 +17,15 @@ importers:
       drizzle-orm:
         specifier: ^0.44.5
         version: 0.44.5(@neondatabase/serverless@1.0.1)(@types/pg@8.15.5)
+      drizzle-zod:
+        specifier: ^0.8.3
+        version: 0.8.3(drizzle-orm@0.44.5(@neondatabase/serverless@1.0.1)(@types/pg@8.15.5))(zod@4.1.8)
       express:
         specifier: ^5.1.0
         version: 5.1.0
+      zod:
+        specifier: ^4.1.8
+        version: 4.1.8
     devDependencies:
       '@types/express':
         specifier: ^5.0.3
@@ -1267,6 +1273,12 @@ packages:
       sqlite3:
         optional: true
 
+  drizzle-zod@0.8.3:
+    resolution: {integrity: sha512-66yVOuvGhKJnTdiqj1/Xaaz9/qzOdRJADpDa68enqS6g3t0kpNkwNYjUuaeXgZfO/UWuIM9HIhSlJ6C5ZraMww==}
+    peerDependencies:
+      drizzle-orm: '>=0.36.0'
+      zod: ^3.25.0 || ^4.0.0
+
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
     engines: {node: '>= 0.4'}
@@ -2457,6 +2469,9 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
+  zod@4.1.8:
+    resolution: {integrity: sha512-5R1P+WwQqmmMIEACyzSvo4JXHY5WiAFHRMg+zBZKgKS+Q1viRa0C1hmUKtHltoIFKtIdki3pRxkmpP74jnNYHQ==}
+
 snapshots:
 
   '@babel/code-frame@7.27.1':
@@ -3572,6 +3587,11 @@ snapshots:
     optionalDependencies:
       '@neondatabase/serverless': 1.0.1
       '@types/pg': 8.15.5
+
+  drizzle-zod@0.8.3(drizzle-orm@0.44.5(@neondatabase/serverless@1.0.1)(@types/pg@8.15.5))(zod@4.1.8):
+    dependencies:
+      drizzle-orm: 0.44.5(@neondatabase/serverless@1.0.1)(@types/pg@8.15.5)
+      zod: 4.1.8
 
   dunder-proto@1.0.1:
     dependencies:
@@ -4995,3 +5015,5 @@ snapshots:
   yn@3.1.1: {}
 
   yocto-queue@0.1.0: {}
+
+  zod@4.1.8: {}

@@ -3,7 +3,7 @@ import { createdAt, updatedAt } from '../timestamps'
 import type { InferInsertModel , InferSelectModel} from 'drizzle-orm'
 
 export const products = pgTable('products', {
-  id: uuid().primaryKey(),
+  id: uuid().primaryKey().defaultRandom(),
   name: text().notNull(),
   slug: text().notNull(),
   description: text(),
@@ -13,7 +13,6 @@ export const products = pgTable('products', {
   createdAt,
   updatedAt,
 })
-
 
 
 export type IProduct = InferInsertModel<typeof products>
