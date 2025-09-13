@@ -24,12 +24,21 @@ export const getProducts = async (
   next: NextFunction,
 ) => {
   try {
-    const allProducts = await db.query.products.findMany()
-    res.status(200).json(allProducts)
+    const {categorieId} = req.query
+    if (categorieId && typeof categorieId === "string") {
+      const categorieProducts = await db.query.products.findMany({
+        where : (products,{eq}) => eq(products.categorie_id,categorieId)
+      })
+      res.status(200).json(categorieProducts)
+    } else {
+      const allProducts = await db.query.products.findMany()
+      res.status(200).json(allProducts)
+    }
   } catch {
     next({ message: 'Failed to fetch products', status: 500 })
   }
 }
+
 
 // Read single product
 export const getProductById = async (

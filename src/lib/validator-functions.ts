@@ -21,6 +21,10 @@ export function validateIdParam() {
   };
 }
 
+// export function validateQueryParam() {
+  
+// }
+
 
 export const validateBody = (schema: z.ZodSchema) => {
   return (req: Request, res: Response, next: NextFunction) => {
