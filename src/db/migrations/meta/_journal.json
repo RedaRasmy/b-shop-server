@@ -15,6 +15,13 @@
       "when": 1757687894261,
       "tag": "0001_sad_dragon_man",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1757753619992,
+      "tag": "0002_high_screwball",
+      "breakpoints": true
     }
   ]
 }
