@@ -7,17 +7,17 @@ import {
   getProducts,
 } from '../controllers/product-controllers'
 import { validateBody, validateIdParam } from '../lib/validator-functions'
-import { insertProductSchema } from '../db/zod-schemas'
+import { insertFullProductSchema } from '../db/zod-schemas'
 
 const router: Router = Router()
 
 router.get('/', getProducts)
 router.get('/:id', validateIdParam(), getProductById)
-router.post('/', validateBody(insertProductSchema), addProduct)
+router.post('/', validateBody(insertFullProductSchema), addProduct)
 router.put(
   '/:id',
   validateIdParam(),
-  validateBody(insertProductSchema),
+  validateBody(insertFullProductSchema),
   updateProduct,
 )
 router.delete('/:id', validateIdParam(), deleteProduct)
