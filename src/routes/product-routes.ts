@@ -5,7 +5,7 @@ import {
   updateProduct,
   getProductById,
   getProducts,
-} from '../controllers/product-controller'
+} from '../controllers/product-controllers'
 import { validateBody, validateIdParam } from '../lib/validator-functions'
 import { insertProductSchema } from '../db/zod-schemas'
 
