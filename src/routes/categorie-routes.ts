@@ -4,7 +4,8 @@ import {
   deleteCategorie,
   updateCategorie,
   getCategories,
-  getCategorieById
+  getCategorieById,
+  getCategorieProducts,
 } from '../controllers/categorie-controllers'
 import { validateBody, validateIdParam } from '../lib/validator-functions'
 import { insertCategorieSchema } from '../db/zod-schemas'
@@ -13,6 +14,7 @@ const router: Router = Router()
 
 router.get('/', getCategories)
 router.get('/:id', validateIdParam(), getCategorieById)
+router.get('/:id/products', validateIdParam(), getCategorieProducts)
 router.post('/', validateBody(insertCategorieSchema), addCategorie)
 router.put(
   '/:id',

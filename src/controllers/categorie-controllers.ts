@@ -83,3 +83,23 @@ export const deleteCategorie = async (
     next({ message: 'Failed to delete categorie', status: 500 })
   }
 }
+
+// Read all products in a categorie
+export const getCategorieProducts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const categorieId = req.params.id! // validated
+    const products = await db.query.products.findMany({
+      where: (products, { eq }) => eq(products.categorie_id, categorieId),
+    })
+	res.status(200).json(products)
+  } catch {
+	next({
+		message:"Failed to fetch categorie products",
+		status: 500
+	})
+  }
+}
