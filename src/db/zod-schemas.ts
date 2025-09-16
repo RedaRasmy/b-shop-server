@@ -1,13 +1,22 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
-import { products, categories, images } from './schemas'
+import { products, categories } from './schemas'
 import { z } from 'zod'
 
 // products
 
-const insertImageSchema = createInsertSchema(images).omit({
-  createdAt: true,
-  updatedAt: true
-})
+// const insertImageSchema = createInsertSchema(images).omit({
+//   createdAt: true,
+//   updatedAt: true
+// })
+
+export const uploadedFileSchema = z.object({
+  fieldname: z.string(),
+  originalname: z.string(),
+  mimetype: z.string().refine(type => type.startsWith('image/')),
+  size: z.number().max(5 * 1024 * 1024), // 5MB
+  filename: z.string(),
+  path: z.string(),
+});
 
 const insertProductSchema = createInsertSchema(products).omit({
   createdAt: true,
@@ -18,12 +27,15 @@ const insertProductSchema = createInsertSchema(products).omit({
 export const insertFullProductSchema = insertProductSchema.extend({
   images: z
     .array(
-      insertImageSchema.omit({
-        productId: true,
+      z.object({
+        id : z.string().uuid().optional(),
+        alt: z.string().min(1, "Alt text is required").max(200, "Alt text too long"),
+        position : z.int()
       })
-    )
+      )
     .max(5),
 })
+
 
 export const selectProductSchema = createSelectSchema(products)
 

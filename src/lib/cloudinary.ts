@@ -8,11 +8,34 @@ cloudinary.config({
 })
 
 
+export interface CloudinaryUploadResult {
+  url: string;
+  public_id: string;
+  width: number;
+  height: number;
+  format: string;
+  bytes: number;
+  secure_url: string;
+  created_at: string;
+  resource_type: string;
+  type: string;
+  version: number;
+}
+
+export interface ProcessedUploadResult {
+  url: string;
+  public_id: string;
+  width: number;
+  height: number;
+  format: string;
+  bytes: number;
+}
+
 export const uploadImageBuffer = async (
   fileBuffer: Buffer, 
   originalName: string,
   folder: string = 'products-images'
-) => {
+):Promise<ProcessedUploadResult> => {
   const options = {
     folder: folder,
     public_id: `${Date.now()}-${originalName.split('.')[0]}`,

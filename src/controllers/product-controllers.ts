@@ -3,6 +3,7 @@ import { db } from '../db'
 import { images, products } from '../db/schemas'
 import { eq, inArray } from 'drizzle-orm'
 import type { IFullProduct } from '../lib/types'
+import { deleteImage, uploadMultipleImages } from '../lib/cloudinary'
 
 // Add one product
 export const addProduct = async (
@@ -10,19 +11,50 @@ export const addProduct = async (
   res: Response,
   next: NextFunction,
 ) => {
+  const { images: productImages, ...productData }: IFullProduct = req.body
+
   try {
-    const { images: productImages, ...productData }: IFullProduct = req.body
+    // Check if files are uploaded
+    if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
+      return res.status(400).json({
+        error: 'At least one product image is required',
+      })
+    }
+
+    // Check if productImages data matches uploaded files
+    if (productImages.length !== req.files.length) {
+      return res.status(400).json({
+        error: 'Image metadata must match number of uploaded files',
+      })
+    }
+
+    // Step 1: Upload files to Cloudinary first
+    const uploadedFiles = await uploadMultipleImages(req.files, 'products')
+
     await db.transaction(async (tx) => {
       const [product] = await tx
         .insert(products)
         .values(productData)
         .returning()
+
+      // Prepare image data with Cloudinary URLs
+      const imageData = uploadedFiles.map((uploadResult, index) => ({
+        productId: product!.id,
+        url: uploadResult.url,
+        publicId: uploadResult.public_id,
+        alt: productImages[index]!.alt,
+        position: productImages[index]!.position,
+        width: uploadResult.width,
+        height: uploadResult.height,
+        format: uploadResult.format,
+        size: uploadResult.bytes,
+      }))
+
       const insertedImages = await tx
         .insert(images)
-        .values(
-          productImages.map((img) => ({ ...img, productId: product!.id })),
-        )
+        .values(imageData)
         .returning()
+
       res.status(201).json({
         product: {
           ...product!,
@@ -30,7 +62,8 @@ export const addProduct = async (
             id: img.id,
             url: img.url,
             alt: img.alt,
-          })),
+            position : img.position,
+          }))
         },
       })
     })
@@ -51,26 +84,14 @@ export const getProducts = async (
       const categorieProducts = await db.query.products.findMany({
         where: (products, { eq }) => eq(products.categorieId, categorieId),
         with: {
-          images: {
-            columns: {
-              url: true,
-              alt: true,
-              id: true,
-            },
-          },
+          images: true 
         },
       })
       res.status(200).json(categorieProducts)
     } else {
       const allProducts = await db.query.products.findMany({
         with: {
-          images: {
-            columns: {
-              url: true,
-              alt: true,
-              id: true,
-            },
-          },
+          images: true,
         },
       })
       res.status(200).json(allProducts)
@@ -90,13 +111,7 @@ export const getProductById = async (
     const product = await db.query.products.findFirst({
       where: (products, { eq }) => eq(products.id, req.params.id!),
       with: {
-        images: {
-          columns: {
-            url: true,
-            alt: true,
-            id: true,
-          },
-        },
+        images: true,
       },
     })
     res.status(200).json({ product })
@@ -126,12 +141,12 @@ export const updateProduct = async (
       const existingImages = await tx.query.images.findMany({
         where: (images, { eq }) => eq(images.productId, productId),
       })
-
       // Determine images to delete, update, and insert
       const newIds = newImages.filter((img) => img.id).map((img) => img.id!)
       const toDelete = existingImages.filter((img) => !newIds.includes(img.id))
       const toUpdate = newImages.filter((img) => img.id)
       const toInsert = newImages
+
         .filter((img) => !img.id)
         .map((img) => ({ ...img, productId }))
 
@@ -187,6 +202,13 @@ export const deleteProduct = async (
   try {
     const productId = req.params.id!
     await db.transaction(async (tx) => {
+      const productImages = await tx.query.images.findMany({
+        where : (images,{eq})=> eq(images.productId,productId)
+      })
+      productImages.forEach(async (img)=>{
+        await deleteImage(img.publicId)
+      })
+      
       await tx.delete(products).where(eq(products.id, productId))
       await tx.delete(images).where(eq(images.productId, productId))
 

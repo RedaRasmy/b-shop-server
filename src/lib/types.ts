@@ -9,13 +9,14 @@ export type Prettify<T> = {
 
 export type Image = {
     id?:string
-    url : string
     alt : string
+    position: number
 }
 
 export type IFullProduct = Prettify<IProduct & {
     images : Image[]
 }>
+
 export type SFullProduct = Prettify<SProduct & {
     images : SImage[]
 }>
