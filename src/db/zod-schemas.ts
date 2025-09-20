@@ -1,5 +1,5 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
-import { products, categories } from './schemas'
+import { products, categories , users } from './schemas'
 import { z } from 'zod'
 
 // products
@@ -40,6 +40,7 @@ export const insertFullProductSchema = insertProductSchema.extend({
 export const selectProductSchema = createSelectSchema(products)
 
 // categories
+
 export const insertCategorieSchema = createInsertSchema(categories).omit({
   createdAt: true,
   updatedAt: true,
@@ -47,3 +48,9 @@ export const insertCategorieSchema = createInsertSchema(categories).omit({
 })
 
 export const selectCategorieSchema = createSelectSchema(categories)
+
+
+// users
+export const insertUserSchema = createInsertSchema(users)
+
+export const selectUserSchema = createSelectSchema(users)
