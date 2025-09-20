@@ -65,7 +65,7 @@ export const updateCategorie = async (
   }
 }
 
-// Delete an item
+// Delete a categorie
 export const deleteCategorie = async (
   req: Request,
   res: Response,
@@ -94,21 +94,15 @@ export const getCategorieProducts = async (
     const categorieId = req.params.id! // validated
     const products = await db.query.products.findMany({
       where: (products, { eq }) => eq(products.categorieId, categorieId),
-	  with : {
-		images : {
-			columns : {
-				id : true,
-				url : true,
-				alt : true
-			}
-		}
-	  }
+      with: {
+        images: true,
+      },
     })
-	res.status(200).json(products)
+    res.status(200).json(products)
   } catch {
-	next({
-		message:"Failed to fetch categorie products",
-		status: 500
-	})
+    next({
+      message: 'Failed to fetch categorie products',
+      status: 500,
+    })
   }
 }
