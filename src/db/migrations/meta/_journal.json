@@ -29,6 +29,20 @@
       "when": 1757788420815,
       "tag": "0003_soft_night_thrasher",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1758388795687,
+      "tag": "0004_zippy_joystick",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1758401190300,
+      "tag": "0005_magenta_sabretooth",
+      "breakpoints": true
     }
   ]
 }
