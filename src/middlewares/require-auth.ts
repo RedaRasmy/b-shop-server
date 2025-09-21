@@ -3,7 +3,8 @@ import jwt from 'jsonwebtoken'
 
 export const requireAuth = (requiredRole?: 'admin') => {
   return (req: Request, res: Response, next: NextFunction) => {
-    const token = req.headers.authorization?.split(' ')[1];
+    // const token = req.headers.authorization?.split(' ')[1];
+    const token = req.cookies.accessToken
     
     if (!token) {
       return res.status(401).json({ error: 'Login required' });

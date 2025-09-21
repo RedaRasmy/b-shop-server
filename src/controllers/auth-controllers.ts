@@ -1,7 +1,12 @@
 import type { Request, Response, NextFunction } from 'express'
 import { db } from '../db'
 import { users } from '../db/schemas'
-import { comparePassword, generateTokens, hashPassword } from '../utils/auth'
+import {
+  comparePassword,
+  generateTokens,
+  hashPassword,
+  revokeRefreshToken,
+} from '../utils/auth'
 
 export type EmailPassword = {
   email: string
@@ -116,7 +121,24 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 
 export function refresh() {}
 
-export function logout() {}
+export async function logout(req: Request, res: Response, next: NextFunction) {
+  const refreshToken = req.cookies.refreshToken
+
+  try {
+    if (refreshToken) {
+      await revokeRefreshToken(refreshToken)
+    }
+
+    res.clearCookie('accessToken', { path: '/' })
+    res.clearCookie('refreshToken', { path: '/api/auth/refresh' })
+
+    res.status(200).json({
+      message: 'User logged out successfully',
+    })
+  } catch (err) {
+    next(err)
+  }
+}
 
 function isUniqueConstraintError(error: unknown): boolean {
   return (
