@@ -18,12 +18,12 @@ export const comparePassword = async (
 }
 
 // Generate Access Token (short-lived)
-export const generateAccessToken = (userId: string, role: string): string => {
+export const generateAccessToken = (userId: string , email : string , role: string): string => {
   return jwt.sign(
     {
       userId,
       role,
-      type: 'access', // Token type identifier
+      email
     },
     process.env.JWT_ACCESS_SECRET!,
     { expiresIn: '15m' }, // 15 minutes
@@ -46,9 +46,9 @@ const generateRefreshToken = async (userId: string) => {
 }
 
 // Generate both tokens at once
-export const generateTokens = (userId: string, role: string) => {
+export const generateTokens = (userId: string , email : string , role: string) => {
   return {
-    accessToken: generateAccessToken(userId, role),
+    accessToken: generateAccessToken(userId , email , role),
     refreshToken: generateRefreshToken(userId),
   }
 }
