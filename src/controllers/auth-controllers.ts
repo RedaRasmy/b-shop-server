@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express'
 import { db } from '../db'
 import { users } from '../db/schemas'
-import { generateTokens, hashPassword } from '../utils/auth'
+import { comparePassword, generateTokens, hashPassword } from '../utils/auth'
 
 export type EmailPassword = {
   email: string
@@ -64,7 +64,55 @@ export async function register(
   }
 }
 
-export function login() {}
+export async function login(req: Request, res: Response, next: NextFunction) {
+  const { email, password } = req.body
+
+  try {
+    // verify email & password
+    const user = await db.query.users.findFirst({
+      where: (users, { eq }) => eq(users.email, email),
+    })
+
+    if (!user) {
+      return res.status(401).json({ error: 'Email or password is incorrect' })
+    }
+
+    // verify password
+    const isPasswordCorrect = await comparePassword(password, user.password)
+    if (!isPasswordCorrect) {
+      return res.status(401).json({ error: 'Email or password is incorrect' })
+    }
+    const { accessToken, refreshToken } = await generateTokens(
+      user.id,
+      email,
+      user.role,
+    )
+
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 15 * 60 * 1000, // 15min,
+      sameSite: 'none',
+    })
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30days,
+      sameSite: 'none',
+      path: '/api/auth/refresh',
+    })
+
+    res.status(200).json({
+      user: {
+        id: user.id,
+        email: user.email,
+      },
+      message: 'User logged in successfully',
+    })
+  } catch (err) {
+    next(err)
+  }
+}
 
 export function refresh() {}
 
