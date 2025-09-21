@@ -46,10 +46,10 @@ const generateRefreshToken = async (userId: string) => {
 }
 
 // Generate both tokens at once
-export const generateTokens = (userId: string , email : string , role: string) => {
+export const generateTokens = async (userId: string , email : string , role: string) => {
   return {
     accessToken: generateAccessToken(userId , email , role),
-    refreshToken: generateRefreshToken(userId),
+    refreshToken: await generateRefreshToken(userId),
   }
 }
 
