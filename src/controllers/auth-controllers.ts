@@ -3,9 +3,11 @@ import { db } from '../db'
 import { users } from '../db/schemas'
 import {
   comparePassword,
+  generateAccessToken,
   generateTokens,
   hashPassword,
   revokeRefreshToken,
+  verifyRefreshToken,
 } from '../utils/auth'
 
 export type EmailPassword = {
@@ -119,7 +121,44 @@ export async function login(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export function refresh() {}
+export async function refresh(req: Request, res: Response, next: NextFunction) {
+  const refreshToken = req.cookies.refreshToken
+
+  try {
+    if (!refreshToken) {
+      return res.status(401).json({
+        message: 'Unauthorized , please log in',
+      })
+    }
+    const session = await verifyRefreshToken(refreshToken)
+
+    if (!session)
+      return res.status(401).json({
+        message: 'Unauthorized , please log in',
+      })
+
+    const user = session.user
+    const accessToken = generateAccessToken(user.id, user.email, user.role)
+
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 15 * 60 * 1000, // 15min,
+      sameSite: 'none',
+    })
+
+    res.status(200).json({
+      message: 'Access token regenerated successfully',
+      user: {
+        id: user.id,
+        email: user.email,
+        isEmailVerified: user.isEmailVerified,
+      },
+    })
+  } catch (err) {
+    next(err)
+  }
+}
 
 export async function logout(req: Request, res: Response, next: NextFunction) {
   const refreshToken = req.cookies.refreshToken
