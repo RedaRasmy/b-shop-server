@@ -11,7 +11,7 @@ export const requireAuth = (requiredRole?: 'admin') => {
     const token = req.cookies.accessToken
     
     if (!token) {
-      return res.status(401).json({ error: 'Login required' });
+      return res.status(401).json({ message: 'Login required' });
     }
 
     try {
@@ -25,12 +25,12 @@ export const requireAuth = (requiredRole?: 'admin') => {
 
       // Check role if specified
       if (requiredRole && decoded.role !== requiredRole) {
-        return res.status(403).json({ error: `${requiredRole} access required` });
+        return res.status(403).json({ message: `${requiredRole} access required` });
       }
 
       next();
     } catch (error) {
-      res.status(401).json({ error: 'Invalid token' });
+      res.status(401).json({ message: 'Invalid token' });
     }
   };
 };

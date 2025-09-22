@@ -81,13 +81,13 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     })
 
     if (!user) {
-      return res.status(401).json({ error: 'Email or password is incorrect' })
+      return res.status(401).json({ message: 'Email or password is incorrect' })
     }
 
     // verify password
     const isPasswordCorrect = await comparePassword(password, user.password)
     if (!isPasswordCorrect) {
-      return res.status(401).json({ error: 'Email or password is incorrect' })
+      return res.status(401).json({ message: 'Email or password is incorrect' })
     }
     const { accessToken, refreshToken } = await generateTokens(
       user.id,
