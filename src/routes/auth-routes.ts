@@ -9,7 +9,7 @@ router.post("/register",validateBody(emailPasswordSchema) , register )
 router.post("/login", validateBody(emailPasswordSchema) , login )
 router.post("/logout" , logout )
 router.post('/refresh' , refresh )
-router.post("/forgot-password")
-router.post('/reset-password')
+// router.post("/forgot-password")
+// router.post('/reset-password')
 
 export default router
