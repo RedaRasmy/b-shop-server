@@ -7,9 +7,14 @@ import authRoutes from './routes/auth-routes'
 import usersRoutes from './routes/user-routes'
 import adminRoutes from './routes/admin-routes'
 import { requireAuth } from './middlewares/require-auth'
+import cors from 'cors'
 
 const app: Express = express()
 
+app.use(cors({
+    origin : process.env.FRONTEND_URL,
+    credentials : true
+}))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
@@ -25,3 +30,5 @@ app.use(notFound)
 app.use(errorHandler)
 
 export default app
+
+
