@@ -64,7 +64,7 @@ export async function register(
     })
   } catch (err) {
     if (isUniqueConstraintError(err)) {
-      res.status(400).json({ error: 'Email already in use' })
+      res.status(400).json({ message: 'Email already in use' })
     } else {
       next(err)
     }
@@ -180,10 +180,13 @@ export async function logout(req: Request, res: Response, next: NextFunction) {
 }
 
 function isUniqueConstraintError(error: unknown): boolean {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    (error as any).code === '23505'
-  )
+  if (typeof error !== "object" || error === null) return false;
+
+  // Direct Postgres/Neon error
+  if ("code" in error && (error as any).code === "23505") return true;
+
+  // Wrapped inside drizzle cause
+  if ("cause" in error && (error as any).cause?.code === "23505") return true;
+
+  return false;
 }
