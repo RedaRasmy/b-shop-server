@@ -59,6 +59,8 @@ export async function register(
       user: {
         id: user.id,
         email: user.email,
+        isEmailVerified : user.isEmailVerified,
+        role : user.role
       },
       message: 'User registered and logged in successfully',
     })
@@ -113,6 +115,8 @@ export async function login(req: Request, res: Response, next: NextFunction) {
       user: {
         id: user.id,
         email: user.email,
+        isEmailVerified: user.isEmailVerified,
+        role: user.role,
       },
       message: 'User logged in successfully',
     })
@@ -153,6 +157,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
         id: user.id,
         email: user.email,
         isEmailVerified: user.isEmailVerified,
+        role: user.role,
       },
     })
   } catch (err) {
@@ -180,13 +185,13 @@ export async function logout(req: Request, res: Response, next: NextFunction) {
 }
 
 function isUniqueConstraintError(error: unknown): boolean {
-  if (typeof error !== "object" || error === null) return false;
+  if (typeof error !== 'object' || error === null) return false
 
   // Direct Postgres/Neon error
-  if ("code" in error && (error as any).code === "23505") return true;
+  if ('code' in error && (error as any).code === '23505') return true
 
   // Wrapped inside drizzle cause
-  if ("cause" in error && (error as any).cause?.code === "23505") return true;
+  if ('cause' in error && (error as any).cause?.code === '23505') return true
 
-  return false;
+  return false
 }
