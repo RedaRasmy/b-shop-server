@@ -46,13 +46,13 @@ export async function register(
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 15 * 60 * 1000, // 15min,
-      sameSite: 'none',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none'  : 'lax',
     })
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30days,
-      sameSite: 'none',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none'  : 'lax',
       path: '/api/auth/refresh',
     })
 
@@ -102,13 +102,13 @@ export async function login(req: Request, res: Response, next: NextFunction) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 15 * 60 * 1000, // 15min,
-      sameSite: 'none',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none'  : 'lax',
     })
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30days,
-      sameSite: 'none',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none'  : 'lax',
       path: '/api/auth/refresh',
     })
 
@@ -128,6 +128,8 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 
 export async function refresh(req: Request, res: Response, next: NextFunction) {
   const refreshToken = req.cookies.refreshToken
+
+  console.log('refresh token in refresh handler : ',refreshToken)
 
   try {
     if (!refreshToken) {
@@ -149,7 +151,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 15 * 60 * 1000, // 15min,
-      sameSite: 'none',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none'  : 'lax',
     })
 
     res.status(200).json({
@@ -195,7 +197,7 @@ export async function me(req: AuthRequest, res: Response, next: NextFunction) {
         isEmailVerified: true,
       },
     })
-
+    
     if (!dbUser) {
       return res.status(404).json({ message: 'User not found' })
     }

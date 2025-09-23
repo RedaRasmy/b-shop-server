@@ -16,7 +16,7 @@ router.post('/register', validateBody(emailPasswordSchema), register)
 router.post('/login', validateBody(emailPasswordSchema), login)
 router.post('/logout', logout)
 router.post('/refresh', refresh)
-router.get('/me', requireAuth(), me)
+router.get('/me', requireAuth() , me)
 // router.post("/forgot-password")
 // router.post('/reset-password')
 

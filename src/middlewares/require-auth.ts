@@ -1,8 +1,9 @@
 import type { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
+import { DecodedTokenPayload, verifyAccessToken } from '../utils/auth'
 
 export interface AuthRequest extends Request {
-  user?: { id: string; role: string; email: string };
+  user?: { id: string; role: string; email: string }
 }
 
 export const requireAuth = (requiredRole?: 'admin') => {
@@ -10,28 +11,26 @@ export const requireAuth = (requiredRole?: 'admin') => {
     // const token = req.headers.authorization?.split(' ')[1];
     // console.log('req.cookies in requireAuth : ',req.cookies)
     const token = req.cookies.accessToken
-    
+
     if (!token) {
-      return res.status(401).json({ message: 'Login required' });
+      return res.status(401).json({ message: 'Login required' })
     }
 
     try {
-      const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as {
-        id: string;
-        role: 'customer' | 'admin';
-        email: string;
-      };
-      
-      req.user = decoded;
+      const decoded = verifyAccessToken(token)
+
+      req.user = decoded
 
       // Check role if specified
       if (requiredRole && decoded.role !== requiredRole) {
-        return res.status(403).json({ message: `${requiredRole} access required` });
+        return res
+          .status(403)
+          .json({ message: `${requiredRole} access required` })
       }
 
-      next();
+      next()
     } catch (error) {
-      res.status(401).json({ message: 'Invalid token' });
+      res.status(401).json({ message: 'Invalid token' })
     }
-  };
-};
+  }
+}

@@ -5,6 +5,12 @@ import { db } from '../db'
 import refreshTokens from '../db/schemas/refresh-token-schema'
 import { eq } from 'drizzle-orm'
 
+export type DecodedTokenPayload = {
+  id : string,
+  role : string,
+  email : string
+}
+
 export const hashPassword = async (password: string): Promise<string> => {
   const salt = await bcrypt.genSalt(12)
   return bcrypt.hash(password, salt)
@@ -21,7 +27,7 @@ export const comparePassword = async (
 export const generateAccessToken = (userId: string , email : string , role: string): string => {
   return jwt.sign(
     {
-      userId,
+      id : userId,
       role,
       email
     },
@@ -53,10 +59,13 @@ export const generateTokens = async (userId: string , email : string , role: str
   }
 }
 
-// // Verify Access Token
-// export const verifyAccessToken = async (token:string) => {
-//   const decoded = jwt.verify(token,process.env.JWT_ACCESS_TOKEN!) 
-// }
+// Verify Access Token
+export const verifyAccessToken = (token:string) => {
+  return jwt.verify(
+        token,
+        process.env.JWT_ACCESS_SECRET!,
+      ) as DecodedTokenPayload
+}
 
 // Verify Refresh Token
 export const verifyRefreshToken = async (token: string) => {
