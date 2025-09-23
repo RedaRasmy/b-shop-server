@@ -9,6 +9,7 @@ import {
   revokeRefreshToken,
   verifyRefreshToken,
 } from '../utils/auth'
+import { AuthRequest } from '../middlewares/require-auth'
 
 export type EmailPassword = {
   email: string
@@ -59,8 +60,8 @@ export async function register(
       user: {
         id: user.id,
         email: user.email,
-        isEmailVerified : user.isEmailVerified,
-        role : user.role
+        isEmailVerified: user.isEmailVerified,
+        role: user.role,
       },
       message: 'User registered and logged in successfully',
     })
@@ -178,6 +179,32 @@ export async function logout(req: Request, res: Response, next: NextFunction) {
 
     res.status(200).json({
       message: 'User logged out successfully',
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+export async function me(req: AuthRequest, res: Response, next: NextFunction) {
+  const user = req.user!
+
+  try {
+    const dbUser = await db.query.users.findFirst({
+      where: (users, { eq }) => eq(users.id, user.id),
+      columns: {
+        isEmailVerified: true,
+      },
+    })
+
+    if (!dbUser) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    res.status(200).json({
+      user: {
+        ...user,
+        isEmailVerified : dbUser.isEmailVerified,
+      },
     })
   } catch (err) {
     next(err)

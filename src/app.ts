@@ -8,9 +8,11 @@ import usersRoutes from './routes/user-routes'
 import adminRoutes from './routes/admin-routes'
 import { requireAuth } from './middlewares/require-auth'
 import cors from 'cors'
+import cookieParser from 'cookie-parser'
 
 const app: Express = express()
 
+app.use(cookieParser())
 app.use(cors({
     origin : process.env.FRONTEND_URL,
     credentials : true

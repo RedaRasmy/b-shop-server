@@ -232,7 +232,6 @@ export const updateProduct = async (
     });
 
   } catch (error) {
-    console.error('Update product error:', error);
     next({ message: 'Failed to update product', status: 500 });
   }
 };

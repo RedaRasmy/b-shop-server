@@ -53,7 +53,12 @@ export const generateTokens = async (userId: string , email : string , role: str
   }
 }
 
-// Verify Access Token
+// // Verify Access Token
+// export const verifyAccessToken = async (token:string) => {
+//   const decoded = jwt.verify(token,process.env.JWT_ACCESS_TOKEN!) 
+// }
+
+// Verify Refresh Token
 export const verifyRefreshToken = async (token: string) => {
   const refreshToken = await db.query.refreshTokens.findFirst({
     where: (refreshTokens, { and, eq, gt }) =>

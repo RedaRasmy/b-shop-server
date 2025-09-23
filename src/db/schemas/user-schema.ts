@@ -6,7 +6,7 @@ const users = pgTable('users', {
   email: varchar('email', { length: 255 }).notNull().unique(),
   password: varchar('password', { length: 255 }).notNull(),
   role: varchar('role', { length: 20 }).default('customer').notNull(), // customer, admin
-  isEmailVerified: boolean('is_email_verified').default(false),
+  isEmailVerified: boolean('is_email_verified').default(false).notNull(),
   createdAt,
   updatedAt,
 });

@@ -43,6 +43,13 @@
       "when": 1758401190300,
       "tag": "0005_magenta_sabretooth",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1758625708338,
+      "tag": "0006_wise_sunspot",
+      "breakpoints": true
     }
   ]
 }

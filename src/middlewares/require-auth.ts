@@ -1,13 +1,14 @@
 import type { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 
-interface AuthRequest extends Request {
-  user?: { userId: string; role: string; email: string };
+export interface AuthRequest extends Request {
+  user?: { id: string; role: string; email: string };
 }
 
 export const requireAuth = (requiredRole?: 'admin') => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     // const token = req.headers.authorization?.split(' ')[1];
+    // console.log('req.cookies in requireAuth : ',req.cookies)
     const token = req.cookies.accessToken
     
     if (!token) {
@@ -16,7 +17,7 @@ export const requireAuth = (requiredRole?: 'admin') => {
 
     try {
       const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as {
-        userId: string;
+        id: string;
         role: 'customer' | 'admin';
         email: string;
       };
