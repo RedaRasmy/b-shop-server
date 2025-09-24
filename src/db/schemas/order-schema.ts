@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, integer, pgEnum } from 'drizzle-orm/pg-core'
+import { pgTable, uuid, text, integer, pgEnum, serial } from 'drizzle-orm/pg-core'
 import { createdAt, updatedAt } from '../timestamps'
 import {
   relations,
@@ -18,7 +18,7 @@ export const orderStatus = pgEnum('order_status', [
 export const paymentMethod = pgEnum('payment_method', ['COD', 'card'])
 
 const orders = pgTable('orders', {
-  id: uuid().primaryKey().defaultRandom(),
+  id: serial().primaryKey(),
   userId: uuid('user_id').references(() => users.id),
   status: orderStatus().default('pending').notNull(),
   total: integer().notNull(),
