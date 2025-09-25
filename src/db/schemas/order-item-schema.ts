@@ -8,7 +8,7 @@ import { orders, products } from '.'
 
 const orderItems = pgTable('order_items', {
   id: uuid().primaryKey().defaultRandom(),
-  orderId: uuid('order_id').references(() => orders.id),
+  orderId: integer('order_id').references(() => orders.id),
   productId: uuid('product_id').references(() => products.id),
   quantity: integer().notNull().default(1),
   priceAtPurchase: integer('price_at_purchase').notNull(),

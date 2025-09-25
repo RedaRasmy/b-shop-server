@@ -1,7 +1,7 @@
 import { pgTable, uuid, text, integer } from 'drizzle-orm/pg-core'
 import { createdAt, updatedAt } from '../timestamps'
 import { relations, type InferInsertModel , type InferSelectModel} from 'drizzle-orm'
-import { categories , images } from '.'
+import { categories , images, reviews } from '.'
 import type { UnusedAttributes } from '../../lib/types'
 
 const products = pgTable('products', {
@@ -22,7 +22,8 @@ export const productsRelations = relations(products,({one,many})=>({
     fields : [products.categorieId],
     references: [categories.id]
    }),
-   images : many(images)
+   images : many(images),
+   reviews : many(reviews)
 }))
 
 

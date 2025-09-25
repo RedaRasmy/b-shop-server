@@ -1,5 +1,7 @@
-import { boolean, pgTable, uuid, varchar } from "drizzle-orm/pg-core";
-import { createdAt, updatedAt } from "../timestamps";
+import { boolean, pgTable, uuid, varchar } from 'drizzle-orm/pg-core'
+import { createdAt, updatedAt } from '../timestamps'
+import { relations } from 'drizzle-orm'
+import reviews from './review-schema'
 
 const users = pgTable('users', {
   id: uuid().primaryKey().defaultRandom(),
@@ -9,6 +11,10 @@ const users = pgTable('users', {
   isEmailVerified: boolean('is_email_verified').default(false).notNull(),
   createdAt,
   updatedAt,
-});
+})
 
 export default users
+
+export const usersRelations = relations(users, ({ many }) => ({
+  reviews: many(reviews),
+}))
