@@ -134,14 +134,14 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
   try {
     if (!refreshToken) {
       return res.status(401).json({
-        message: 'Unauthorized , please log in',
+        message: 'Refresh token not provided',
       })
     }
     const session = await verifyRefreshToken(refreshToken)
 
     if (!session)
       return res.status(401).json({
-        message: 'Unauthorized , please log in',
+        message: 'Invalid refresh token',
       })
 
     const user = session.user

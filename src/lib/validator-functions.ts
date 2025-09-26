@@ -11,7 +11,7 @@ export function validateIdParam() {
     } catch (error) {
       if (error instanceof z.ZodError) {
         res.status(400).json({
-          error: 'Invalid ID parameter',
+          message: 'Invalid ID parameter',
           details: error.issues
         });
       } else {
@@ -34,7 +34,7 @@ export const validateBody = (schema: z.ZodSchema) => {
     } catch (error) {
       if (error instanceof z.ZodError) {
         res.status(400).json({
-          error: 'Validation failed',
+          message: 'Validation failed',
           details: error.issues
         });
       } else {
