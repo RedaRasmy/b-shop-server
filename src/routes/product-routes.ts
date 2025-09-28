@@ -6,15 +6,20 @@ import {
   getProductById,
   getProducts,
 } from '../controllers/product-controllers'
-import { validateBody, validateIdParam } from '../lib/validator-functions'
+import {
+  validateBody,
+  validateIdParam,
+  validateQuery,
+} from '../lib/validator-functions'
 import { insertFullProductSchema } from '../db/zod-schemas'
 import { upload } from '../lib/upload'
 import { requireAuth } from '../middlewares/require-auth'
+import { getProductsQuerySchema } from '../validation/get-products-query-schema'
 
 const router: Router = Router()
 
-// public 
-router.get('/', getProducts)
+// public
+router.get('/', validateQuery(getProductsQuerySchema), getProducts)
 router.get('/:id', validateIdParam(), getProductById)
 
 // protected

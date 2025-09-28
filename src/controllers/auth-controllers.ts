@@ -129,8 +129,6 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 export async function refresh(req: Request, res: Response, next: NextFunction) {
   const refreshToken = req.cookies.refreshToken
 
-  console.log('refresh token in refresh handler : ',refreshToken)
-
   try {
     if (!refreshToken) {
       return res.status(401).json({

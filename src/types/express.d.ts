@@ -9,6 +9,7 @@ declare global {
         role: string;
         email: string;
       };
+      validatedQuery? : any
     }
   }
 }

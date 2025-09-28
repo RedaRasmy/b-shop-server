@@ -1,9 +1,16 @@
 import type { Request, Response, NextFunction } from 'express'
 import { db } from '../db'
 import { images, products } from '../db/schemas'
-import { eq } from 'drizzle-orm'
+import { and, asc, count, desc, eq, ilike } from 'drizzle-orm'
 import type { IFullProduct } from '../lib/types'
-import { deleteImage, deleteMultipleImages, uploadMultipleImages } from '../lib/cloudinary'
+import {
+  deleteImage,
+  deleteMultipleImages,
+  uploadMultipleImages,
+} from '../lib/cloudinary'
+import { isString } from '../utils/is-string'
+import { IProduct } from '../db/schemas/product-schema'
+import { GetProductsQuery } from '../validation/get-products-query-schema'
 
 // Add one product
 export const addProduct = async (
@@ -62,8 +69,8 @@ export const addProduct = async (
             id: img.id,
             url: img.url,
             alt: img.alt,
-            position : img.position,
-          }))
+            position: img.position,
+          })),
         },
       })
     })
@@ -72,31 +79,65 @@ export const addProduct = async (
   }
 }
 
-// Read all products
 export const getProducts = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const { categorieId } = req.query
-    if (categorieId && typeof categorieId === 'string') {
-      const categorieProducts = await db.query.products.findMany({
-        where: (products, { eq }) => eq(products.categorieId, categorieId),
-        with: {
-          images: true 
-        },
-      })
-      res.status(200).json(categorieProducts)
-    } else {
-      const allProducts = await db.query.products.findMany({
-        with: {
-          images: true,
-        },
-      })
-      res.status(200).json(allProducts)
+    const { page, perPage, search, categoryId, sort } = req.validatedQuery as GetProductsQuery
+
+    // Filtering conditions
+    const where = (products: any, { eq, ilike, and }: any) => {
+      const filters = []
+      if (categoryId)
+        filters.push(eq(products.categorieId, categoryId))
+      if (search) filters.push(ilike(products.name, `%${search}%`))
+      return filters.length ? and(...filters) : undefined
     }
-  } catch {
+
+    // Sorting
+    let orderBy: any
+    if (isString(sort)) {
+      const [field, direction] = sort.split(':') as [
+        keyof IProduct,
+        'asc' | 'desc',
+      ]
+      orderBy =
+        direction.toLowerCase() === 'asc'
+          ? asc(products[field])
+          : desc(products[field])
+    }
+
+    // Fetch current page
+    const filteredProducts = await db.query.products.findMany({
+      where,
+      with: { images: true },
+      limit: perPage,
+      offset: (page - 1) * perPage,
+      orderBy,
+    })
+
+    let totalCount: number | null = null
+    let totalPages: number | null = null
+
+    // Only compute total when page = 1
+    if (page === 1) {
+      const [{ totalCount }] = await db
+        .select({ totalCount: count() })
+        .from(products)
+        .where(where(products,{eq,ilike,and}))
+      totalPages = Math.ceil(totalCount / perPage)
+    }
+
+    res.json({
+      data: filteredProducts,
+      page,
+      perPage,
+      total: totalCount,
+      totalPages,
+    })
+  } catch (err) {
     next({ message: 'Failed to fetch products', status: 500 })
   }
 }
@@ -130,15 +171,15 @@ export const deleteProduct = async (
     const productId = req.params.id!
     await db.transaction(async (tx) => {
       const productImages = await tx.query.images.findMany({
-        where : (images,{eq})=> eq(images.productId,productId)
+        where: (images, { eq }) => eq(images.productId, productId),
       })
-      productImages.forEach(async (img)=> {
+      productImages.forEach(async (img) => {
         await deleteImage(img.publicId!)
       })
-      
+
       await tx.delete(products).where(eq(products.id, productId))
       await tx.delete(images).where(eq(images.productId, productId))
-      
+
       res.status(200).json({ productId })
     })
   } catch {
@@ -152,42 +193,42 @@ export const updateProduct = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const productId = req.params.id!;
+  const productId = req.params.id!
 
   try {
     // Step 1: Delete existing product (this handles Cloudinary cleanup)
     await db.transaction(async (tx) => {
       // Get and delete images from Cloudinary
       const productImages = await tx.query.images.findMany({
-        where: (images, { eq }) => eq(images.productId, productId)
-      });
+        where: (images, { eq }) => eq(images.productId, productId),
+      })
 
       // Delete images from Cloudinary
-      await deleteMultipleImages(productImages.map(img=>img.publicId!))
+      await deleteMultipleImages(productImages.map((img) => img.publicId!))
 
       // Delete from database
-      await tx.delete(images).where(eq(images.productId, productId));
-      await tx.delete(products).where(eq(products.id, productId));
-    });
+      await tx.delete(images).where(eq(images.productId, productId))
+      await tx.delete(products).where(eq(products.id, productId))
+    })
 
     // Step 2: Create new product with the same ID
-    const { images: productImages, ...productData }: IFullProduct = req.body;
+    const { images: productImages, ...productData }: IFullProduct = req.body
 
     // Validation (same as addProduct)
     if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
       return res.status(400).json({
         error: 'At least one product image is required',
-      });
+      })
     }
 
     if (productImages.length !== req.files.length) {
       return res.status(400).json({
         error: 'Image metadata must match number of uploaded files',
-      });
+      })
     }
 
     // Upload new files
-    const uploadedFiles = await uploadMultipleImages(req.files, 'products');
+    const uploadedFiles = await uploadMultipleImages(req.files, 'products')
 
     await db.transaction(async (tx) => {
       // Insert product with the SAME ID to keep URLs working
@@ -197,7 +238,7 @@ export const updateProduct = async (
           ...productData,
           id: productId, // Keep same ID
         })
-        .returning();
+        .returning()
 
       // Insert new images
       const imageData = uploadedFiles.map((uploadResult, index) => ({
@@ -210,12 +251,12 @@ export const updateProduct = async (
         height: uploadResult.height,
         format: uploadResult.format,
         size: uploadResult.bytes,
-      }));
+      }))
 
       const insertedImages = await tx
         .insert(images)
         .values(imageData)
-        .returning();
+        .returning()
 
       res.status(200).json({
         message: 'Product updated successfully',
@@ -226,12 +267,11 @@ export const updateProduct = async (
             url: img.url,
             alt: img.alt,
             position: img.position,
-          }))
+          })),
         },
-      });
-    });
-
+      })
+    })
   } catch (error) {
-    next({ message: 'Failed to update product', status: 500 });
+    next({ message: 'Failed to update product', status: 500 })
   }
-};
+}
