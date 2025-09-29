@@ -3,20 +3,22 @@ import { z } from 'zod'
 
 const idParamSchema = z.string().uuid()
 
-export function validateIdParam() {
-  return (req: Request, res: Response, next: NextFunction) => {
-    try {
-      idParamSchema.parse(req.params.id)
-      next()
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        res.status(400).json({
-          message: 'Invalid ID parameter',
-          details: error.issues,
-        })
-      } else {
-        next(error)
-      }
+export function validateIdParam(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    idParamSchema.parse(req.params.id)
+    next()
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      res.status(400).json({
+        message: 'Invalid ID parameter',
+        details: error.issues,
+      })
+    } else {
+      next(error)
     }
   }
 }
@@ -60,17 +62,17 @@ export const validateBody = (schema: z.ZodSchema) => {
 export const validateQuery = (schema: z.ZodSchema) => {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
-      req.validatedQuery = schema.parse(req.query);
-      next();
+      req.validatedQuery = schema.parse(req.query)
+      next()
     } catch (error) {
       if (error instanceof z.ZodError) {
         res.status(400).json({
           message: 'Invalid query params',
           details: error.issues,
-        });
+        })
       } else {
-        next(error);
+        next(error)
       }
     }
-  };
-};
+  }
+}

@@ -1,5 +1,21 @@
 import type { Request, Response, NextFunction } from 'express'
-import { db } from '../../db'
+import { db } from '@/db'
+import { categories } from '@/db/schema'
+import { eq } from 'drizzle-orm'
+
+// Add one product
+export const addCategory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const [categorie] = await db.insert(categories).values(req.body).returning()
+    res.status(201).json({ categorie })
+  } catch {
+    next({ message: 'Failed to add categorie', status: 500 })
+  }
+}
 
 // Read all products
 export const getCategories = async (
@@ -28,6 +44,43 @@ export const getCategoryById = async (
     res.status(200).json({ categorie })
   } catch {
     next({ message: 'Failed to fetch categorie', status: 500 })
+  }
+}
+
+// Update a product
+export const updateCategory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const categorie = await db
+      .update(categories)
+      .set(req.body)
+      .where(eq(categories.id, req.params.id!))
+      .returning()
+    res.status(201).json({ categorie })
+  } catch {
+    next({ message: 'Failed to update categorie', status: 500 })
+  }
+}
+
+// Delete a categorie
+export const deleteCategory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const [categorie] = await db
+      .delete(categories)
+      .where(eq(categories.id, req.params.id!))
+      .returning({
+        id: categories.id,
+      })
+    res.status(200).json({ productId: categorie?.id })
+  } catch {
+    next({ message: 'Failed to delete categorie', status: 500 })
   }
 }
 

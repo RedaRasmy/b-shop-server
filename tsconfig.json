@@ -33,7 +33,7 @@
       "@/*" : ["src/*"]
     },
   },
-  "include": ["src"],
+  "include": ["src", "src/features/products/admin/controller.ts"],
   "exclude": ["node_modules", "dist"],
   
 }

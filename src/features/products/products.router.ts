@@ -1,43 +1,11 @@
 import { Router } from 'express'
-import {
-  addProduct,
-  deleteProduct,
-  updateProduct,
-  getProductById,
-  getProducts,
-} from './products.controller'
-import {
-  validateBody,
-  validateIdParam,
-  validateQuery,
-} from '@/middlewares/validators'
-import { insertFullProductSchema } from './products.validation'
-import { upload } from '@/lib/upload'
-import { requireAuth } from '@/middlewares/require-auth'
+import * as controller from './products.controller'
+import { validateIdParam, validateQuery } from '@/middlewares/validators'
 import { getProductsQuerySchema } from './products.validation'
 
 const router: Router = Router()
 
-// public
-router.get('/', validateQuery(getProductsQuerySchema), getProducts)
-router.get('/:id', validateIdParam(), getProductById)
+router.get('/', validateQuery(getProductsQuerySchema), controller.getProducts)
+router.get('/:id', validateIdParam , controller.getProductById)
 
-// protected (admin)
-router.post(
-  '/',
-  requireAuth('admin'),
-  upload.array('images', 5),
-  validateBody(insertFullProductSchema),
-  addProduct,
-)
-router.put(
-  '/:id',
-  requireAuth('admin'),
-  upload.array('images', 5),
-  validateIdParam(),
-  validateBody(insertFullProductSchema),
-  updateProduct,
-)
-router.delete('/:id', requireAuth('admin'), validateIdParam(), deleteProduct)
-
-export default router
+export const productsRouter = router

@@ -6,4 +6,4 @@ const router:Router = Router()
 // router.put("/profile")
 // router.delete("/account")
 
-export default router
+export const usersRouter = router
