@@ -4,13 +4,14 @@ import { notFound } from './middlewares/not-found'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import {router} from './routes'
+import config from '@config/config'
 
 const app = express()
 
 app.use(cookieParser())
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: config.FRONTEND_URL ,
     credentials: true,
   }),
 )

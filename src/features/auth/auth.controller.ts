@@ -10,6 +10,7 @@ import {
   verifyRefreshToken,
 } from '../../utils/auth'
 import { AuthRequest } from '../../middlewares/require-auth'
+import config from '@config/config'
 
 export type EmailPassword = {
   email: string
@@ -44,15 +45,15 @@ export async function register(
 
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: config.nodeEnv === 'production',
       maxAge: 15 * 60 * 1000, // 15min,
-      sameSite: process.env.NODE_ENV === 'production' ? 'none'  : 'lax',
+      sameSite: config.nodeEnv === 'production' ? 'none'  : 'lax',
     })
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: config.nodeEnv === 'production',
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30days,
-      sameSite: process.env.NODE_ENV === 'production' ? 'none'  : 'lax',
+      sameSite: config.nodeEnv === 'production' ? 'none'  : 'lax',
       path: '/api/auth/refresh',
     })
 
@@ -100,15 +101,15 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: config.nodeEnv === 'production',
       maxAge: 15 * 60 * 1000, // 15min,
-      sameSite: process.env.NODE_ENV === 'production' ? 'none'  : 'lax',
+      sameSite: config.nodeEnv === 'production' ? 'none'  : 'lax',
     })
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: config.nodeEnv === 'production',
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30days,
-      sameSite: process.env.NODE_ENV === 'production' ? 'none'  : 'lax',
+      sameSite: config.nodeEnv === 'production' ? 'none'  : 'lax',
       path: '/api/auth/refresh',
     })
 
@@ -147,9 +148,9 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
 
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: config.nodeEnv === 'production',
       maxAge: 15 * 60 * 1000, // 15min,
-      sameSite: process.env.NODE_ENV === 'production' ? 'none'  : 'lax',
+      sameSite: config.nodeEnv === 'production' ? 'none'  : 'lax',
     })
 
     res.status(200).json({

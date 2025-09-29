@@ -4,11 +4,12 @@ import crypto from 'crypto'
 import { db } from '../db'
 import { refreshTokens } from '../db/schema'
 import { eq } from 'drizzle-orm'
+import config from '@config/config'
 
 export type DecodedTokenPayload = {
-  id : string,
-  role : string,
-  email : string
+  id: string
+  role: string
+  email: string
 }
 
 export const hashPassword = async (password: string): Promise<string> => {
@@ -24,14 +25,18 @@ export const comparePassword = async (
 }
 
 // Generate Access Token (short-lived)
-export const generateAccessToken = (userId: string , email : string , role: string): string => {
+export const generateAccessToken = (
+  userId: string,
+  email: string,
+  role: string,
+): string => {
   return jwt.sign(
     {
-      id : userId,
+      id: userId,
       role,
-      email
+      email,
     },
-    process.env.JWT_ACCESS_SECRET!,
+    config.JWT_ACCESS_SECRET,
     { expiresIn: '15m' }, // 15 minutes
   )
 }
@@ -52,19 +57,23 @@ const generateRefreshToken = async (userId: string) => {
 }
 
 // Generate both tokens at once
-export const generateTokens = async (userId: string , email : string , role: string) => {
+export const generateTokens = async (
+  userId: string,
+  email: string,
+  role: string,
+) => {
   return {
-    accessToken: generateAccessToken(userId , email , role),
+    accessToken: generateAccessToken(userId, email, role),
     refreshToken: await generateRefreshToken(userId),
   }
 }
 
 // Verify Access Token
-export const verifyAccessToken = (token:string) => {
+export const verifyAccessToken = (token: string) => {
   return jwt.verify(
-        token,
-        process.env.JWT_ACCESS_SECRET!,
-      ) as DecodedTokenPayload
+    token,
+    config.JWT_ACCESS_SECRET,
+  ) as DecodedTokenPayload
 }
 
 // Verify Refresh Token
