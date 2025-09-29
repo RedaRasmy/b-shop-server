@@ -1,9 +1,9 @@
-import { Prettify } from "@/lib/types"
+import { Prettify } from "@lib/types"
 import type { NextFunction , Request ,Response } from "express"
 import products, { IProduct } from "../tables/products.table"
 import images, { Image } from "../tables/product-images.table"
-import { deleteImage, deleteMultipleImages, uploadMultipleImages } from "@/lib/cloudinary"
-import { db } from "@/db"
+import { deleteImage, deleteMultipleImages, uploadMultipleImages } from "@lib/cloudinary"
+import { db } from "@db/index"
 import { eq } from "drizzle-orm"
 
 

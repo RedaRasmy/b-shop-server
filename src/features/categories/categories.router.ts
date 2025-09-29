@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import * as controller from './categories.controller'
-import { validateIdParam } from '@/middlewares/validators'
+import { validateIdParam } from '@mw/validators'
 
 const router: Router = Router()
 

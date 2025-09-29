@@ -2,10 +2,10 @@ import { Router } from 'express'
 import { requireAuth } from '@mw/require-auth'
 import { productsRouter } from '@products/products.router'
 import { categoriesRouter } from './features/categories/categories.router'
-import { authRouter } from './features/auth/auth.router'
-import { usersRouter } from './features/users/users.router'
 import { categoriesAdminRouter } from './features/categories/admin/router'
 import { productsAdminRouter } from './features/products/admin/router'
+import { authRouter } from '@auth/auth.router'
+import { usersRouter } from '@users/users.router'
 
 export const router = Router()
 

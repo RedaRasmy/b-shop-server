@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "node -r module-alias/register dist/server.js",
     "dev": "nodemon -r tsconfig-paths/register --exec ts-node --files src/server.ts",
     "lint": "eslint 'src/**/*.ts'",
     "test": "jest",
@@ -52,12 +52,12 @@
     "typescript": "^5.9.2"
   },
   "_moduleAliases": {
-    "@": "dist", 
+    "@lib" : "dist/lib",
     "@mw": "dist/middlewares",
     "@utils": "dist/utils",
     "@config": "dist/config",
     "@db": "dist/db",
-    "@tables": "dist/db/schema.js", 
+    "@tables": "dist/db/schema.js",
     "@auth": "dist/features/auth",
     "@users": "dist/features/users",
     "@products": "dist/features/products",

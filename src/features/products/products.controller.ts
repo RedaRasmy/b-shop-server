@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express'
-import { db } from '@/db'
-import { products } from '@/db/schema'
+import { db } from '@db/index'
+import { products } from '@tables'
 import { and, asc, count, desc, eq, ilike } from 'drizzle-orm'
 import { IProduct } from './tables/products.table'
 import { GetProductsQuery } from './products.validation'

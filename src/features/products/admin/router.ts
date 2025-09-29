@@ -1,11 +1,11 @@
 import { Router } from 'express'
 import * as adminController from './controller'
-import { upload } from '@/lib/upload'
+import { upload } from '@lib/upload'
 import {
   validateBody,
   validateIdParam,
   validateQuery,
-} from '@/middlewares/validators'
+} from '@mw/validators'
 import {
   getProductsQuerySchema,
   insertFullProductSchema,

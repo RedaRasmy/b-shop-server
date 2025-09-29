@@ -30,19 +30,25 @@
     // Path aliases
     "baseUrl": ".",
     "paths": {
-      "@/*" : ["src/*"],
-      "@mw/*" : ["src/middlewares/*"],
-      "@utils/*" : ["src/utils/*"],
-      "@db/*" : ["src/db/*"],
-      "@tables" : ["src/db/schema.ts"],
-      "@config/*" : ["src/config/*"],
-      "@auth/*" : ["src/features/auth/*"],
-      "@users/*" : ["src/features/users/*"],
-      "@products/*" : ["src/features/products/*"],
-      "@categories/*" : ["src/features/categories/*"],
-      "@orders/*" : ["src/features/orders/*"]
-    },
+      "@lib/*" : ["src/lib/*"],
+      "@mw/*": ["src/middlewares/*"],
+      "@utils/*": ["src/utils/*"],
+      "@db/*": ["src/db/*"],
+      "@tables": ["src/db/schema.ts"],
+      "@config/*": ["src/config/*"],
+      "@auth/*": ["src/features/auth/*"],
+      "@users/*": ["src/features/users/*"],
+      "@products/*": ["src/features/products/*"],
+      "@categories/*": ["src/features/categories/*"],
+      "@orders/*": ["src/features/orders/*"]
+    }
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"],
+
+  "ts-node": {
+    "require": ["tsconfig-paths/register"],
+    // IMPORTANT: When running source files, the project root is the source.
+    "project": "./tsconfig.json"
+  }
 }

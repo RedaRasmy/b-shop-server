@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express'
-import { db } from '@/db'
-import { categories } from '@/db/schema'
+import { db } from '@db/index'
+import { categories } from '@db/schema'
 import { eq } from 'drizzle-orm'
 
 // Add one product

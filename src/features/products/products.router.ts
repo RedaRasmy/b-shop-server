@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import * as controller from './products.controller'
-import { validateIdParam, validateQuery } from '@/middlewares/validators'
+import { validateIdParam, validateQuery } from '@mw/validators'
 import { getProductsQuerySchema } from './products.validation'
 
 const router: Router = Router()
