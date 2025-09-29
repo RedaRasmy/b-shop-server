@@ -5,13 +5,8 @@ import { and, asc, count, desc, eq, ilike } from 'drizzle-orm'
 import { IProduct } from './tables/products.table'
 import { GetProductsQuery } from './products.validation'
 
-
-interface PRequest extends Request {
-    validatedQuery?: any
-}
-
 export const getProducts = async (
-  req: PRequest,
+  req: Request,
   res: Response,
   next: NextFunction,
 ) => {
@@ -89,4 +84,3 @@ export const getProductById = async (
     next({ message: 'Failed to fetch product', status: 500 })
   }
 }
-
