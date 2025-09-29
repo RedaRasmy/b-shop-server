@@ -52,6 +52,16 @@
     "typescript": "^5.9.2"
   },
   "_moduleAliases": {
-    "@": "dist"
+    "@": "dist", 
+    "@mw": "dist/middlewares",
+    "@utils": "dist/utils",
+    "@config": "dist/config",
+    "@db": "dist/db",
+    "@tables": "dist/db/schema.js", 
+    "@auth": "dist/features/auth",
+    "@users": "dist/features/users",
+    "@products": "dist/features/products",
+    "@categories": "dist/features/categories",
+    "@orders": "dist/features/orders"
   }
 }

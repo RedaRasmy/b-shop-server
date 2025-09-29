@@ -27,13 +27,22 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
 
-    // path alias
+    // Path aliases
     "baseUrl": ".",
     "paths": {
-      "@/*" : ["src/*"]
+      "@/*" : ["src/*"],
+      "@mw/*" : ["src/middlewares/*"],
+      "@utils/*" : ["src/utils/*"],
+      "@db/*" : ["src/db/*"],
+      "@tables" : ["src/db/schema.ts"],
+      "@config/*" : ["src/config/*"],
+      "@auth/*" : ["src/features/auth/*"],
+      "@users/*" : ["src/features/users/*"],
+      "@products/*" : ["src/features/products/*"],
+      "@categories/*" : ["src/features/categories/*"],
+      "@orders/*" : ["src/features/orders/*"]
     },
   },
-  "include": ["src", "src/features/products/admin/controller.ts"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist"],
-  
 }

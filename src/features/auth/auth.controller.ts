@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express'
 import { db } from '../../db'
-import { users } from '../../db/schema'
+import {users} from '@tables'
 import {
   comparePassword,
   generateAccessToken,

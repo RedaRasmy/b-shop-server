@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { requireAuth } from './middlewares/require-auth'
-import { productsRouter } from './features/products/products.router'
+import { requireAuth } from '@mw/require-auth'
+import { productsRouter } from '@products/products.router'
 import { categoriesRouter } from './features/categories/categories.router'
 import { authRouter } from './features/auth/auth.router'
 import { usersRouter } from './features/users/users.router'
