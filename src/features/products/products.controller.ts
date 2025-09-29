@@ -1,16 +1,22 @@
 import type { Request, Response, NextFunction } from 'express'
-import { db } from '../db'
-import { images, products } from '../db/schemas'
+import { db } from '@/db'
+import { images, products } from '@/db/schema'
 import { and, asc, count, desc, eq, ilike } from 'drizzle-orm'
-import type { IFullProduct } from '../lib/types'
 import {
   deleteImage,
   deleteMultipleImages,
   uploadMultipleImages,
-} from '../lib/cloudinary'
-import { isString } from '../utils/is-string'
-import { IProduct } from '../db/schemas/product-schema'
-import { GetProductsQuery } from '../validation/get-products-query-schema'
+} from '../../lib/cloudinary'
+import { IProduct } from './tables/products.table'
+import { GetProductsQuery } from './products.validation'
+import { Prettify } from '@/lib/types'
+import { Image } from './tables/product-images.table'
+
+type IFullProduct = Prettify<
+  IProduct & {
+    images: Image[]
+  }
+>
 
 // Add one product
 export const addProduct = async (
@@ -79,35 +85,39 @@ export const addProduct = async (
   }
 }
 
+
+
+interface PRequest extends Request {
+    validatedQuery?: any
+}
+
 export const getProducts = async (
-  req: Request,
+  req: PRequest,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    const { page, perPage, search, categoryId, sort } = req.validatedQuery as GetProductsQuery
+    const { page, perPage, search, categoryId, sort } =
+      req.validatedQuery as GetProductsQuery
 
     // Filtering conditions
     const where = (products: any, { eq, ilike, and }: any) => {
       const filters = []
-      if (categoryId)
-        filters.push(eq(products.categorieId, categoryId))
+      if (categoryId) filters.push(eq(products.categorieId, categoryId))
       if (search) filters.push(ilike(products.name, `%${search}%`))
       return filters.length ? and(...filters) : undefined
     }
 
     // Sorting
     let orderBy: any
-    if (isString(sort)) {
-      const [field, direction] = sort.split(':') as [
-        keyof IProduct,
-        'asc' | 'desc',
-      ]
-      orderBy =
-        direction.toLowerCase() === 'asc'
-          ? asc(products[field])
-          : desc(products[field])
-    }
+    const [field, direction] = sort.split(':') as [
+      keyof IProduct,
+      'asc' | 'desc',
+    ]
+    orderBy =
+      direction.toLowerCase() === 'asc'
+        ? asc(products[field])
+        : desc(products[field])
 
     // Fetch current page
     const filteredProducts = await db.query.products.findMany({
@@ -126,7 +136,7 @@ export const getProducts = async (
       const [{ totalCount }] = await db
         .select({ totalCount: count() })
         .from(products)
-        .where(where(products,{eq,ilike,and}))
+        .where(where(products, { eq, ilike, and }))
       totalPages = Math.ceil(totalCount / perPage)
     }
 

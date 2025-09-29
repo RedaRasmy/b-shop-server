@@ -1,6 +1,5 @@
 import type { NextFunction, Request, Response } from 'express'
-import jwt from 'jsonwebtoken'
-import { DecodedTokenPayload, verifyAccessToken } from '../utils/auth'
+import { verifyAccessToken } from '../utils/auth'
 
 export interface AuthRequest extends Request {
   user?: { id: string; role: string; email: string }

@@ -1,11 +1,11 @@
 import { pgTable, uuid, integer, uniqueIndex, varchar } from 'drizzle-orm/pg-core'
-import { createdAt, updatedAt } from '../timestamps'
+import { createdAt,updatedAt } from '../../../db/timestamps'
 import {
   relations,
-  //   type InferInsertModel,
-  //   type InferSelectModel,
+    type InferInsertModel,
+    type InferSelectModel,
 } from 'drizzle-orm'
-import { products, users } from '.'
+import { products, users } from '../../../db/schema'
 
 const reviews = pgTable('reviews', {
   id: uuid().primaryKey().defaultRandom(),
@@ -30,3 +30,7 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
     references : [users.id]
   })
 }))
+
+
+export type IReview = InferInsertModel<typeof reviews>
+export type SReview = InferSelectModel<typeof reviews>

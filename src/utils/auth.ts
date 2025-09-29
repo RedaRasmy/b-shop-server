@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import crypto from 'crypto'
 import { db } from '../db'
-import refreshTokens from '../db/schemas/refresh-token-schema'
+import { refreshTokens } from '../db/schema'
 import { eq } from 'drizzle-orm'
 
 export type DecodedTokenPayload = {

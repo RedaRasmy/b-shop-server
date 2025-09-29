@@ -1,12 +1,11 @@
 import { pgTable, uuid, text, integer, varchar } from 'drizzle-orm/pg-core'
-import { createdAt, updatedAt } from '../timestamps'
+import { createdAt, updatedAt } from '../../../db/timestamps'
 import {
   relations,
   type InferInsertModel,
   type InferSelectModel,
 } from 'drizzle-orm'
-import { products } from '.'
-import type { UnusedAttributes } from '../../lib/types'
+import { products } from '../../../db/schema'
 
 const images = pgTable('product_images', {
   id: uuid().primaryKey().defaultRandom(),
@@ -33,6 +32,11 @@ export const imagesRelations = relations(images, ({ one }) => ({
   }),
 }))
 
-export type IImage = Omit<InferInsertModel<typeof images>, UnusedAttributes>
-
+export type IImage = InferInsertModel<typeof images>
 export type SImage = InferSelectModel<typeof images>
+
+export type Image = {
+    id?:string
+    alt : string
+    position: number
+}

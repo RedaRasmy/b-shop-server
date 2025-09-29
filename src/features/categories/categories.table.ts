@@ -1,7 +1,7 @@
 import { pgTable, uuid, text , boolean} from 'drizzle-orm/pg-core'
-import { createdAt, updatedAt } from '../timestamps'
+import { createdAt, updatedAt } from '../../db/timestamps'
 import { relations, type InferInsertModel , type InferSelectModel} from 'drizzle-orm'
-import {products} from '.'
+import {products} from '../../db/schema'
 import type { UnusedAttributes } from '../../lib/types'
 
 const categories = pgTable('categories', {

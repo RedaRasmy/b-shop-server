@@ -6,10 +6,10 @@ import {
   getCategories,
   getCategorieById,
   getCategorieProducts,
-} from '../controllers/categorie-controllers'
-import { validateBody, validateIdParam } from '../lib/validator-functions'
-import { insertCategorieSchema } from '../db/zod-schemas'
-import { requireAuth } from '../middlewares/require-auth'
+} from './categories.controller'
+import { validateBody, validateIdParam } from '@/middlewares/validators'
+import { insertCategorieSchema } from './categories.validation'
+import { requireAuth } from '@/middlewares/require-auth'
 
 const router: Router = Router()
 

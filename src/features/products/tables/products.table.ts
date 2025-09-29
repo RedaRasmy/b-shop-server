@@ -1,8 +1,7 @@
 import { pgTable, uuid, text, integer } from 'drizzle-orm/pg-core'
-import { createdAt, updatedAt } from '../timestamps'
+import { createdAt, updatedAt } from '../../../db/timestamps'
 import { relations, type InferInsertModel , type InferSelectModel} from 'drizzle-orm'
-import { categories , images, reviews } from '.'
-import type { UnusedAttributes } from '../../lib/types'
+import { categories , images, reviews } from '../../../db/schema'
 
 const products = pgTable('products', {
   id: uuid().primaryKey().defaultRandom(),
@@ -27,7 +26,6 @@ export const productsRelations = relations(products,({one,many})=>({
 }))
 
 
-export type IProduct = Omit<InferInsertModel<typeof products>,UnusedAttributes>
-
+export type IProduct = InferInsertModel<typeof products>
 export type SProduct = InferSelectModel<typeof products>
 

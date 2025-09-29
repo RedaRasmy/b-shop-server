@@ -1,7 +1,6 @@
-// db/schema.ts
 import { pgTable, serial, varchar, timestamp, index, uuid } from 'drizzle-orm/pg-core'
-import { users } from '.'
-import { createdAt } from '../timestamps'
+import { users } from '../../db/schema'
+import { createdAt } from '../../db/timestamps'
 import { relations } from 'drizzle-orm'
 
 

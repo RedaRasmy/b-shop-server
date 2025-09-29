@@ -5,16 +5,16 @@ import {
   updateProduct,
   getProductById,
   getProducts,
-} from '../controllers/product-controllers'
+} from './products.controller'
 import {
   validateBody,
   validateIdParam,
   validateQuery,
-} from '../lib/validator-functions'
-import { insertFullProductSchema } from '../db/zod-schemas'
-import { upload } from '../lib/upload'
-import { requireAuth } from '../middlewares/require-auth'
-import { getProductsQuerySchema } from '../validation/get-products-query-schema'
+} from '@/middlewares/validators'
+import { insertFullProductSchema } from './products.validation'
+import { upload } from '@/lib/upload'
+import { requireAuth } from '@/middlewares/require-auth'
+import { getProductsQuerySchema } from './products.validation'
 
 const router: Router = Router()
 
@@ -22,7 +22,7 @@ const router: Router = Router()
 router.get('/', validateQuery(getProductsQuerySchema), getProducts)
 router.get('/:id', validateIdParam(), getProductById)
 
-// protected
+// protected (admin)
 router.post(
   '/',
   requireAuth('admin'),

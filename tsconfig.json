@@ -11,7 +11,7 @@
 
     /* Node environment */
     "lib": ["esnext"],
-    "types": ["node","jest"],
+    // "types": ["node"],
 
     /* Other Outputs */
     "sourceMap": true,
@@ -25,8 +25,15 @@
 
     /* Compatibility */
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+
+    // path alias
+    "baseUrl": ".",
+    "paths": {
+      "@/*" : ["src/*"]
+    },
   },
   "include": ["src"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist"],
+  
 }

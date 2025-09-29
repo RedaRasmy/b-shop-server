@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express'
-import { db } from '../db'
-import { users } from '../db/schemas'
+import { db } from '../../db'
+import { users } from '../../db/schema'
 import {
   comparePassword,
   generateAccessToken,
@@ -8,8 +8,8 @@ import {
   hashPassword,
   revokeRefreshToken,
   verifyRefreshToken,
-} from '../utils/auth'
-import { AuthRequest } from '../middlewares/require-auth'
+} from '../../utils/auth'
+import { AuthRequest } from '../../middlewares/require-auth'
 
 export type EmailPassword = {
   email: string

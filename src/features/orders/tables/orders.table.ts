@@ -1,11 +1,11 @@
 import { pgTable, uuid, text, integer, pgEnum, serial } from 'drizzle-orm/pg-core'
-import { createdAt, updatedAt } from '../timestamps'
+import { createdAt, updatedAt } from '../../../db/timestamps'
 import {
   relations,
   //   type InferInsertModel,
   //   type InferSelectModel,
 } from 'drizzle-orm'
-import { orderItems, users } from '.'
+import { orderItems, users } from '../../../db/schema'
 
 export const orderStatus = pgEnum('order_status', [
   'pending',

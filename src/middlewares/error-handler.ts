@@ -1,7 +1,8 @@
 import type { Request, Response, NextFunction } from 'express'
-import type { AppError } from '../lib/app-error'
 
-
+export interface AppError extends Error {
+  status?: number
+}
 
 export const errorHandler = (
   err: AppError,

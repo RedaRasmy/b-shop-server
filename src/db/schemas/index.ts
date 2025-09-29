@@ -1,8 +1,0 @@
-export {default as products,productsRelations} from './product-schema'
-export {default as categories , categoriesRelations } from './categorie-schema'
-export {default as images , imagesRelations } from './product-images-schema'
-export {default as users , usersRelations } from './user-schema'
-export {default as refreshTokens , refreshTokensRelations } from './refresh-token-schema'
-export {default as orders , ordersRelations , orderStatus , paymentMethod } from './order-schema'
-export {default as orderItems , orderItemsRelations} from './order-item-schema'
-export {default as reviews , reviewsRelations } from './review-schema'
