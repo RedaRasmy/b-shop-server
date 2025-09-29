@@ -1,3 +1,5 @@
+import { entityStatus } from '@db/enums'
+
 export {
   default as images,
   imagesRelations,
@@ -10,10 +12,7 @@ export {
   default as categories,
   categoriesRelations,
 } from '../features/categories/categories.table'
-export {
-  default as users,
-  usersRelations,
-} from '../features/users/users.table'
+export { default as users, usersRelations } from '../features/users/users.table'
 export {
   default as refreshTokens,
   refreshTokensRelations,
@@ -32,3 +31,5 @@ export {
   default as reviews,
   reviewsRelations,
 } from '../features/products/tables/product-reviews.table'
+
+export { entityStatus }
