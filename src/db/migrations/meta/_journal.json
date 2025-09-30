@@ -22,6 +22,13 @@
       "when": 1759184495172,
       "tag": "0002_gifted_toro",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1759265005673,
+      "tag": "0003_curved_network",
+      "breakpoints": true
     }
   ]
 }
