@@ -63,16 +63,3 @@ export const uploadedFileSchema = z.object({
 
 export const insertProductSchema = createInsertSchema(products)
 export const selectProductSchema = createSelectSchema(products)
-
-export const insertFullProductSchema = insertProductSchema.extend({
-  images: z
-    .array(
-      z.object({
-        id : z.string().uuid().optional(),
-        alt: z.string().min(1, "Alt text is required").max(200, "Alt text too long"),
-        position : z.int()
-      })
-      )
-    .max(5),
-})
-
