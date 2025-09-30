@@ -9,8 +9,8 @@ export const addCategory = async (
   next: NextFunction,
 ) => {
   try {
-    const [categorie] = await db.insert(categories).values(req.body).returning()
-    res.status(201).json({ categorie })
+    const [category] = await db.insert(categories).values(req.body).returning()
+    res.status(201).json(category)
   } catch {
     next({ message: 'Failed to add categorie', status: 500 })
   }
