@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import * as adminController from './controller'
 import { validateBody, validateIdParam } from '@mw/validators'
-import { insertCategorieSchema } from '../categories.validation'
+import { InsertCategorySchema } from '../categories.validation'
 
 const router: Router = Router()
 
@@ -15,16 +15,15 @@ router.get(
 
 router.post(
   '/',
-  validateBody(insertCategorieSchema),
+  validateBody(InsertCategorySchema),
   adminController.addCategory,
 )
 router.put(
   '/:id',
   validateIdParam,
-  validateBody(insertCategorieSchema),
+  validateBody(InsertCategorySchema),
   adminController.updateCategory,
 )
 router.delete('/:id', validateIdParam, adminController.deleteCategory)
 
 export const categoriesAdminRouter = router
-// export default router

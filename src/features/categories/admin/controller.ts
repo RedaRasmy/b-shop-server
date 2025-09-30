@@ -3,7 +3,6 @@ import { db } from '@db/index'
 import { categories } from '@db/schema'
 import { eq } from 'drizzle-orm'
 
-// Add one product
 export const addCategory = async (
   req: Request,
   res: Response,
@@ -17,7 +16,6 @@ export const addCategory = async (
   }
 }
 
-// Read all products
 export const getCategories = async (
   req: Request,
   res: Response,
@@ -31,7 +29,6 @@ export const getCategories = async (
   }
 }
 
-// Read single product
 export const getCategoryById = async (
   req: Request,
   res: Response,
@@ -47,7 +44,6 @@ export const getCategoryById = async (
   }
 }
 
-// Update a product
 export const updateCategory = async (
   req: Request,
   res: Response,
@@ -65,7 +61,6 @@ export const updateCategory = async (
   }
 }
 
-// Delete a categorie
 export const deleteCategory = async (
   req: Request,
   res: Response,
@@ -84,7 +79,6 @@ export const deleteCategory = async (
   }
 }
 
-// Read all products in a categorie
 export const getCategoryProducts = async (
   req: Request,
   res: Response,
