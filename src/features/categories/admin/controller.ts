@@ -1,7 +1,9 @@
 import type { Request, Response, NextFunction } from 'express'
 import { db } from '@db/index'
 import { categories } from '@db/schema'
-import { eq } from 'drizzle-orm'
+import { and, asc, desc, eq, ilike, sql } from 'drizzle-orm'
+import { CategoriesQuery } from '@categories/admin/validation'
+import { ICategory } from '@categories/categories.table'
 
 export const addCategory = async (
   req: Request,
@@ -22,8 +24,38 @@ export const getCategories = async (
   next: NextFunction,
 ) => {
   try {
-    const allCategories = await db.query.categories.findMany()
-    res.status(200).json(allCategories)
+    const {sort,status,search} = req.validatedQuery as CategoriesQuery
+
+   // 1. --- Build WHERE Clause for Filtering and Searching ---
+    const conditions = [];
+
+    // Filter by Status (active/inactive)
+    if (status) {
+      conditions.push(eq(categories.status, status));
+    }
+
+    if (search) {
+      // Use ilike for a general search across the category name
+      conditions.push(ilike(categories.name, `%${search}%`));
+    }
+
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+    // 2. --- Build ORDER BY Clause for Sorting ---
+    const [sortField, sortDirection] = sort.split(':') as [keyof ICategory , 'asc' | 'desc']
+
+    // Determine sort direction (asc or desc)
+    const orderByDirection = sortDirection === 'asc' 
+        ? asc(categories[sortField]) 
+        : desc(categories[sortField])
+
+    // 3. --- Fetch Data from DB ---
+    const result = await db.query.categories.findMany({
+      where: whereClause,
+      orderBy: [orderByDirection],
+    })
+    
+    res.status(200).json(result)
   } catch {
     next({ message: 'Failed to fetch categories', status: 500 })
   }
