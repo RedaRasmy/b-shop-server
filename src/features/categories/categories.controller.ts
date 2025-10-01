@@ -40,7 +40,7 @@ export const getCategoryProducts = async (
   try {
     const categorieId = req.params.id! // validated
     const products = await db.query.products.findMany({
-      where: (products, { eq }) => eq(products.categorieId, categorieId),
+      where: (products, { eq }) => eq(products.categoryId, categorieId),
       with: {
         images: true,
       },
