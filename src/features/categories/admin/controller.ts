@@ -24,38 +24,54 @@ export const getCategories = async (
   next: NextFunction,
 ) => {
   try {
-    const {sort,status,search} = req.validatedQuery as CategoriesQuery
+    const { sort, status, search } = req.validatedQuery as CategoriesQuery
 
-   // 1. --- Build WHERE Clause for Filtering and Searching ---
-    const conditions = [];
+    // 1. --- Build WHERE Clause for Filtering and Searching ---
+    const conditions = []
 
     // Filter by Status (active/inactive)
     if (status) {
-      conditions.push(eq(categories.status, status));
+      conditions.push(eq(categories.status, status))
     }
 
     if (search) {
       // Use ilike for a general search across the category name
-      conditions.push(ilike(categories.name, `%${search}%`));
+      conditions.push(ilike(categories.name, `%${search}%`))
     }
 
-    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined
 
     // 2. --- Build ORDER BY Clause for Sorting ---
-    const [sortField, sortDirection] = sort.split(':') as [keyof ICategory , 'asc' | 'desc']
+    const [sortField, sortDirection] = sort.split(':') as [
+      keyof ICategory,
+      'asc' | 'desc',
+    ]
 
     // Determine sort direction (asc or desc)
-    const orderByDirection = sortDirection === 'asc' 
-        ? asc(categories[sortField]) 
+    const orderByDirection =
+      sortDirection === 'asc'
+        ? asc(categories[sortField])
         : desc(categories[sortField])
 
     // 3. --- Fetch Data from DB ---
     const result = await db.query.categories.findMany({
       where: whereClause,
       orderBy: [orderByDirection],
+      with: {
+        products: {
+          columns: {
+            id: true,
+          },
+        },
+      },
     })
+
+    const response = result.map(({ products, ...cat }) => ({
+      ...cat,
+      productsCount: products.length,
+    }))
     
-    res.status(200).json(result)
+    res.status(200).json(response)
   } catch {
     next({ message: 'Failed to fetch categories', status: 500 })
   }
