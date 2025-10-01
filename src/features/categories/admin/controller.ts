@@ -83,7 +83,6 @@ export const getCategoryById = async (
   next: NextFunction,
 ) => {
   try {
-
     const result = await db.query.categories.findFirst({
       where: (categories, { eq }) => eq(categories.id, req.params.id!),
       with: {
@@ -95,7 +94,7 @@ export const getCategoryById = async (
       },
     })
 
-    const { products , ...category } = result!
+    const { products, ...category } = result!
 
     res.status(200).json({
       ...category,
@@ -129,13 +128,17 @@ export const deleteCategory = async (
   next: NextFunction,
 ) => {
   try {
-    const [categorie] = await db
+    const result = await db
       .delete(categories)
       .where(eq(categories.id, req.params.id!))
-      .returning({
-        id: categories.id,
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({
+        message: 'Category not found',
       })
-    res.status(200).json({ productId: categorie?.id })
+    }
+    
+    res.status(204).send()
   } catch {
     next({ message: 'Failed to delete categorie', status: 500 })
   }
