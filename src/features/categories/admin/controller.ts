@@ -70,7 +70,7 @@ export const getCategories = async (
       ...cat,
       productsCount: products.length,
     }))
-    
+
     res.status(200).json(response)
   } catch {
     next({ message: 'Failed to fetch categories', status: 500 })
@@ -83,10 +83,24 @@ export const getCategoryById = async (
   next: NextFunction,
 ) => {
   try {
-    const categorie = await db.query.categories.findFirst({
+
+    const result = await db.query.categories.findFirst({
       where: (categories, { eq }) => eq(categories.id, req.params.id!),
+      with: {
+        products: {
+          columns: {
+            id: true,
+          },
+        },
+      },
     })
-    res.status(200).json({ categorie })
+
+    const { products , ...category } = result!
+
+    res.status(200).json({
+      ...category,
+      productsCount: products.length,
+    })
   } catch {
     next({ message: 'Failed to fetch categorie', status: 500 })
   }
