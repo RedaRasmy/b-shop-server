@@ -5,4 +5,4 @@ export type Prettify<T> = {
 } & {}
 
 
-
+export type Order = 'asc' | 'desc'

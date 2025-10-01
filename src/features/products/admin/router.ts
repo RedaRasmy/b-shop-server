@@ -2,16 +2,13 @@ import { Router } from 'express'
 import * as adminController from './controller'
 import { upload } from '@lib/upload'
 import { validateBody, validateIdParam, validateQuery } from '@mw/validators'
-import {
-  getProductsQuerySchema,
-} from '../products.validation'
-import { AddProductSchema } from '@products/admin/validation'
+import { AddProductSchema, AdminProductsQuerySchema } from '@products/admin/validation'
 
 const router = Router()
 
 router.get(
   '/',
-  validateQuery(getProductsQuerySchema),
+  validateQuery(AdminProductsQuerySchema),
   adminController.getProducts,
 )
 router.get('/:id', validateIdParam, adminController.getProductById)

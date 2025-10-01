@@ -1,5 +1,8 @@
 import { StatusSchema } from '@db/enums'
+import { getSortSchema } from '@utils/get-sort-schema'
 import z from 'zod'
+
+/// Insert
 
 const ImageSchema = z.object({
   alt: z.string().max(255, 'Alt is too long').optional().default(''),
@@ -40,3 +43,40 @@ export const AddProductSchema = z.object({
 })
 
 export type AddProduct = z.input<typeof AddProductSchema>
+
+/// Query
+
+const SORTABLE_FIELDS = [
+  'name',
+  'price',
+  'stock',
+  'status',
+  'createdAt',
+  'updatedAt'
+]
+
+const SortSchema = getSortSchema(SORTABLE_FIELDS)
+
+export const AdminProductsQuerySchema = z.object({
+  // pagination
+  page: z.coerce.number().int().min(1, 'Page must be at least 1').default(1),
+  perPage: z.coerce
+    .number()
+    .int()
+    .min(1 , "Per page must be at least 1")
+    .max(100, 'Per page must be at most 100')
+    .default(10),
+
+  // searching
+  search: z.string().min(1, 'Search must not be empty').max(100).optional(),
+  
+  // filters
+  categoryId: z.string().uuid('Invalid category ID').optional(),
+  status : StatusSchema.optional(),
+
+
+  // Sorting 
+  sort: SortSchema,
+})
+
+export type AdminProductsQuery = z.infer<typeof AdminProductsQuerySchema>

@@ -137,7 +137,7 @@ export const deleteCategory = async (
         message: 'Category not found',
       })
     }
-    
+
     res.status(204).send()
   } catch {
     next({ message: 'Failed to delete categorie', status: 500 })
@@ -150,9 +150,9 @@ export const getCategoryProducts = async (
   next: NextFunction,
 ) => {
   try {
-    const categorieId = req.params.id! // validated
+    const categoryId = req.params.id! // validated
     const products = await db.query.products.findMany({
-      where: (products, { eq }) => eq(products.categorieId, categorieId),
+      where: (products, { eq }) => eq(products.categoryId, categoryId),
       with: {
         images: true,
       },

@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, integer, pgEnum } from 'drizzle-orm/pg-core'
+import { pgTable, uuid, text, integer } from 'drizzle-orm/pg-core'
 import { createdAt, updatedAt } from '../../../db/timestamps'
 import {
   relations,
@@ -14,7 +14,7 @@ const products = pgTable('products', {
   description: text().notNull(),
   price: integer().notNull(),
   stock: integer().notNull(),
-  categorieId: uuid('categorie_id')
+  categoryId: uuid('category_id')
     .notNull()
     .references(() => categories.id),
   status: entityStatus().notNull(),
@@ -25,7 +25,7 @@ export default products
 
 export const productsRelations = relations(products, ({ one, many }) => ({
   categorie: one(categories, {
-    fields: [products.categorieId],
+    fields: [products.categoryId],
     references: [categories.id],
   }),
   images: many(images),

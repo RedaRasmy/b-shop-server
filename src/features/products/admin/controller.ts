@@ -1,14 +1,104 @@
-import { Prettify } from "@lib/types"
-import type { NextFunction , Request ,Response } from "express"
-import products, { IProduct } from "../tables/products.table"
-import images, { Image } from "../tables/product-images.table"
-import { deleteImage, deleteMultipleImages, uploadMultipleImages } from "@lib/cloudinary"
-import { db } from "@db/index"
-import { eq } from "drizzle-orm"
+import { Prettify } from '@lib/types'
+import type { NextFunction, Request, Response } from 'express'
+import products, { IProduct } from '../tables/products.table'
+import images, { Image } from '../tables/product-images.table'
+import {
+  deleteImage,
+  deleteMultipleImages,
+  uploadMultipleImages,
+} from '@lib/cloudinary'
+import { db } from '@db/index'
+import { and, asc, count, desc, eq, ilike } from 'drizzle-orm'
+import { AdminProductsQuery } from '@products/admin/validation'
+import { getInventoryStatus } from '@utils/get-inventory-status'
 
+export const getProducts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const { page, perPage, search, categoryId, sort, status } =
+      req.validatedQuery as AdminProductsQuery
 
-// same get requests for now
-export {getProductById,getProducts} from '../products.controller'
+    // Filtering conditions
+    const where = (products: any, { eq, ilike, and }: any) => {
+      const filters = []
+      if (categoryId) filters.push(eq(products.categorieId, categoryId))
+      if (search) filters.push(ilike(products.name, `%${search}%`))
+      if (status) filters.push(eq(products.status, status))
+      return filters.length ? and(...filters) : undefined
+    }
+
+    // Sorting
+    let orderBy: any
+    const [field, direction] = sort.split(':') as [
+      keyof IProduct,
+      'asc' | 'desc',
+    ]
+    const sortDirection = direction.toLowerCase() === 'asc' ? asc : desc
+    orderBy = sortDirection(products[field])
+
+    // Fetch current page
+    const filteredProducts = await db.query.products.findMany({
+      where,
+      with: { images: true },
+      limit: perPage,
+      offset: (page - 1) * perPage,
+      orderBy,
+    })
+
+    let totalCount: number | null = null
+    let totalPages: number | null = null
+
+    // Only compute total when page = 1
+    if (page === 1) {
+      const [{ totalCount }] = await db
+        .select({ totalCount: count() })
+        .from(products)
+        .where(where(products, { eq, ilike, and }))
+      totalPages = Math.ceil(totalCount / perPage)
+    }
+
+    res.json({
+      data: filteredProducts.map((p) => ({
+        ...p,
+        inventoryStatus: getInventoryStatus(p.stock),
+      })),
+      page,
+      perPage,
+      total: totalCount,
+      totalPages,
+    })
+  } catch (err) {
+    next({ message: 'Failed to fetch products', status: 500 })
+  }
+}
+
+export const getProductById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const product = await db.query.products.findFirst({
+      where: (products, { eq }) => eq(products.id, req.params.id!),
+      with: {
+        images: true,
+      },
+    })
+    if (!product) {
+      return res.status(404).send({
+        message : "Product Not Found"
+      })
+    }
+    res
+      .status(200)
+      .json({ ...product, inventoryStatus: getInventoryStatus(product.stock) })
+  } catch {
+    next({ message: 'Failed to fetch product', status: 500 })
+  }
+}
 
 // Add one product
 
@@ -83,7 +173,6 @@ export const addProduct = async (
     next({ message: 'Failed to add product', status: 500 })
   }
 }
-
 
 export const deleteProduct = async (
   req: Request,
