@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, integer } from 'drizzle-orm/pg-core'
+import { pgTable, uuid, text, integer, varchar } from 'drizzle-orm/pg-core'
 import { createdAt, updatedAt } from '../../../db/timestamps'
 import {
   relations,
@@ -10,7 +10,7 @@ import { entityStatus, categories, images, reviews } from '@tables'
 const products = pgTable('products', {
   id: uuid().primaryKey().defaultRandom(),
   name: text().notNull(),
-  slug: text().notNull().unique(),
+  slug: varchar({ length: 255 }).notNull().unique(),
   description: text().notNull(),
   price: integer().notNull(),
   stock: integer().notNull(),
