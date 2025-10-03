@@ -1,7 +1,7 @@
 import { Prettify } from '@lib/types'
 import type { NextFunction, Request, Response } from 'express'
 import products, { IProduct } from '../tables/products.table'
-import images, { Image } from '../tables/product-images.table'
+import images, { IImage, Image } from '../tables/product-images.table'
 import {
   deleteImage,
   deleteMultipleImages,
@@ -9,41 +9,24 @@ import {
 } from '@lib/cloudinary'
 import { db } from '@db/index'
 import { and, asc, count, desc, eq, ilike } from 'drizzle-orm'
-import { AdminProductsQuery } from '@products/admin/validation'
+import { AddProduct, AdminProductsQuery } from '@products/admin/validation'
 import { getInventoryStatus } from '@utils/get-inventory-status'
 
 /// ADD
-
-type IFullProduct = Prettify<
-  IProduct & {
-    images: Image[]
-  }
->
 
 export const addProduct = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  const { images: productImages, ...productData }: IFullProduct = req.body
-
+  const { images: productImages, ...productData }: AddProduct = req.body
   try {
-    // Check if files are uploaded
-    if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
+    // Check if all files exists
+    if (productImages.some((p) => !p.file)) {
       return res.status(400).json({
-        error: 'At least one product image is required',
+        message: 'One file or more are missing',
       })
     }
-
-    // Check if productImages data matches uploaded files
-    if (productImages.length !== req.files.length) {
-      return res.status(400).json({
-        error: 'Image metadata must match number of uploaded files',
-      })
-    }
-
-    // Step 1: Upload files to Cloudinary first
-    const uploadedFiles = await uploadMultipleImages(req.files, 'products')
 
     await db.transaction(async (tx) => {
       const [product] = await tx
@@ -51,37 +34,44 @@ export const addProduct = async (
         .values(productData)
         .returning()
 
+      console.log('uploading to cloudinary ...')
+
+      // Upload files to Cloudinary first
+      const uploadedFiles = await uploadMultipleImages(
+        productImages.map((i) => i.file),
+        `products/${product.id}`,
+      )
+
       // Prepare image data with Cloudinary URLs
-      const imageData = uploadedFiles.map((uploadResult, index) => ({
-        productId: product!.id,
+      const imageData: IImage[] = uploadedFiles.map((uploadResult, index) => ({
+        productId: product.id,
         url: uploadResult.url,
         publicId: uploadResult.public_id,
         alt: productImages[index]!.alt,
-        position: productImages[index]!.position,
         width: uploadResult.width,
         height: uploadResult.height,
         format: uploadResult.format,
         size: uploadResult.bytes,
+        position: index,
       }))
+      console.log('uploading images ...')
 
       const insertedImages = await tx
         .insert(images)
         .values(imageData)
         .returning()
 
+      console.log('sending response...')
+
       res.status(201).json({
         product: {
           ...product!,
-          images: insertedImages.map((img) => ({
-            id: img.id,
-            url: img.url,
-            alt: img.alt,
-            position: img.position,
-          })),
+          images: insertedImages,
         },
       })
     })
-  } catch {
+  } catch (error) {
+    console.error('Add Product Error : ', error)
     next({ message: 'Failed to add product', status: 500 })
   }
 }
@@ -226,7 +216,7 @@ export const updateProduct = async (
     })
 
     // Step 2: Create new product with the same ID
-    const { images: productImages, ...productData }: IFullProduct = req.body
+    const { images: productImages, ...productData }: AddProduct = req.body
 
     // Validation (same as addProduct)
     if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
@@ -260,7 +250,7 @@ export const updateProduct = async (
         url: uploadResult.url,
         publicId: uploadResult.public_id,
         alt: productImages[index]!.alt,
-        position: productImages[index]!.position,
+        position: index,
         width: uploadResult.width,
         height: uploadResult.height,
         format: uploadResult.format,

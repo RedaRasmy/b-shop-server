@@ -1,10 +1,12 @@
 import config from '@config/config'
+import { slugify } from '@utils/slugify'
 import { v2 as cloudinary, type AdminAndResourceOptions } from 'cloudinary'
+import { v4 as uuid } from 'uuid'
 
 cloudinary.config({
-  cloud_name: config.CLOUDINARY_CLOUD_NAME!,
-  api_key: config.CLOUDINARY_API_KEY!,
-  api_secret: config.CLOUDINARY_API_SECRET!,
+  cloud_name: config.CLOUDINARY_CLOUD_NAME,
+  api_key: config.CLOUDINARY_API_KEY,
+  api_secret: config.CLOUDINARY_API_SECRET,
   secure: true,
 })
 
@@ -31,57 +33,50 @@ export interface ProcessedUploadResult {
   bytes: number
 }
 
-export const uploadImageBuffer = async (
-  fileBuffer: Buffer,
-  originalName: string,
-  folder: string = 'products',
-): Promise<ProcessedUploadResult> => {
+export const uploadImageBuffer = async ({
+  fileBuffer,
+  folder,
+}: {
+  fileBuffer: Buffer
+  folder: string
+}): Promise<ProcessedUploadResult> => {
   const options = {
     folder: folder,
-    public_id: `${Date.now()}-${originalName.split('.')[0]}`,
+    public_id: `${uuid()}`,
     resource_type: 'auto' as const,
     use_filename: true,
     unique_filename: false,
     overwrite: true,
   }
-
-  try {
-    return new Promise((resolve, reject) => {
-      cloudinary.uploader
-        .upload_stream(options, (error, result) => {
-          if (error) {
-            console.error('Cloudinary upload error:', error)
-            reject(error)
-          } else if (result) {
-            resolve({
-              url: result.secure_url,
-              public_id: result.public_id,
-              width: result.width,
-              height: result.height,
-              format: result.format,
-              bytes: result.bytes,
-            })
-          } else {
-            reject(new Error('Upload failed - no result'))
-          }
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader
+      .upload_stream(options, (error, result) => {
+        if (error) return reject(error)
+        if (!result) return reject(new Error('Upload failed - no result'))
+        resolve({
+          url: result.secure_url,
+          public_id: result.public_id,
+          width: result.width,
+          height: result.height,
+          format: result.format,
+          bytes: result.bytes,
         })
-        .end(fileBuffer)
-    })
-  } catch (error) {
-    console.error('Upload error:', error)
-    throw error
-  }
+      })
+      .end(fileBuffer)
+  })
 }
 
 // Function to upload multiple images
 export const uploadMultipleImages = async (
   files: Express.Multer.File[],
-  folder: string = 'products',
+  folder: string,
 ) => {
   const uploadPromises = files.map((file) =>
-    uploadImageBuffer(file.buffer, file.originalname, folder),
+    uploadImageBuffer({
+      fileBuffer: file.buffer,
+      folder,
+    }),
   )
-
   return Promise.all(uploadPromises)
 }
 
@@ -101,7 +96,7 @@ export const getAssetInfo = async (publicId: string) => {
   }
 }
 
-// Function to delete images (useful for cleanup)
+// Function to delete images
 export const deleteImage = async (publicId: string) => {
   try {
     const result = await cloudinary.uploader.destroy(publicId)
