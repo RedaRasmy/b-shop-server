@@ -43,6 +43,13 @@
       "when": 1759409637950,
       "tag": "0005_lyrical_hawkeye",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1759530780449,
+      "tag": "0006_young_yellowjacket",
+      "breakpoints": true
     }
   ]
 }

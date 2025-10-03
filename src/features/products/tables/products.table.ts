@@ -14,9 +14,9 @@ const products = pgTable('products', {
   description: text().notNull(),
   price: integer().notNull(),
   stock: integer().notNull(),
-  categoryId: uuid('category_id')
-    .notNull()
-    .references(() => categories.id),
+  categoryId: uuid('category_id').references(() => categories.id, {
+    onDelete: 'set null',
+  }),
   status: entityStatus().notNull(),
   createdAt,
   updatedAt,
