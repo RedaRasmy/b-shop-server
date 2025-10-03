@@ -1,14 +1,9 @@
-import { Prettify } from '@lib/types'
 import type { NextFunction, Request, Response } from 'express'
 import products, { IProduct } from '../tables/products.table'
-import images, { IImage, Image } from '../tables/product-images.table'
-import {
-  deleteImage,
-  deleteMultipleImages,
-  uploadMultipleImages,
-} from '@lib/cloudinary'
+import images, { IImage } from '../tables/product-images.table'
+import { deleteMultipleImages, uploadMultipleImages } from '@lib/cloudinary'
 import { db } from '@db/index'
-import { and, asc, count, desc, eq, ilike } from 'drizzle-orm'
+import { and, asc, count, desc, eq, ilike, inArray } from 'drizzle-orm'
 import { AddProduct, AdminProductsQuery } from '@products/admin/validation'
 import { getInventoryStatus } from '@utils/get-inventory-status'
 
@@ -34,8 +29,6 @@ export const addProduct = async (
         .values(productData)
         .returning()
 
-      console.log('uploading to cloudinary ...')
-
       // Upload files to Cloudinary first
       const uploadedFiles = await uploadMultipleImages(
         productImages.map((i) => i.file),
@@ -54,14 +47,11 @@ export const addProduct = async (
         size: uploadResult.bytes,
         position: index,
       }))
-      console.log('uploading images ...')
 
       const insertedImages = await tx
         .insert(images)
         .values(imageData)
         .returning()
-
-      console.log('sending response...')
 
       res.status(201).json({
         product: {
@@ -166,102 +156,73 @@ export const getProductById = async (
   }
 }
 
-export const deleteProduct = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const productId = req.params.id!
-    await db.transaction(async (tx) => {
-      const productImages = await tx.query.images.findMany({
-        where: (images, { eq }) => eq(images.productId, productId),
-      })
-      productImages.forEach(async (img) => {
-        await deleteImage(img.publicId!)
-      })
+// UPDATE
 
-      await tx.delete(products).where(eq(products.id, productId))
-      await tx.delete(images).where(eq(images.productId, productId))
-
-      res.status(200).json({ productId })
-    })
-  } catch {
-    next({ message: 'Failed to delete product', status: 500 })
-  }
-}
-
-// Update a product by replacing it
 export const updateProduct = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   const productId = req.params.id!
+  const { images: productImages, ...productData } = req.body as AddProduct
+  const newImages = productImages.filter((img) => img.file) // file exists => new
+  const oldImages = productImages.filter((img) => img.id) // id exists => old
 
   try {
-    // Step 1: Delete existing product (this handles Cloudinary cleanup)
     await db.transaction(async (tx) => {
-      // Get and delete images from Cloudinary
-      const productImages = await tx.query.images.findMany({
+      // get products images
+      const existingImages = await tx.query.images.findMany({
         where: (images, { eq }) => eq(images.productId, productId),
       })
 
       // Delete images from Cloudinary
-      await deleteMultipleImages(productImages.map((img) => img.publicId!))
+      const oldImageIds = new Set(oldImages.map((i) => i.id))
+      const deletedImages = existingImages.filter(
+        (img) => !oldImageIds.has(img.id),
+      )
+      await deleteMultipleImages(deletedImages.map((img) => img.publicId))
 
-      // Delete from database
-      await tx.delete(images).where(eq(images.productId, productId))
-      await tx.delete(products).where(eq(products.id, productId))
-    })
+      // Delete images from database
+      await tx.delete(images).where(
+        inArray(
+          images.id,
+          deletedImages.map((i) => i.id),
+        ),
+      )
 
-    // Step 2: Create new product with the same ID
-    const { images: productImages, ...productData }: AddProduct = req.body
+      // Upload new images to cloudinary
+      const uploadedFiles = await uploadMultipleImages(
+        newImages.map((img) => img.file),
+        `products/${productId}`,
+      )
 
-    // Validation (same as addProduct)
-    if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
-      return res.status(400).json({
-        error: 'At least one product image is required',
-      })
-    }
-
-    if (productImages.length !== req.files.length) {
-      return res.status(400).json({
-        error: 'Image metadata must match number of uploaded files',
-      })
-    }
-
-    // Upload new files
-    const uploadedFiles = await uploadMultipleImages(req.files, 'products')
-
-    await db.transaction(async (tx) => {
-      // Insert product with the SAME ID to keep URLs working
-      const [product] = await tx
-        .insert(products)
-        .values({
-          ...productData,
-          id: productId, // Keep same ID
-        })
-        .returning()
-
-      // Insert new images
-      const imageData = uploadedFiles.map((uploadResult, index) => ({
+      // Insert new images to database
+      const imagesData: IImage[] = uploadedFiles.map((uploadResult, index) => ({
         productId: productId,
         url: uploadResult.url,
         publicId: uploadResult.public_id,
-        alt: productImages[index]!.alt,
-        position: index,
+        alt: newImages[index].alt,
         width: uploadResult.width,
         height: uploadResult.height,
         format: uploadResult.format,
         size: uploadResult.bytes,
+        position: index,
       }))
 
-      const insertedImages = await tx
+      const insertedImages = await db
         .insert(images)
-        .values(imageData)
+        .values(imagesData)
         .returning()
 
+      /// update the product row
+
+      const [product] = await db
+        .update(products)
+        .set(productData)
+        .where(eq(products.id, productId))
+        .returning()
+
+      // send response
       res.status(200).json({
         message: 'Product updated successfully',
         product: {
@@ -277,5 +238,32 @@ export const updateProduct = async (
     })
   } catch (error) {
     next({ message: 'Failed to update product', status: 500 })
+  }
+}
+
+/// DELETE
+
+export const deleteProduct = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const productId = req.params.id!
+    await db.transaction(async (tx) => {
+      const productImages = await tx.query.images.findMany({
+        where: (images, { eq }) => eq(images.productId, productId),
+      })
+      // delete images from cloudinary
+      await deleteMultipleImages(productImages.map((i) => i.publicId))
+
+      await tx.delete(products).where(eq(products.id, productId))
+      // images will be deleted automaticly (cascade)
+
+      res.status(200).json({ productId })
+    })
+  } catch(err) {
+    console.log('failed to delete product : ',err)
+    next({ message: 'Failed to delete product', status: 500 })
   }
 }

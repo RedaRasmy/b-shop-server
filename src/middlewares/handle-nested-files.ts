@@ -42,7 +42,5 @@ export function handleNestedFiles(
     })
   }
 
-  console.log('final req.body before validation : ', req.body)
-
   next()
 }

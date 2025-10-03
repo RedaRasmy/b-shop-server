@@ -11,9 +11,11 @@ const images = pgTable('product_images', {
   id: uuid().primaryKey().defaultRandom(),
   productId: uuid('product_id')
     .notNull()
-    .references(() => products.id),
+    .references(() => products.id, {
+      onDelete: 'cascade',
+    }),
   url: text().notNull(),
-  publicId: varchar('public_id', { length: 255 }),
+  publicId: varchar('public_id', { length: 255 }).notNull(),
   alt: text().notNull(),
   position: integer().notNull(),
   width: integer('width'),
@@ -34,9 +36,3 @@ export const imagesRelations = relations(images, ({ one }) => ({
 
 export type IImage = InferInsertModel<typeof images>
 export type SImage = InferSelectModel<typeof images>
-
-export type Image = {
-    id?:string
-    alt : string
-    position: number
-}
