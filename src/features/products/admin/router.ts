@@ -1,36 +1,47 @@
 import { Router } from 'express'
 import * as adminController from './controller'
-import { upload } from '@lib/upload'
+import { upload, uploadProductImages } from '@lib/upload'
 import { validateBody, validateIdParam, validateQuery } from '@mw/validators'
-import { AddProductSchema, AdminProductsQuerySchema } from '@products/admin/validation'
+import {
+  AddProductSchema,
+  AdminProductsQuerySchema,
+} from '@products/admin/validation'
+import { handleNestedFiles } from '@mw/handle-nested-files'
 
 const router = Router()
+// ADD
+
+router.post(
+  '/',
+  uploadProductImages, // this put files in req.files (multer)
+  handleNestedFiles, // this unflat body and put req.files in req.body.images
+  validateBody(AddProductSchema), // validate and transform values to the right types
+  adminController.addProduct,
+)
+
+// GET
 
 router.get(
   '/',
   validateQuery(AdminProductsQuerySchema),
   adminController.getProducts,
 )
+
 router.get('/:id', validateIdParam, adminController.getProductById)
-router.post(
-  '/',
-  upload.fields([
-    { name: 'images[0].file', maxCount: 1 },
-    { name: 'images[1].file', maxCount: 1 },
-    { name: 'images[2].file', maxCount: 1 },
-    { name: 'images[3].file', maxCount: 1 },
-    { name: 'images[4].file', maxCount: 1 },
-  ]),
-  validateBody(AddProductSchema),
-  adminController.addProduct,
-)
+
+// UPDATE
+
 router.put(
   '/:id',
-  upload.array('images', 5),
   validateIdParam,
-  validateBody(AddProductSchema),
+  uploadProductImages, // this put files in req.files (multer)
+  handleNestedFiles, // this put req.files in req.body.images
+  validateBody(AddProductSchema), // validate and transform values to the right types
   adminController.updateProduct,
 )
+
+// DELETE
+
 router.delete('/:id', validateIdParam, adminController.deleteProduct)
 
 export const productsAdminRouter = router

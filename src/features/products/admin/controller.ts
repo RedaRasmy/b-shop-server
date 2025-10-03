@@ -12,6 +12,82 @@ import { and, asc, count, desc, eq, ilike } from 'drizzle-orm'
 import { AdminProductsQuery } from '@products/admin/validation'
 import { getInventoryStatus } from '@utils/get-inventory-status'
 
+/// ADD
+
+type IFullProduct = Prettify<
+  IProduct & {
+    images: Image[]
+  }
+>
+
+export const addProduct = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { images: productImages, ...productData }: IFullProduct = req.body
+
+  try {
+    // Check if files are uploaded
+    if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
+      return res.status(400).json({
+        error: 'At least one product image is required',
+      })
+    }
+
+    // Check if productImages data matches uploaded files
+    if (productImages.length !== req.files.length) {
+      return res.status(400).json({
+        error: 'Image metadata must match number of uploaded files',
+      })
+    }
+
+    // Step 1: Upload files to Cloudinary first
+    const uploadedFiles = await uploadMultipleImages(req.files, 'products')
+
+    await db.transaction(async (tx) => {
+      const [product] = await tx
+        .insert(products)
+        .values(productData)
+        .returning()
+
+      // Prepare image data with Cloudinary URLs
+      const imageData = uploadedFiles.map((uploadResult, index) => ({
+        productId: product!.id,
+        url: uploadResult.url,
+        publicId: uploadResult.public_id,
+        alt: productImages[index]!.alt,
+        position: productImages[index]!.position,
+        width: uploadResult.width,
+        height: uploadResult.height,
+        format: uploadResult.format,
+        size: uploadResult.bytes,
+      }))
+
+      const insertedImages = await tx
+        .insert(images)
+        .values(imageData)
+        .returning()
+
+      res.status(201).json({
+        product: {
+          ...product!,
+          images: insertedImages.map((img) => ({
+            id: img.id,
+            url: img.url,
+            alt: img.alt,
+            position: img.position,
+          })),
+        },
+      })
+    })
+  } catch {
+    next({ message: 'Failed to add product', status: 500 })
+  }
+}
+
+/// GET
+
 export const getProducts = async (
   req: Request,
   res: Response,
@@ -89,7 +165,7 @@ export const getProductById = async (
     })
     if (!product) {
       return res.status(404).send({
-        message : "Product Not Found"
+        message: 'Product Not Found',
       })
     }
     res
@@ -97,80 +173,6 @@ export const getProductById = async (
       .json({ ...product, inventoryStatus: getInventoryStatus(product.stock) })
   } catch {
     next({ message: 'Failed to fetch product', status: 500 })
-  }
-}
-
-// Add one product
-
-type IFullProduct = Prettify<
-  IProduct & {
-    images: Image[]
-  }
->
-
-export const addProduct = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { images: productImages, ...productData }: IFullProduct = req.body
-
-  try {
-    // Check if files are uploaded
-    if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
-      return res.status(400).json({
-        error: 'At least one product image is required',
-      })
-    }
-
-    // Check if productImages data matches uploaded files
-    if (productImages.length !== req.files.length) {
-      return res.status(400).json({
-        error: 'Image metadata must match number of uploaded files',
-      })
-    }
-
-    // Step 1: Upload files to Cloudinary first
-    const uploadedFiles = await uploadMultipleImages(req.files, 'products')
-
-    await db.transaction(async (tx) => {
-      const [product] = await tx
-        .insert(products)
-        .values(productData)
-        .returning()
-
-      // Prepare image data with Cloudinary URLs
-      const imageData = uploadedFiles.map((uploadResult, index) => ({
-        productId: product!.id,
-        url: uploadResult.url,
-        publicId: uploadResult.public_id,
-        alt: productImages[index]!.alt,
-        position: productImages[index]!.position,
-        width: uploadResult.width,
-        height: uploadResult.height,
-        format: uploadResult.format,
-        size: uploadResult.bytes,
-      }))
-
-      const insertedImages = await tx
-        .insert(images)
-        .values(imageData)
-        .returning()
-
-      res.status(201).json({
-        product: {
-          ...product!,
-          images: insertedImages.map((img) => ({
-            id: img.id,
-            url: img.url,
-            alt: img.alt,
-            position: img.position,
-          })),
-        },
-      })
-    })
-  } catch {
-    next({ message: 'Failed to add product', status: 500 })
   }
 }
 
