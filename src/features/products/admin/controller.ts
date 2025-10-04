@@ -6,6 +6,7 @@ import { db } from '@db/index'
 import { and, asc, count, desc, eq, ilike, inArray } from 'drizzle-orm'
 import { AddProduct, AdminProductsQuery } from '@products/admin/validation'
 import { getInventoryStatus } from '@utils/get-inventory-status'
+import logger from 'src/logger'
 
 /// ADD
 
@@ -61,7 +62,7 @@ export const addProduct = async (
       })
     })
   } catch (error) {
-    console.error('Add Product Error : ', error)
+    logger.error(error, 'Failed to add product')
     next({ message: 'Failed to add product', status: 500 })
   }
 }
@@ -127,7 +128,7 @@ export const getProducts = async (
       totalPages,
     })
   } catch (err) {
-    console.error('get products error : ',err)
+    logger.error(err, 'Failed to get products')
     next({ message: 'Failed to fetch products', status: 500 })
   }
 }
@@ -152,7 +153,8 @@ export const getProductById = async (
     res
       .status(200)
       .json({ ...product, inventoryStatus: getInventoryStatus(product.stock) })
-  } catch {
+  } catch (err) {
+    logger.error(err, 'Failed to get product')
     next({ message: 'Failed to fetch product', status: 500 })
   }
 }
@@ -244,7 +246,7 @@ export const updateProduct = async (
       })
     })
   } catch (error) {
-    console.error('update product error : ', error)
+    logger.error(error, 'Failed to update product')
     next({ message: 'Failed to update product', status: 500 })
   }
 }
@@ -271,7 +273,7 @@ export const deleteProduct = async (
       res.status(200).json({ productId })
     })
   } catch (err) {
-    console.log('failed to delete product : ', err)
+    logger.error(err, 'Failed to delete product')
     next({ message: 'Failed to delete product', status: 500 })
   }
 }

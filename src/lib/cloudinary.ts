@@ -1,6 +1,7 @@
 import config from '@config/config'
 import { slugify } from '@utils/slugify'
 import { v2 as cloudinary, type AdminAndResourceOptions } from 'cloudinary'
+import logger from 'src/logger'
 import { v4 as uuid } from 'uuid'
 
 cloudinary.config({
@@ -88,10 +89,8 @@ export const getAssetInfo = async (publicId: string) => {
 
   try {
     const result = await cloudinary.api.resource(publicId, options)
-    console.log(result)
     return result.colors
   } catch (error) {
-    console.error(error)
     throw error
   }
 }
@@ -102,7 +101,7 @@ export const deleteImage = async (publicId: string) => {
     const result = await cloudinary.uploader.destroy(publicId)
     return result
   } catch (error) {
-    console.error('Delete error:', error)
+    logger.error(error,"Failed to delete cloudinary image")
     throw error
   }
 }

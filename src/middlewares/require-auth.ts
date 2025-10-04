@@ -7,8 +7,7 @@ export interface AuthRequest extends Request {
 
 export const requireAuth = (requiredRole?: 'admin') => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
-    // const token = req.headers.authorization?.split(' ')[1];
-    // console.log('req.cookies in requireAuth : ',req.cookies)
+
     const token = req.cookies.accessToken
 
     if (!token) {
