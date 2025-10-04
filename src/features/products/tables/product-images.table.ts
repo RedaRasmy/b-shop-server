@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, integer, varchar } from 'drizzle-orm/pg-core'
+import { pgTable, uuid, text, integer, varchar, boolean } from 'drizzle-orm/pg-core'
 import { createdAt, updatedAt } from '../../../db/timestamps'
 import {
   relations,
@@ -17,7 +17,7 @@ const images = pgTable('product_images', {
   url: text().notNull(),
   publicId: varchar('public_id', { length: 255 }).notNull(),
   alt: text().notNull(),
-  position: integer().notNull(),
+  isPrimary: boolean('is_primary').notNull(),
   width: integer('width'),
   height: integer('height'),
   format: varchar('format', { length: 10 }), // jpg, png, etc.

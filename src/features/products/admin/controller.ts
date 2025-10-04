@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from 'express'
 import products, { IProduct } from '../tables/products.table'
-import images, { IImage } from '../tables/product-images.table'
+import images, { IImage, SImage } from '../tables/product-images.table'
 import { deleteMultipleImages, uploadMultipleImages } from '@lib/cloudinary'
 import { db } from '@db/index'
 import { and, asc, count, desc, eq, ilike, inArray } from 'drizzle-orm'
@@ -40,12 +40,12 @@ export const addProduct = async (
         productId: product.id,
         url: uploadResult.url,
         publicId: uploadResult.public_id,
-        alt: productImages[index]!.alt,
+        alt: productImages[index].alt,
         width: uploadResult.width,
         height: uploadResult.height,
         format: uploadResult.format,
         size: uploadResult.bytes,
-        position: index,
+        isPrimary: productImages[index].isPrimary,
       }))
 
       const insertedImages = await tx
@@ -55,7 +55,7 @@ export const addProduct = async (
 
       res.status(201).json({
         product: {
-          ...product!,
+          ...product,
           images: insertedImages,
         },
       })
@@ -190,29 +190,32 @@ export const updateProduct = async (
         ),
       )
 
-      // Upload new images to cloudinary
-      const uploadedFiles = await uploadMultipleImages(
-        newImages.map((img) => img.file),
-        `products/${productId}`,
-      )
+      let insertedImages: SImage[] = []
 
-      // Insert new images to database
-      const imagesData: IImage[] = uploadedFiles.map((uploadResult, index) => ({
-        productId: productId,
-        url: uploadResult.url,
-        publicId: uploadResult.public_id,
-        alt: newImages[index].alt,
-        width: uploadResult.width,
-        height: uploadResult.height,
-        format: uploadResult.format,
-        size: uploadResult.bytes,
-        position: index,
-      }))
+      if (newImages.length > 0) {
+        // Upload new images to cloudinary
+        const uploadedFiles = await uploadMultipleImages(
+          newImages.map((img) => img.file),
+          `products/${productId}`,
+        )
 
-      const insertedImages = await db
-        .insert(images)
-        .values(imagesData)
-        .returning()
+        // Insert new images to database
+        const imagesData: IImage[] = uploadedFiles.map(
+          (uploadResult, index) => ({
+            productId: productId,
+            url: uploadResult.url,
+            publicId: uploadResult.public_id,
+            alt: newImages[index].alt,
+            width: uploadResult.width,
+            height: uploadResult.height,
+            format: uploadResult.format,
+            size: uploadResult.bytes,
+            isPrimary: newImages[index].isPrimary,
+          }),
+        )
+
+        insertedImages = await db.insert(images).values(imagesData).returning()
+      }
 
       /// update the product row
 
@@ -227,16 +230,20 @@ export const updateProduct = async (
         message: 'Product updated successfully',
         product: {
           ...product!,
-          images: insertedImages.map((img) => ({
-            id: img.id,
-            url: img.url,
-            alt: img.alt,
-            position: img.position,
-          })),
+          images: [
+            ...oldImages,
+            ...insertedImages.map((i) => ({
+              id: i.id,
+              url: i.url,
+              isPrimary: i.isPrimary,
+              alt: i.alt,
+            })),
+          ],
         },
       })
     })
   } catch (error) {
+    console.error('update product error : ', error)
     next({ message: 'Failed to update product', status: 500 })
   }
 }
@@ -262,8 +269,8 @@ export const deleteProduct = async (
 
       res.status(200).json({ productId })
     })
-  } catch(err) {
-    console.log('failed to delete product : ',err)
+  } catch (err) {
+    console.log('failed to delete product : ', err)
     next({ message: 'Failed to delete product', status: 500 })
   }
 }
