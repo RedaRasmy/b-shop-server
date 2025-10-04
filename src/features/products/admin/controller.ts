@@ -80,7 +80,7 @@ export const getProducts = async (
     // Filtering conditions
     const where = (products: any, { eq, ilike, and }: any) => {
       const filters = []
-      if (categoryId) filters.push(eq(products.categorieId, categoryId))
+      if (categoryId) filters.push(eq(products.categoryId, categoryId))
       if (search) filters.push(ilike(products.name, `%${search}%`))
       if (status) filters.push(eq(products.status, status))
       return filters.length ? and(...filters) : undefined
@@ -127,6 +127,7 @@ export const getProducts = async (
       totalPages,
     })
   } catch (err) {
+    console.error('get products error : ',err)
     next({ message: 'Failed to fetch products', status: 500 })
   }
 }
