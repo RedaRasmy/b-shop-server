@@ -105,7 +105,7 @@ export const getProducts = async (
       orderBy,
     })
 
-    let totalCount: number | null = null
+    let total: number | null = null
     let totalPages: number | null = null
 
     // Only compute total when page = 1
@@ -114,6 +114,7 @@ export const getProducts = async (
         .select({ totalCount: count() })
         .from(products)
         .where(where(products, { eq, ilike, and }))
+      total = totalCount
       totalPages = Math.ceil(totalCount / perPage)
     }
 
@@ -124,7 +125,7 @@ export const getProducts = async (
       })),
       page,
       perPage,
-      total: totalCount,
+      total,
       totalPages,
     })
   } catch (err) {
