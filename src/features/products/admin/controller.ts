@@ -3,7 +3,7 @@ import products, { IProduct } from '../tables/products.table'
 import images, { IImage, SImage } from '../tables/product-images.table'
 import { deleteMultipleImages, uploadMultipleImages } from '@lib/cloudinary'
 import { db } from '@db/index'
-import { and, asc, count, desc, eq, ilike, inArray } from 'drizzle-orm'
+import { and, asc, count, desc, eq, ilike, inArray, isNull } from 'drizzle-orm'
 import { AddProduct, AdminProductsQuery } from '@products/admin/validation'
 import { getInventoryStatus } from '@utils/get-inventory-status'
 import logger from 'src/logger'
@@ -92,7 +92,14 @@ export const getProducts = async (
     // Filtering conditions
     const where = (products: any, { eq, ilike, and }: any) => {
       const filters = []
-      if (categoryId) filters.push(eq(products.categoryId, categoryId))
+      if (categoryId) {
+        if (categoryId === 'null') {
+          // special case where category is deleted
+          filters.push(isNull(products.categoryId))
+        } else {
+          filters.push(eq(products.categoryId, categoryId))
+        }
+      }
       if (search) filters.push(ilike(products.name, `%${search}%`))
       if (status) filters.push(eq(products.status, status))
       return filters.length ? and(...filters) : undefined

@@ -10,7 +10,7 @@ const ImageSchema = z.object({
   alt: z.string().max(255, 'Alt is too long').optional().default(''),
   isPrimary: z.coerce.boolean(),
   url: z.string().min(1).optional(), // for update
-  file : z.any().optional()
+  file: z.any().optional(),
 })
 
 export const AddProductSchema = z.object({
@@ -56,7 +56,8 @@ export const AdminProductsQuerySchema = z.object({
   search: z.string().min(1, 'Search must not be empty').max(100).optional(),
 
   // filters
-  categoryId: z.string().uuid('Invalid category ID').optional(),
+  // categoryId: z.string().uuid('Invalid category ID').optional(),
+  categoryId: z.union([z.uuid('Invalid category ID'), z.literal('null')]).optional(),
   status: StatusSchema.optional(),
 
   // Sorting
