@@ -61,8 +61,19 @@ export const addProduct = async (
         },
       })
     })
-  } catch (error) {
+  } catch (error: any) {
     logger.error(error, 'Failed to add product')
+
+    const isUniqueSlugError =
+      error?.cause?.code === '23505' &&
+      error?.cause?.constraint === 'products_slug_unique'
+
+    if (isUniqueSlugError) {
+      return res.status(409).json({
+        message: 'A product with this slug already exists.',
+      })
+    }
+
     next({ message: 'Failed to add product', status: 500 })
   }
 }
