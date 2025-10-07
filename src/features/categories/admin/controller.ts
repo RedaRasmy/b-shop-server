@@ -116,7 +116,7 @@ export const updateCategory = async (
       .set(req.body)
       .where(eq(categories.id, req.params.id!))
       .returning()
-    res.status(201).json({ categorie })
+    res.status(201).json(categorie)
   } catch {
     next({ message: 'Failed to update categorie', status: 500 })
   }
