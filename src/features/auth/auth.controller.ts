@@ -1,6 +1,5 @@
-import type { Request, Response, NextFunction } from 'express'
 import { db } from '../../db'
-import {users} from '@tables'
+import { users } from '@tables'
 import {
   comparePassword,
   generateAccessToken,
@@ -9,125 +8,127 @@ import {
   revokeRefreshToken,
   verifyRefreshToken,
 } from '../../utils/auth'
-import { AuthRequest } from '../../middlewares/require-auth'
 import config from '@config/config'
+import { makePostEndpoint, makeSimpleEndpoint } from '@utils/wrappers'
+import { EmailPasswordSchema } from '@auth/auth.validation'
 
-export type EmailPassword = {
-  email: string
-  password: string
-}
+export const register = makePostEndpoint(
+  EmailPasswordSchema,
+  async (req, res, next) => {
+    const { email, password } = req.body
 
-export async function register(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
-  const { email, password } = req.body
+    try {
+      const hashedPassword = await hashPassword(password)
 
-  try {
-    const hashedPassword = await hashPassword(password)
+      const [user] = await db
+        .insert(users)
+        .values({
+          email,
+          password: hashedPassword,
+        })
+        .returning()
 
-    const [user] = await db
-      .insert(users)
-      .values({
-        email,
-        password: hashedPassword,
+      if (!user) throw new Error('Failed to insert user') // just to satisfy TS
+
+      const { accessToken, refreshToken } = await generateTokens(
+        user.id,
+        user.email,
+        user.role,
+      )
+
+      res.cookie('accessToken', accessToken, {
+        httpOnly: true,
+        secure: config.nodeEnv === 'production',
+        maxAge: 15 * 60 * 1000, // 15min,
+        sameSite: config.nodeEnv === 'production' ? 'none' : 'lax',
       })
-      .returning()
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: config.nodeEnv === 'production',
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30days,
+        sameSite: config.nodeEnv === 'production' ? 'none' : 'lax',
+        path: '/api/auth/refresh',
+      })
 
-    if (!user) throw new Error('Failed to insert user') // just to satisfy TS
+      res.status(201).json({
+        user: {
+          id: user.id,
+          email: user.email,
+          isEmailVerified: user.isEmailVerified,
+          role: user.role,
+        },
+        message: 'User registered and logged in successfully',
+      })
+    } catch (err) {
+      if (isUniqueConstraintError(err)) {
+        res.status(400).json({ message: 'Email already in use' })
+      } else {
+        next(err)
+      }
+    }
+  },
+)
 
-    const { accessToken, refreshToken } = await generateTokens(
-      user.id,
-      user.email,
-      user.role,
-    )
+export const login = makePostEndpoint(
+  EmailPasswordSchema,
+  async (req, res, next) => {
+    const { email, password } = req.body
 
-    res.cookie('accessToken', accessToken, {
-      httpOnly: true,
-      secure: config.nodeEnv === 'production',
-      maxAge: 15 * 60 * 1000, // 15min,
-      sameSite: config.nodeEnv === 'production' ? 'none'  : 'lax',
-    })
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: config.nodeEnv === 'production',
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30days,
-      sameSite: config.nodeEnv === 'production' ? 'none'  : 'lax',
-      path: '/api/auth/refresh',
-    })
+    try {
+      // verify email & password
+      const user = await db.query.users.findFirst({
+        where: (users, { eq }) => eq(users.email, email),
+      })
 
-    res.status(201).json({
-      user: {
-        id: user.id,
-        email: user.email,
-        isEmailVerified: user.isEmailVerified,
-        role: user.role,
-      },
-      message: 'User registered and logged in successfully',
-    })
-  } catch (err) {
-    if (isUniqueConstraintError(err)) {
-      res.status(400).json({ message: 'Email already in use' })
-    } else {
+      if (!user) {
+        return res
+          .status(401)
+          .json({ message: 'Email or password is incorrect' })
+      }
+
+      // verify password
+      const isPasswordCorrect = await comparePassword(password, user.password)
+      if (!isPasswordCorrect) {
+        return res
+          .status(401)
+          .json({ message: 'Email or password is incorrect' })
+      }
+      const { accessToken, refreshToken } = await generateTokens(
+        user.id,
+        email,
+        user.role,
+      )
+
+      res.cookie('accessToken', accessToken, {
+        httpOnly: true,
+        secure: config.nodeEnv === 'production',
+        maxAge: 15 * 60 * 1000, // 15min,
+        sameSite: config.nodeEnv === 'production' ? 'none' : 'lax',
+      })
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: config.nodeEnv === 'production',
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30days,
+        sameSite: config.nodeEnv === 'production' ? 'none' : 'lax',
+        path: '/api/auth/refresh',
+      })
+
+      res.status(200).json({
+        user: {
+          id: user.id,
+          email: user.email,
+          isEmailVerified: user.isEmailVerified,
+          role: user.role,
+        },
+        message: 'User logged in successfully',
+      })
+    } catch (err) {
       next(err)
     }
-  }
-}
+  },
+)
 
-export async function login(req: Request, res: Response, next: NextFunction) {
-  const { email, password } = req.body
-
-  try {
-    // verify email & password
-    const user = await db.query.users.findFirst({
-      where: (users, { eq }) => eq(users.email, email),
-    })
-
-    if (!user) {
-      return res.status(401).json({ message: 'Email or password is incorrect' })
-    }
-
-    // verify password
-    const isPasswordCorrect = await comparePassword(password, user.password)
-    if (!isPasswordCorrect) {
-      return res.status(401).json({ message: 'Email or password is incorrect' })
-    }
-    const { accessToken, refreshToken } = await generateTokens(
-      user.id,
-      email,
-      user.role,
-    )
-
-    res.cookie('accessToken', accessToken, {
-      httpOnly: true,
-      secure: config.nodeEnv === 'production',
-      maxAge: 15 * 60 * 1000, // 15min,
-      sameSite: config.nodeEnv === 'production' ? 'none'  : 'lax',
-    })
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: config.nodeEnv === 'production',
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30days,
-      sameSite: config.nodeEnv === 'production' ? 'none'  : 'lax',
-      path: '/api/auth/refresh',
-    })
-
-    res.status(200).json({
-      user: {
-        id: user.id,
-        email: user.email,
-        isEmailVerified: user.isEmailVerified,
-        role: user.role,
-      },
-      message: 'User logged in successfully',
-    })
-  } catch (err) {
-    next(err)
-  }
-}
-
-export async function refresh(req: Request, res: Response, next: NextFunction) {
+export const refresh = makeSimpleEndpoint(async (req, res, next) => {
   const refreshToken = req.cookies.refreshToken
 
   try {
@@ -150,7 +151,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
       httpOnly: true,
       secure: config.nodeEnv === 'production',
       maxAge: 15 * 60 * 1000, // 15min,
-      sameSite: config.nodeEnv === 'production' ? 'none'  : 'lax',
+      sameSite: config.nodeEnv === 'production' ? 'none' : 'lax',
     })
 
     res.status(200).json({
@@ -165,9 +166,9 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
   } catch (err) {
     next(err)
   }
-}
+})
 
-export async function logout(req: Request, res: Response, next: NextFunction) {
+export const logout = makeSimpleEndpoint(async (req, res, next) => {
   const refreshToken = req.cookies.refreshToken
 
   try {
@@ -184,9 +185,9 @@ export async function logout(req: Request, res: Response, next: NextFunction) {
   } catch (err) {
     next(err)
   }
-}
+})
 
-export async function me(req: AuthRequest, res: Response, next: NextFunction) {
+export const me = makeSimpleEndpoint(async (req, res, next) => {
   const user = req.user!
 
   try {
@@ -196,7 +197,7 @@ export async function me(req: AuthRequest, res: Response, next: NextFunction) {
         isEmailVerified: true,
       },
     })
-    
+
     if (!dbUser) {
       return res.status(404).json({ message: 'User not found' })
     }
@@ -204,13 +205,13 @@ export async function me(req: AuthRequest, res: Response, next: NextFunction) {
     res.status(200).json({
       user: {
         ...user,
-        isEmailVerified : dbUser.isEmailVerified,
+        isEmailVerified: dbUser.isEmailVerified,
       },
     })
   } catch (err) {
     next(err)
   }
-}
+})
 
 function isUniqueConstraintError(error: unknown): boolean {
   if (typeof error !== 'object' || error === null) return false
