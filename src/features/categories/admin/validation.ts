@@ -6,10 +6,10 @@ const SortSchema = getSortSchema([
     'name' , 'status' , 'createdAt' ,'updatedAt'
 ])
 
-export const CategoriesQuerySchema = z.object({
+export const AdminCategoriesQuerySchema = z.object({
     status : StatusSchema.optional(),
     search: z.string().min(1, 'Search must not be empty').max(100).optional(),
     sort : SortSchema
 })
 
-export type CategoriesQuery = z.infer<typeof CategoriesQuerySchema>
+export type AdminCategoriesQuery = z.infer<typeof AdminCategoriesQuerySchema>

@@ -1,7 +1,7 @@
 import { db } from '@db/index'
 import { categories } from '@db/schema'
 import { and, asc, desc, eq, ilike, sql } from 'drizzle-orm'
-import { CategoriesQuerySchema } from '@categories/admin/validation'
+import { AdminCategoriesQuerySchema } from '@categories/admin/validation'
 import { ICategory } from '@categories/categories.table'
 import {
   makeGetEndpoint,
@@ -21,13 +21,13 @@ export const addCategory = makePostEndpoint(
         .returning()
       res.status(201).json(category)
     } catch {
-      next({ message: 'Failed to add categorie', status: 500 })
+      next({ message: 'Failed to add category', status: 500 })
     }
   },
 )
 
 export const getCategories = makeGetEndpoint(
-  CategoriesQuerySchema,
+  AdminCategoriesQuerySchema,
   async (req, res, next) => {
     try {
       const { sort, status, search } = req.query
@@ -104,7 +104,7 @@ export const getCategoryById = makeByIdEndpoint(async (req, res, next) => {
       productsCount: products.length,
     })
   } catch {
-    next({ message: 'Failed to fetch categorie', status: 500 })
+    next({ message: 'Failed to fetch category', status: 500 })
   }
 })
 
@@ -119,7 +119,7 @@ export const updateCategory = makeUpdateEndpoint(
         .returning()
       res.status(201).json(categorie)
     } catch {
-      next({ message: 'Failed to update categorie', status: 500 })
+      next({ message: 'Failed to update category', status: 500 })
     }
   },
 )
@@ -138,7 +138,7 @@ export const deleteCategory = makeByIdEndpoint(async (req, res, next) => {
 
     res.status(204).send()
   } catch {
-    next({ message: 'Failed to delete categorie', status: 500 })
+    next({ message: 'Failed to delete category', status: 500 })
   }
 })
 
@@ -154,7 +154,7 @@ export const getCategoryProducts = makeByIdEndpoint(async (req, res, next) => {
     res.status(200).json(products)
   } catch {
     next({
-      message: 'Failed to fetch categorie products',
+      message: 'Failed to fetch category products',
       status: 500,
     })
   }

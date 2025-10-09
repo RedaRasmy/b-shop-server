@@ -1,55 +1,80 @@
 import type { Request, Response, NextFunction } from 'express'
 import { db } from '../../db'
+import { makeByIdEndpoint, makeSimpleEndpoint } from '@utils/wrappers'
+import { getInventoryStatus } from '@utils/get-inventory-status'
 
-// Read all products
-export const getCategories = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const getCategories = makeSimpleEndpoint(async (req, res, next) => {
   try {
-    const allCategories = await db.query.categories.findMany()
-    res.status(200).json(allCategories)
+    const result = await db.query.categories.findMany({
+      where: (categories, { eq }) => eq(categories.status, 'active'),
+    })
+
+    // remove status column
+    const data = result.map(({ status, ...cat }) => cat)
+
+    res.status(200).json(data)
   } catch {
     next({ message: 'Failed to fetch categories', status: 500 })
   }
-}
+})
 
-// Read single product
-export const getCategoryById = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+export const getCategoryById = makeByIdEndpoint(async (req, res, next) => {
+  const id = req.params.id
   try {
-    const categorie = await db.query.categories.findFirst({
-      where: (categories, { eq }) => eq(categories.id, req.params.id!),
+    const result = await db.query.categories.findFirst({
+      where: (categories, { eq, and }) =>
+        and(eq(categories.id, id), eq(categories.status, 'active')),
     })
-    res.status(200).json({ categorie })
-  } catch {
-    next({ message: 'Failed to fetch categorie', status: 500 })
-  }
-}
 
-// Read all products in a categorie
-export const getCategoryProducts = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
+    if (!result) {
+      return res.status(404).json({
+        message: 'Category Not Found!',
+      })
+    }
+
+    /// remove status
+    const { status, ...category } = result
+
+    res.status(200).json(category)
+  } catch {
+    next({ message: 'Failed to fetch category', status: 500 })
+  }
+})
+
+export const getCategoryProducts = makeByIdEndpoint(async (req, res, next) => {
+  const id = req.params.id
   try {
-    const categorieId = req.params.id! // validated
     const products = await db.query.products.findMany({
-      where: (products, { eq }) => eq(products.categoryId, categorieId),
+      where: (products, { eq }) => eq(products.categoryId, id),
       with: {
         images: true,
+        reviews: true,
+        category: true,
       },
     })
-    res.status(200).json(products)
+
+    const isForbidden = products[0].category!.status === 'inactive'
+
+    if (isForbidden) {
+      return res.status(404).json({
+        message: 'Category Not Found!',
+      })
+    }
+
+    // remove unwanted data and add inventoryStatus
+    const data = products.map(
+      ({ category, status, stock, createdAt, updatedAt, ...p }) => ({
+        ...p,
+        inventoryStatus: getInventoryStatus(stock),
+      }),
+    )
+
+    res.status(200).json(data)
   } catch {
     next({
-      message: 'Failed to fetch categorie products',
+      message: 'Failed to fetch category products',
       status: 500,
     })
   }
-}
+})
+

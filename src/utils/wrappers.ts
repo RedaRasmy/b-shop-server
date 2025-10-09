@@ -97,3 +97,15 @@ export function makeUpdateEndpoint<Body>(
     return callback(req as any, res, next)
   }
 }
+
+export function makeSimpleEndpoint(
+  callback: (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) => void,
+) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    return callback(req as any, res, next)
+  }
+}
