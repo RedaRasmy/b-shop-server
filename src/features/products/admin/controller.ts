@@ -93,8 +93,7 @@ export const getProducts = makeGetEndpoint(
   AdminProductsQuerySchema,
   async (req, res, next) => {
     try {
-      const { page, perPage, search, categoryId, sort, status } =
-        req.validatedQuery as AdminProductsQuery
+      const { page, perPage, search, categoryId, sort, status } = req.query
 
       // Filtering conditions
       const where = (products: any, { eq, ilike, and }: any) => {

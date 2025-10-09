@@ -24,7 +24,7 @@ const products = pgTable('products', {
 export default products
 
 export const productsRelations = relations(products, ({ one, many }) => ({
-  categorie: one(categories, {
+  category: one(categories, {
     fields: [products.categoryId],
     references: [categories.id],
   }),
