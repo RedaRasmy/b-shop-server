@@ -66,32 +66,10 @@ export function makePostEndpoint<Body>(
   }
 }
 
-// export function makeDeleteEndpoint(
-//   callback: (
-//     req: Request<{ id: string }>,
-//     res: Response,
-//     next: NextFunction,
-//   ) => void,
-// ) {
-//   return (req: Request, res: Response, next: NextFunction) => {
-
-//     const result = IdSchema.safeParse(req.params.id)
-
-//     if (!result.success) {
-//       return res.status(400).send({
-//         message: 'Invalid search params',
-//         details: result.error.issues,
-//       })
-//     }
-
-//     return callback(req as any, res, next)
-//   }
-// }
-
 export function makeUpdateEndpoint<Body>(
   schema: z.ZodType<Body>,
   callback: (
-    req: Request<{ id: string }, any, any, Body>,
+    req: Request<{ id: string }, any, Body>,
     res: Response,
     next: NextFunction,
   ) => void,
