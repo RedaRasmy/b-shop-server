@@ -24,9 +24,9 @@ export function makeGetEndpoint<Query>(
   }
 }
 
-export function makeGetOneEndpoint(
+export function makeByIdEndpoint(
   callback: (
-    req: Request<{id:string}>,
+    req: Request<{ id: string }>,
     res: Response,
     next: NextFunction,
   ) => void,
@@ -40,7 +40,6 @@ export function makeGetOneEndpoint(
         details: result.error.issues,
       })
     }
-
     return callback(req as any, res, next)
   }
 }
@@ -67,27 +66,27 @@ export function makePostEndpoint<Body>(
   }
 }
 
-export function makeDeleteEndpoint(
-  callback: (
-    req: Request<{ id: string }>,
-    res: Response,
-    next: NextFunction,
-  ) => void,
-) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    
-    const result = IdSchema.safeParse(req.params.id)
+// export function makeDeleteEndpoint(
+//   callback: (
+//     req: Request<{ id: string }>,
+//     res: Response,
+//     next: NextFunction,
+//   ) => void,
+// ) {
+//   return (req: Request, res: Response, next: NextFunction) => {
 
-    if (!result.success) {
-      return res.status(400).send({
-        message: 'Invalid search params',
-        details: result.error.issues,
-      })
-    }
+//     const result = IdSchema.safeParse(req.params.id)
 
-    return callback(req as any, res, next)
-  }
-}
+//     if (!result.success) {
+//       return res.status(400).send({
+//         message: 'Invalid search params',
+//         details: result.error.issues,
+//       })
+//     }
+
+//     return callback(req as any, res, next)
+//   }
+// }
 
 export function makeUpdateEndpoint<Body>(
   schema: z.ZodType<Body>,

@@ -41,24 +41,9 @@ export const validateBody = (schema: z.ZodSchema) => {
   }
 }
 
-// export const validateQuery = (schema: z.ZodSchema) => {
-//   return (req: Request, res: Response, next: NextFunction) => {
-//     try {
-//       (req as any).validatedQuery = schema.parse(req.query)
-//       next()
-//     } catch (error) {
-//       if (error instanceof z.ZodError) {
-//         res.status(400).json({
-//           message: 'Invalid query params',
-//           details: error.issues,
-//         })
-//       } else {
-//         next(error)
-//       }
-//     }
-//   }
-// }
 
+
+  
 export const validateQuery = (schema: z.ZodSchema) => {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
