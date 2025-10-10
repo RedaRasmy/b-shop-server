@@ -1,6 +1,6 @@
 import { db } from '@db/index'
 import { categories } from '@db/schema'
-import { and, asc, desc, eq, ilike, sql } from 'drizzle-orm'
+import { and, asc, desc, eq, ilike } from 'drizzle-orm'
 import { AdminCategoriesQuerySchema } from '@categories/admin/validation'
 import { ICategory } from '@categories/categories.table'
 import {
@@ -10,6 +10,7 @@ import {
   makeUpdateEndpoint,
 } from '@utils/wrappers'
 import { InsertCategorySchema } from '@categories/categories.validation'
+import logger from 'src/logger'
 
 export const addCategory = makePostEndpoint(
   InsertCategorySchema,
@@ -30,9 +31,10 @@ export const getCategories = makeGetEndpoint(
   AdminCategoriesQuerySchema,
   async (req, res, next) => {
     try {
-      const { sort, status, search } = req.query
+      const { sort = 'createdAt:desc', status, search } = req.query
 
-      // 1. --- Build WHERE Clause for Filtering and Searching ---
+      console.log('query : ', req.query)
+
       const conditions = []
 
       // Filter by Status (active/inactive)
@@ -78,7 +80,8 @@ export const getCategories = makeGetEndpoint(
       }))
 
       res.status(200).json(response)
-    } catch {
+    } catch (error) {
+      logger.error(error)
       next({ message: 'Failed to fetch categories', status: 500 })
     }
   },
