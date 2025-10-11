@@ -1,9 +1,10 @@
 import { Router } from 'express'
 import * as controller from './products.controller'
+import { optionalAuth } from '@mw/optional-auth'
 
 const router: Router = Router()
 
 router.get('/' , controller.getProducts)
-router.get('/:id', controller.getProductById)
+router.get('/:id', optionalAuth() , controller.getProductById)
 
 export const productsRouter = router
