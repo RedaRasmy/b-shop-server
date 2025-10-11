@@ -1,38 +1,26 @@
 import { db } from '@db/index'
-import { products } from '@tables'
-import { and, asc, count, desc, eq, ilike, isNotNull } from 'drizzle-orm'
+import { categories, images, products, reviews } from '@tables'
+import { and, asc, count, desc, eq, ilike, isNotNull, sql } from 'drizzle-orm'
 import { IProduct } from './tables/products.table'
 import { ProductsQuerySchema } from './products.validation'
 import { makeByIdEndpoint, makeGetEndpoint } from '@utils/wrappers'
 import { getInventoryStatus } from '@utils/get-inventory-status'
 import logger from 'src/logger'
+import { buildProductFilters } from '@products/utils/build-product-filters'
 
 export const getProducts = makeGetEndpoint(
   ProductsQuerySchema,
   async (req, res, next) => {
     try {
       const {
-        page,
-        perPage,
+        page = 1,
+        perPage = 20,
         search,
         categoryId,
         sort = 'createdAt:desc',
       } = req.query
 
-      // Filtering conditions
-      const where = (products: any, { eq, ilike, and }: any) => {
-        const filters = []
-        /// Default filters
-        filters.push(eq(products.status, 'active'))
-        filters.push(isNotNull(products.categoryId))
-
-        // Optional
-        if (categoryId) {
-          filters.push(eq(products.categoryId, categoryId))
-        }
-        if (search) filters.push(ilike(products.name, `%${search}%`))
-        return filters.length ? and(...filters) : undefined
-      }
+      const where = buildProductFilters({ search, categoryId })
 
       // Sorting
       let orderBy: any
@@ -43,14 +31,40 @@ export const getProducts = makeGetEndpoint(
       const sortDirection = direction.toLowerCase() === 'asc' ? asc : desc
       orderBy = sortDirection(products[field])
 
-      // Fetch current page
-      const filteredProducts = await db.query.products.findMany({
-        where,
-        with: { images: true, reviews: true, category: true },
-        limit: perPage,
-        offset: (page - 1) * perPage,
-        orderBy,
-      })
+      const filteredProducts = await db
+        .select({
+          id: products.id,
+          slug: products.slug,
+          name: products.name,
+          price: products.price,
+          createdAt: products.createdAt,
+          categoryId: products.categoryId,
+          reviewCount: sql<number>`cast(count (${reviews.id}) as integer)`.as(
+            'review_count',
+          ),
+          averageRating: sql<number>`cast(AVG(${reviews.rating}) as float)`.as(
+            'average_rating',
+          ),
+          thumbnailUrl: images.url,
+        })
+        .from(products)
+        .where(where(products, { eq, ilike, and }))
+        .innerJoin(
+          categories,
+          and(
+            eq(categories.id, products.categoryId),
+            eq(categories.status, 'active'),
+          ),
+        )
+        .leftJoin(reviews, eq(products.id, reviews.productId))
+        .leftJoin(
+          images,
+          and(eq(products.id, images.productId), eq(images.isPrimary, true)),
+        )
+        .groupBy(products.id, images.url)
+        .offset((page - 1) * perPage)
+        .limit(perPage)
+        .orderBy(orderBy)
 
       let total: number | null = null
       let totalPages: number | null = null
@@ -60,17 +74,25 @@ export const getProducts = makeGetEndpoint(
         const [{ totalCount }] = await db
           .select({ totalCount: count() })
           .from(products)
+          .innerJoin(
+            categories,
+            and(
+              eq(categories.id, products.categoryId),
+              eq(categories.status, 'active'),
+            ),
+          )
           .where(where(products, { eq, ilike, and }))
         total = totalCount
         totalPages = Math.ceil(totalCount / perPage)
       }
 
-      const data = filteredProducts
-        .filter((p) => p.category?.status === 'active')
-        .map(({ status, stock, createdAt, updatedAt, category, ...p }) => ({
-          ...p,
-          inventoryStatus: getInventoryStatus(stock),
-        }))
+      const week = 1000 * 60 * 60 * 24 * 7
+
+      // add isNew
+      const data = filteredProducts.map(({ createdAt, ...p }) => ({
+        ...p,
+        isNew: Date.now() - createdAt.getTime() < week,
+      }))
 
       res.json({
         data,

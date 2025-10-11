@@ -33,8 +33,6 @@ export const getCategories = makeGetEndpoint(
     try {
       const { sort = 'createdAt:desc', status, search } = req.query
 
-      console.log('query : ', req.query)
-
       const conditions = []
 
       // Filter by Status (active/inactive)
