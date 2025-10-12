@@ -11,7 +11,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "db:generate": "npx drizzle-kit generate",
-    "db:migrate": "npx drizzle-kit migrate"
+    "db:migrate": "npx drizzle-kit migrate",
+    "db:studio" : "npx drizzle-kit studio"
   },
   "keywords": [],
   "author": "",
