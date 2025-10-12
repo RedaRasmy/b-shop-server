@@ -107,14 +107,14 @@ export const getProducts = makeGetEndpoint(
   },
 )
 
-export const getProductById = makeByIdEndpoint(async (req, res, next) => {
+export const getProductBySlug = makeByIdEndpoint(async (req, res, next) => {
   const isAdmin = req.user?.role === 'admin'
-  const id = req.params.id
+  const slug = req.params.id
   try {
     /// NOTE : I used query instead of select because images and reviews are arrays
     // and select dont support this kind of joins
     const product = await db.query.products.findFirst({
-      where: (products, { eq }) => eq(products.id, id),
+      where: (products, { eq }) => eq(products.slug, slug),
       with: {
         images: true,
         reviews: {
