@@ -1,7 +1,7 @@
 import { boolean, pgTable, uuid, varchar } from 'drizzle-orm/pg-core'
 import { createdAt, updatedAt } from '../../db/timestamps'
 import { relations } from 'drizzle-orm'
-import {reviews} from '../../db/schema'
+import { cartItems, reviews } from '../../db/schema'
 
 const users = pgTable('users', {
   id: uuid().primaryKey().defaultRandom(),
@@ -17,4 +17,5 @@ export default users
 
 export const usersRelations = relations(users, ({ many }) => ({
   reviews: many(reviews),
+  cart: many(cartItems),
 }))

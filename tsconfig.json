@@ -37,7 +37,7 @@
       "@tables": ["src/db/schema.ts"],
       "@config/*": ["src/config/*"],
       "@auth/*": ["src/features/auth/*"],
-      "@users/*": ["src/features/users/*"],
+      "@profile/*": ["src/features/profile/*"],
       "@products/*": ["src/features/products/*"],
       "@categories/*": ["src/features/categories/*"],
       "@orders/*": ["src/features/orders/*"]

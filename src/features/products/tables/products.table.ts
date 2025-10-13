@@ -5,7 +5,7 @@ import {
   type InferInsertModel,
   type InferSelectModel,
 } from 'drizzle-orm'
-import { entityStatus, categories, images, reviews } from '@tables'
+import { entityStatus, categories, images, reviews, cartItems } from '@tables'
 
 const products = pgTable('products', {
   id: uuid().primaryKey().defaultRandom(),
@@ -30,6 +30,7 @@ export const productsRelations = relations(products, ({ one, many }) => ({
   }),
   images: many(images),
   reviews: many(reviews),
+  cartItems : many(cartItems)
 }))
 
 export type IProduct = InferInsertModel<typeof products>

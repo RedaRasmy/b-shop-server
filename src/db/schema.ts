@@ -12,7 +12,10 @@ export {
   default as categories,
   categoriesRelations,
 } from '../features/categories/categories.table'
-export { default as users, usersRelations } from '../features/profile/profile.table'
+export {
+  default as users,
+  usersRelations,
+} from '../features/profile/profile.table'
 export {
   default as refreshTokens,
   refreshTokensRelations,
@@ -31,5 +34,9 @@ export {
   default as reviews,
   reviewsRelations,
 } from '../features/products/tables/product-reviews.table'
+export {
+  default as cartItems,
+  cartItemsRelations,
+} from '@profile/cart/cart.table'
 
 export { entityStatus }

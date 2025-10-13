@@ -63,7 +63,7 @@
     "@db": "dist/db",
     "@tables": "dist/db/schema.js",
     "@auth": "dist/features/auth",
-    "@users": "dist/features/users",
+    "@profile": "dist/features/profile",
     "@products": "dist/features/products",
     "@categories": "dist/features/categories",
     "@orders": "dist/features/orders"
