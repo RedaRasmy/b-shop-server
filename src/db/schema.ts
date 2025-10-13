@@ -12,7 +12,7 @@ export {
   default as categories,
   categoriesRelations,
 } from '../features/categories/categories.table'
-export { default as users, usersRelations } from '../features/users/users.table'
+export { default as users, usersRelations } from '../features/profile/profile.table'
 export {
   default as refreshTokens,
   refreshTokensRelations,

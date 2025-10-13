@@ -5,7 +5,7 @@ import { categoriesRouter } from './features/categories/categories.router'
 import { categoriesAdminRouter } from './features/categories/admin/router'
 import { productsAdminRouter } from './features/products/admin/router'
 import { authRouter } from '@auth/auth.router'
-import { usersRouter } from '@users/users.router'
+import { profileRouter } from 'src/features/profile/profile.router'
 
 export const router = Router()
 
@@ -13,8 +13,7 @@ export const router = Router()
 router.use('/products', productsRouter)
 router.use('/categories', categoriesRouter)
 router.use('/auth', authRouter)
-router.use('/users', requireAuth(), usersRouter)
-
+router.use('/me', requireAuth(), profileRouter)
 
 // Admin Routes (Protected by Authorization)
 const adminRouter = Router()
