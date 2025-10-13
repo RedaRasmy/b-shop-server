@@ -2,10 +2,14 @@ import type { NextFunction, Request, Response } from 'express'
 import { z } from 'zod'
 const IdSchema = z.string().min(1)
 
+export interface ValidatedQueryRequest<T> extends Request<any, any, any, T> {
+  validatedQuery: T
+}
+
 export function makeGetEndpoint<Query>(
   schema: z.ZodType<Query>,
   callback: (
-    req: Request<any, any, any, Query>,
+    req: ValidatedQueryRequest<Query>,
     res: Response,
     next: NextFunction,
   ) => void,
@@ -20,7 +24,10 @@ export function makeGetEndpoint<Query>(
       })
     }
 
-    return callback(req as any, res, next)
+    // req.validatedQuery = result.data
+    ;(req as ValidatedQueryRequest<Query>).validatedQuery = result.data
+
+    return callback(req as ValidatedQueryRequest<Query>, res, next)
   }
 }
 
@@ -62,6 +69,8 @@ export function makePostEndpoint<Body>(
       })
     }
 
+    req.body = result.data
+
     return callback(req as any, res, next)
   }
 }
@@ -99,11 +108,7 @@ export function makeUpdateEndpoint<Body>(
 }
 
 export function makeSimpleEndpoint(
-  callback: (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ) => void,
+  callback: (req: Request, res: Response, next: NextFunction) => void,
 ) {
   return (req: Request, res: Response, next: NextFunction) => {
     return callback(req as any, res, next)

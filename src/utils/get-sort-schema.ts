@@ -16,5 +16,5 @@ export function getSortSchema(sortableFields:string[]) {
         message: `Invalid sortable field. Allowed: ${sortableFields.join(', ')}`,
       },
     )
-    .optional()
+    .default('createdAt:desc')
 }

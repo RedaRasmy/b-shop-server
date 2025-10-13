@@ -14,13 +14,13 @@ export const getProducts = makeGetEndpoint(
   async (req, res, next) => {
     try {
       const {
-        page = 1,
-        perPage = 20,
+        page ,
+        perPage ,
         search,
         categoryId,
-        sort = 'createdAt:desc',
-      } = req.query
-
+        sort,
+      } = req.validatedQuery
+      
       const where = buildProductFilters({ search, categoryId })
 
       // Sorting
@@ -63,9 +63,9 @@ export const getProducts = makeGetEndpoint(
           and(eq(products.id, images.productId), eq(images.isPrimary, true)),
         )
         .groupBy(products.id, images.url)
+        .orderBy(orderBy)
         .offset((page - 1) * perPage)
         .limit(perPage)
-        .orderBy(orderBy)
 
       let total: number | null = null
       let totalPages: number | null = null
