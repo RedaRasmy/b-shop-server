@@ -7,20 +7,14 @@ import { makeByIdEndpoint, makeGetEndpoint } from '@utils/wrappers'
 import { getInventoryStatus } from '@utils/get-inventory-status'
 import logger from 'src/logger'
 import { buildProductFilters } from '@products/utils/build-product-filters'
-import {  isNewProduct } from '@products/utils/is-new'
+import { isNewProduct } from '@products/utils/is-new'
 
 export const getProducts = makeGetEndpoint(
   ProductsQuerySchema,
   async (req, res, next) => {
     try {
-      const {
-        page ,
-        perPage ,
-        search,
-        categoryId,
-        sort,
-      } = req.validatedQuery
-      
+      const { page, perPage, search, categoryId, sort } = req.validatedQuery
+
       const where = buildProductFilters({ search, categoryId })
 
       // Sorting
@@ -47,6 +41,7 @@ export const getProducts = makeGetEndpoint(
             'average_rating',
           ),
           thumbnailUrl: images.url,
+          stock: products.stock,
         })
         .from(products)
         .where(where(products, { eq, ilike, and }))
@@ -88,9 +83,10 @@ export const getProducts = makeGetEndpoint(
       }
 
       // add isNew
-      const data = filteredProducts.map(({ createdAt, ...p }) => ({
+      const data = filteredProducts.map(({ createdAt, stock, ...p }) => ({
         ...p,
         isNew: isNewProduct(createdAt),
+        inventoryStatus: getInventoryStatus(stock),
       }))
 
       res.json({

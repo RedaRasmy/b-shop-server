@@ -3,6 +3,7 @@ import { cartItems } from '@db/schema'
 import { isNewProduct } from '@products/utils/is-new'
 import { InsertCartItemSchema } from '@profile/cart/cart.validation'
 import { formatNumber } from '@utils/format-number'
+import { getInventoryStatus } from '@utils/get-inventory-status'
 import {
   makeByIdEndpoint,
   makePostEndpoint,
@@ -27,6 +28,7 @@ export const getCart = makeSimpleEndpoint(async (req, res, next) => {
             categoryId: true,
             createdAt: true,
             status: true,
+            stock: true,
           },
           with: {
             images: {
@@ -65,6 +67,7 @@ export const getCart = makeSimpleEndpoint(async (req, res, next) => {
             createdAt,
             status,
             category,
+            stock,
             ...productData
           },
           ...item
@@ -75,6 +78,7 @@ export const getCart = makeSimpleEndpoint(async (req, res, next) => {
             thumbnailUrl: images[0].url,
             reviewCount: reviews.length,
             isNew: isNewProduct(createdAt),
+            inventoryStatus: getInventoryStatus(stock),
             averageRating:
               reviews.length === 0
                 ? null
