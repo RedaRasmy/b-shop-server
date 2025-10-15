@@ -18,6 +18,12 @@ export const getCart = makeSimpleEndpoint(async (req, res, next) => {
   try {
     const cart = await db.query.cartItems.findMany({
       where: (cartItems, { eq }) => eq(cartItems.userId, userId),
+      columns: {
+        id: true,
+        addedAt: true,
+        productId: true,
+        quantity: true,
+      },
       with: {
         product: {
           columns: {
