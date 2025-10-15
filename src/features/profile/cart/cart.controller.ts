@@ -76,23 +76,21 @@ export const getCart = makeSimpleEndpoint(async (req, res, next) => {
             stock,
             ...productData
           },
-          ...item
+          quantity,
         }) => ({
-          ...item,
-          product: {
-            ...productData,
-            thumbnailUrl: images[0].url,
-            reviewCount: reviews.length,
-            isNew: isNewProduct(createdAt),
-            inventoryStatus: getInventoryStatus(stock),
-            averageRating:
-              reviews.length === 0
-                ? null
-                : formatNumber(
-                    reviews.reduce((acc, { rating }) => acc + rating, 0) /
-                      reviews.length,
-                  ),
-          },
+          quantity,
+          ...productData,
+          thumbnailUrl: images[0].url,
+          reviewCount: reviews.length,
+          isNew: isNewProduct(createdAt),
+          inventoryStatus: getInventoryStatus(stock),
+          averageRating:
+            reviews.length === 0
+              ? null
+              : formatNumber(
+                  reviews.reduce((acc, { rating }) => acc + rating, 0) /
+                    reviews.length,
+                ),
         }),
       )
 
@@ -141,7 +139,7 @@ export const addCartItem = makePostEndpoint(
 export const updateCartItem = makeUpdateEndpoint(
   InsertCartItemSchema.omit({ productId: true }),
   async (req, res, next) => {
-    const id = req.params.id
+    const productId = req.params.id
     const quantity = req.body.quantity
     const userId = req.user?.id!
 
@@ -149,7 +147,9 @@ export const updateCartItem = makeUpdateEndpoint(
       await db
         .update(cartItems)
         .set({ quantity })
-        .where(and(eq(cartItems.id, id), eq(cartItems.userId, userId)))
+        .where(
+          and(eq(cartItems.productId, productId), eq(cartItems.userId, userId)),
+        )
 
       res.status(204).send()
     } catch (error) {
@@ -160,13 +160,15 @@ export const updateCartItem = makeUpdateEndpoint(
 )
 
 export const deleteCartItem = makeByIdEndpoint(async (req, res, next) => {
-  const id = req.params.id
+  const productId = req.params.id
   const userId = req.user?.id!
 
   try {
     await db
       .delete(cartItems)
-      .where(and(eq(cartItems.id, id), eq(cartItems.userId, userId)))
+      .where(
+        and(eq(cartItems.productId, productId), eq(cartItems.userId, userId)),
+      )
     res.status(204).send()
   } catch (err) {
     logger.error(err)
