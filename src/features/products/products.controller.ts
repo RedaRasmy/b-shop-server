@@ -1,13 +1,18 @@
 import { db } from '@db/index'
 import { categories, images, products, reviews } from '@tables'
-import { and, asc, count, desc, eq, ilike, sql } from 'drizzle-orm'
+import { and, asc, count, desc, eq, ilike, inArray, sql } from 'drizzle-orm'
 import { IProduct } from './tables/products.table'
 import { ProductsQuerySchema } from './products.validation'
-import { makeByIdEndpoint, makeGetEndpoint } from '@utils/wrappers'
+import {
+  makeByIdEndpoint,
+  makeGetEndpoint,
+  makePostEndpoint,
+} from '@utils/wrappers'
 import { getInventoryStatus } from '@utils/get-inventory-status'
 import logger from 'src/logger'
 import { buildProductFilters } from '@products/utils/build-product-filters'
 import { isNewProduct } from '@products/utils/is-new'
+import z from 'zod'
 
 export const getProducts = makeGetEndpoint(
   ProductsQuerySchema,
@@ -96,6 +101,59 @@ export const getProducts = makeGetEndpoint(
         total,
         totalPages,
       })
+    } catch (err) {
+      logger.error(err, 'Failed to get products')
+      next({ message: 'Failed to fetch products', status: 500 })
+    }
+  },
+)
+
+export const getProductsByIds = makePostEndpoint(
+  z.array(z.string()),
+  async (req, res, next) => {
+    const ids = req.body
+
+    try {
+      const filteredProducts = await db
+        .select({
+          id: products.id,
+          slug: products.slug,
+          name: products.name,
+          price: products.price,
+          createdAt: products.createdAt,
+          categoryId: products.categoryId,
+          reviewCount: sql<number>`cast(count (${reviews.id}) as integer)`.as(
+            'review_count',
+          ),
+          averageRating: sql<number>`cast(AVG(${reviews.rating}) as float)`.as(
+            'average_rating',
+          ),
+          thumbnailUrl: images.url,
+          stock: products.stock,
+        })
+        .from(products)
+        .where(inArray(products.id, ids))
+        .innerJoin(
+          categories,
+          and(
+            eq(categories.id, products.categoryId),
+            eq(categories.status, 'active'),
+          ),
+        )
+        .leftJoin(reviews, eq(products.id, reviews.productId))
+        .leftJoin(
+          images,
+          and(eq(products.id, images.productId), eq(images.isPrimary, true)),
+        )
+        .groupBy(products.id, images.url)
+
+      const data = filteredProducts.map(({ createdAt, stock, ...p }) => ({
+        ...p,
+        isNew: isNewProduct(createdAt),
+        inventoryStatus: getInventoryStatus(stock),
+      }))
+
+      res.json(data)
     } catch (err) {
       logger.error(err, 'Failed to get products')
       next({ message: 'Failed to fetch products', status: 500 })

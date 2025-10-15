@@ -4,7 +4,8 @@ import { optionalAuth } from '@mw/optional-auth'
 
 const router: Router = Router()
 
-router.get('/' , controller.getProducts)
-router.get('/:id', optionalAuth() , controller.getProductBySlug)
+router.get('/', controller.getProducts)
+router.get('/:id', optionalAuth(), controller.getProductBySlug)
+router.post('/bulk', controller.getProductsByIds)
 
 export const productsRouter = router
