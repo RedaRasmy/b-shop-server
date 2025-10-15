@@ -173,3 +173,14 @@ export const deleteCartItem = makeByIdEndpoint(async (req, res, next) => {
     next(err)
   }
 })
+
+export const clearCart = makeSimpleEndpoint(async (req, res, next) => {
+  const userId = req.user?.id!
+  try {
+    await db.delete(cartItems).where(eq(cartItems.userId, userId))
+    res.sendStatus(204)
+  } catch (err) {
+    logger.error(err)
+    next(err)
+  }
+})

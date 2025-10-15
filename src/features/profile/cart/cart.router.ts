@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import {
   addCartItem,
+  clearCart,
   deleteCartItem,
   getCart,
   updateCartItem,
@@ -12,3 +13,4 @@ cartRouter.get('/', getCart)
 cartRouter.post('/', addCartItem)
 cartRouter.put('/:id', updateCartItem)
 cartRouter.delete('/:id', deleteCartItem)
+cartRouter.delete('/', clearCart)
