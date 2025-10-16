@@ -4,6 +4,7 @@ import {
   clearCart,
   deleteCartItem,
   getCart,
+  mergeCart,
   updateCartItem,
 } from './cart.controller'
 
@@ -14,3 +15,4 @@ cartRouter.post('/', addCartItem)
 cartRouter.put('/:id', updateCartItem)
 cartRouter.delete('/:id', deleteCartItem)
 cartRouter.delete('/', clearCart)
+cartRouter.post('/merge',mergeCart)

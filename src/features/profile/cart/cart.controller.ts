@@ -10,8 +10,9 @@ import {
   makeSimpleEndpoint,
   makeUpdateEndpoint,
 } from '@utils/wrappers'
-import { and, eq } from 'drizzle-orm'
+import { and, eq, sql } from 'drizzle-orm'
 import logger from 'src/logger'
+import z from 'zod'
 
 export const getCart = makeSimpleEndpoint(async (req, res, next) => {
   const userId = req.user?.id!
@@ -186,3 +187,41 @@ export const clearCart = makeSimpleEndpoint(async (req, res, next) => {
     next(err)
   }
 })
+
+export const mergeCart = makePostEndpoint(
+  z
+    .array(
+      z.object({
+        productId: z.uuid(),
+        quantity: z.number().int().min(1),
+      }),
+    )
+    .min(1, 'At least one item is required'),
+  async (req, res, next) => {
+    const userId = req.user?.id!
+    const items = req.body
+
+    try {
+      await db
+        .insert(cartItems)
+        .values(
+          items.map((item) => ({
+            userId,
+            productId: item.productId,
+            quantity: item.quantity,
+          })),
+        )
+        .onConflictDoUpdate({
+          target: [cartItems.userId, cartItems.productId],
+          set: {
+            quantity: sql`${cartItems.quantity} + excluded.quantity`,
+          },
+        })
+
+      res.sendStatus(200)
+    } catch (error) {
+      logger.error(error)
+      next(error)
+    }
+  },
+)
