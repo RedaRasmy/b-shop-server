@@ -57,6 +57,7 @@ export const getCart = makeSimpleEndpoint(async (req, res, next) => {
           },
         },
       },
+      orderBy: (cartItems, { desc }) => desc(cartItems.addedAt),
     })
 
     const shouldBeActive = ({
