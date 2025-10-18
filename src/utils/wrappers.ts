@@ -117,7 +117,7 @@ type User = {
 
 type AuthRequest = Prettify<Omit<Request, 'user'> & { user: User }>
 
-export function makeAuthEndopint(
+export function makeAuthEndpoint(
   callback: (req: AuthRequest, res: Response, next: NextFunction) => void,
 ) {
   return (req: Request, res: Response, next: NextFunction) => {
