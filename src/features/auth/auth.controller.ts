@@ -9,10 +9,13 @@ import {
   verifyRefreshToken,
 } from '../../utils/auth'
 import config from '@config/config'
-import { makePostEndpoint, makeSimpleEndpoint } from '@utils/wrappers'
+import {
+  makeBodyEndpoint,
+  makeSimpleEndpoint,
+} from '@utils/wrappers'
 import { EmailPasswordSchema } from '@auth/auth.validation'
 
-export const register = makePostEndpoint(
+export const register = makeBodyEndpoint(
   EmailPasswordSchema,
   async (req, res, next) => {
     const { email, password } = req.body
@@ -69,7 +72,7 @@ export const register = makePostEndpoint(
   },
 )
 
-export const login = makePostEndpoint(
+export const login = makeBodyEndpoint(
   EmailPasswordSchema,
   async (req, res, next) => {
     const { email, password } = req.body
@@ -186,8 +189,6 @@ export const logout = makeSimpleEndpoint(async (req, res, next) => {
     next(err)
   }
 })
-
-
 
 function isUniqueConstraintError(error: unknown): boolean {
   if (typeof error !== 'object' || error === null) return false

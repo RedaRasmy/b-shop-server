@@ -4,15 +4,15 @@ import { and, asc, desc, eq, ilike } from 'drizzle-orm'
 import { AdminCategoriesQuerySchema } from '@categories/admin/validation'
 import { ICategory } from '@categories/categories.table'
 import {
-  makeGetEndpoint,
-  makePostEndpoint,
+  makeQueryEndpoint,
+  makeBodyEndpoint,
   makeByIdEndpoint,
   makeUpdateEndpoint,
 } from '@utils/wrappers'
 import { InsertCategorySchema } from '@categories/categories.validation'
 import logger from 'src/logger'
 
-export const addCategory = makePostEndpoint(
+export const addCategory = makeBodyEndpoint(
   InsertCategorySchema,
   async (req, res, next) => {
     try {
@@ -27,11 +27,11 @@ export const addCategory = makePostEndpoint(
   },
 )
 
-export const getCategories = makeGetEndpoint(
+export const getCategories = makeQueryEndpoint(
   AdminCategoriesQuerySchema,
   async (req, res, next) => {
     try {
-      const { sort = 'createdAt:desc', status, search } = req.query
+      const { sort = 'createdAt:desc', status, search } = req.validatedQuery
 
       const conditions = []
 
@@ -116,7 +116,7 @@ export const updateCategory = makeUpdateEndpoint(
       const categorie = await db
         .update(categories)
         .set(req.body)
-        .where(eq(categories.id, req.params.id!))
+        .where(eq(categories.id, req.params.id))
         .returning()
       res.status(201).json(categorie)
     } catch {

@@ -3,7 +3,10 @@ import { db } from '@db/index'
 import { users } from '@db/schema'
 import { FullNameSchema, PhoneSchema } from '@profile/profile.validation'
 import { comparePassword, hashPassword } from '@utils/auth'
-import { makePostEndpoint, makeSimpleEndpoint } from '@utils/wrappers'
+import {
+  makeBodyEndpoint,
+  makeSimpleEndpoint,
+} from '@utils/wrappers'
 import { eq } from 'drizzle-orm'
 import z from 'zod'
 
@@ -33,7 +36,7 @@ export const me = makeSimpleEndpoint(async (req, res, next) => {
   }
 })
 
-export const updateProfile = makePostEndpoint(
+export const updateProfile = makeBodyEndpoint(
   z.object({
     phone: PhoneSchema.optional(),
     fullName: FullNameSchema.optional(),
@@ -57,7 +60,7 @@ export const updateProfile = makePostEndpoint(
   },
 )
 
-export const updatePassword = makePostEndpoint(
+export const updatePassword = makeBodyEndpoint(
   z.object({
     oldPassword: PasswordSchema,
     newPassword: PasswordSchema,

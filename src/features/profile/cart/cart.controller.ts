@@ -6,7 +6,7 @@ import { formatNumber } from '@utils/format-number'
 import { getInventoryStatus } from '@utils/get-inventory-status'
 import {
   makeByIdEndpoint,
-  makePostEndpoint,
+  makeBodyEndpoint,
   makeSimpleEndpoint,
   makeUpdateEndpoint,
 } from '@utils/wrappers'
@@ -103,7 +103,7 @@ export const getCart = makeSimpleEndpoint(async (req, res, next) => {
   }
 })
 
-export const addCartItem = makePostEndpoint(
+export const addCartItem = makeBodyEndpoint(
   InsertCartItemSchema,
   async (req, res, next) => {
     const data = req.body
@@ -189,7 +189,7 @@ export const clearCart = makeSimpleEndpoint(async (req, res, next) => {
   }
 })
 
-export const mergeCart = makePostEndpoint(
+export const mergeCart = makeBodyEndpoint(
   z
     .array(
       z.object({

@@ -12,13 +12,13 @@ import { getInventoryStatus } from '@utils/get-inventory-status'
 import logger from 'src/logger'
 import {
   makeByIdEndpoint,
-  makeGetEndpoint,
-  makePostEndpoint,
+  makeQueryEndpoint,
+  makeBodyEndpoint,
   makeUpdateEndpoint,
 } from '@utils/wrappers'
 
 /// ADD
-export const addProduct = makePostEndpoint(
+export const addProduct = makeBodyEndpoint(
   AddProductSchema,
   async (req, res, next) => {
     const { images: productImages, ...productData } = req.body
@@ -89,7 +89,7 @@ export const addProduct = makePostEndpoint(
 
 /// GET
 
-export const getProducts = makeGetEndpoint(
+export const getProducts = makeQueryEndpoint(
   AdminProductsQuerySchema,
   async (req, res, next) => {
     try {

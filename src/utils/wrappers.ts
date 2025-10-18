@@ -1,12 +1,88 @@
+import { Prettify, ToRecord } from '@lib/types'
 import type { NextFunction, Request, Response } from 'express'
 import { z } from 'zod'
-const IdSchema = z.string().min(1)
 
-export interface ValidatedQueryRequest<T> extends Request<any, any, any, T> {
+/*
+    Simple 
+    Params
+    Body
+    Query 
+    Auth
+*/
+
+/// SIMPLE
+
+export function makeSimpleEndpoint(
+  callback: (req: Request, res: Response, next: NextFunction) => void,
+) {
+  return callback
+}
+
+/// PARAMS
+
+function compareArrays(a: unknown[], b: unknown[]): boolean {
+  if (a.length !== b.length) return false
+
+  const aSorted = [...a].sort()
+  const bSorted = [...b].sort()
+
+  return aSorted.every((val, idx) => val === bSorted[idx])
+}
+
+export function makeParamsEndpoint<T extends readonly string[]>(
+  params: [...T],
+  callback: (
+    req: Request<ToRecord<T>>,
+    res: Response,
+    next: NextFunction,
+  ) => void,
+) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    /// validate
+    const isGood = compareArrays(params, Object.keys(req.params))
+
+    if (!isGood) {
+      return res.status(400).send({
+        message: 'Invalid search params',
+      })
+    }
+    return callback(req as Request<ToRecord<T>>, res, next)
+  }
+}
+
+/// BODY
+
+export function makeBodyEndpoint<Body>(
+  schema: z.ZodType<Body>,
+  callback: (
+    req: Request<any, any, Body>,
+    res: Response,
+    next: NextFunction,
+  ) => void,
+) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const result = schema.safeParse(req.body)
+
+    if (!result.success) {
+      return res.status(400).send({
+        message: 'Invalid body',
+        details: result.error.issues,
+      })
+    }
+
+    req.body = result.data
+
+    return callback(req as Request<any, any, Body>, res, next)
+  }
+}
+
+/// QUERY
+
+interface ValidatedQueryRequest<T> extends Request<any, any, any, T> {
   validatedQuery: T
 }
 
-export function makeGetEndpoint<Query>(
+export function makeQueryEndpoint<Query>(
   schema: z.ZodType<Query>,
   callback: (
     req: ValidatedQueryRequest<Query>,
@@ -31,6 +107,34 @@ export function makeGetEndpoint<Query>(
   }
 }
 
+/// AUTH
+
+type User = {
+  id: string
+  role: string
+  email: string
+}
+
+type AuthRequest = Prettify<Omit<Request, 'user'> & { user: User }>
+
+export function makeAuthEndopint(
+  callback: (req: AuthRequest, res: Response, next: NextFunction) => void,
+) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const user = req.user
+
+    if (!user) {
+      return res.status(403).send({
+        message: 'Unauthorized',
+      })
+    }
+
+    return callback(req as AuthRequest, res, next)
+  }
+}
+
+/// BY ID
+
 export function makeByIdEndpoint(
   callback: (
     req: Request<{ id: string }>,
@@ -38,42 +142,10 @@ export function makeByIdEndpoint(
     next: NextFunction,
   ) => void,
 ) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const result = IdSchema.safeParse(req.params.id)
-
-    if (!result.success) {
-      return res.status(400).send({
-        message: 'Invalid search params',
-        details: result.error.issues,
-      })
-    }
-    return callback(req as any, res, next)
-  }
+  return makeParamsEndpoint(['id'], callback)
 }
 
-export function makePostEndpoint<Body>(
-  schema: z.ZodType<Body>,
-  callback: (
-    req: Request<any, any, Body>,
-    res: Response,
-    next: NextFunction,
-  ) => void,
-) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const result = schema.safeParse(req.body)
-
-    if (!result.success) {
-      return res.status(400).send({
-        message: 'Invalid body',
-        details: result.error.issues,
-      })
-    }
-
-    req.body = result.data
-
-    return callback(req as any, res, next)
-  }
-}
+/// UPDATE BY ID
 
 export function makeUpdateEndpoint<Body>(
   schema: z.ZodType<Body>,
@@ -83,34 +155,5 @@ export function makeUpdateEndpoint<Body>(
     next: NextFunction,
   ) => void,
 ) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const IdSchema = z.string().min(1)
-    const result = IdSchema.safeParse(req.params.id)
-
-    if (!result.success) {
-      return res.status(400).send({
-        message: 'Invalid search params',
-        details: result.error.issues,
-      })
-    }
-
-    const bodyResult = schema.safeParse(req.body)
-
-    if (!bodyResult.success) {
-      return res.status(400).send({
-        message: 'Invalid body',
-        details: bodyResult.error.issues,
-      })
-    }
-
-    return callback(req as any, res, next)
-  }
-}
-
-export function makeSimpleEndpoint(
-  callback: (req: Request, res: Response, next: NextFunction) => void,
-) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    return callback(req as any, res, next)
-  }
+  return makeParamsEndpoint(['id'], makeBodyEndpoint(schema, callback))
 }

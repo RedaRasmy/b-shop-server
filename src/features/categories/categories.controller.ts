@@ -1,6 +1,8 @@
-import type { Request, Response, NextFunction } from 'express'
 import { db } from '../../db'
-import { makeByIdEndpoint, makeSimpleEndpoint } from '@utils/wrappers'
+import {
+  makeByIdEndpoint,
+  makeSimpleEndpoint,
+} from '@utils/wrappers'
 import { getInventoryStatus } from '@utils/get-inventory-status'
 
 export const getCategories = makeSimpleEndpoint(async (req, res, next) => {
@@ -77,4 +79,3 @@ export const getCategoryProducts = makeByIdEndpoint(async (req, res, next) => {
     })
   }
 })
-

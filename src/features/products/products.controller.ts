@@ -5,8 +5,8 @@ import { IProduct } from './tables/products.table'
 import { ProductsQuerySchema } from './products.validation'
 import {
   makeByIdEndpoint,
-  makeGetEndpoint,
-  makePostEndpoint,
+  makeQueryEndpoint,
+  makeBodyEndpoint,
 } from '@utils/wrappers'
 import { getInventoryStatus } from '@utils/get-inventory-status'
 import logger from 'src/logger'
@@ -14,7 +14,7 @@ import { buildProductFilters } from '@products/utils/build-product-filters'
 import { isNewProduct } from '@products/utils/is-new'
 import z from 'zod'
 
-export const getProducts = makeGetEndpoint(
+export const getProducts = makeQueryEndpoint(
   ProductsQuerySchema,
   async (req, res, next) => {
     try {
@@ -108,7 +108,7 @@ export const getProducts = makeGetEndpoint(
   },
 )
 
-export const getProductsByIds = makePostEndpoint(
+export const getProductsByIds = makeBodyEndpoint(
   z.array(z.string()),
   async (req, res, next) => {
     const ids = req.body
