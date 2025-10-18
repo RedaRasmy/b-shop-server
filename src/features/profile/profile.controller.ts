@@ -1,6 +1,7 @@
 import { PasswordSchema } from '@auth/auth.validation'
 import { db } from '@db/index'
 import { users } from '@db/schema'
+import { FullNameSchema, PhoneSchema } from '@profile/profile.validation'
 import { comparePassword, hashPassword } from '@utils/auth'
 import { makePostEndpoint, makeSimpleEndpoint } from '@utils/wrappers'
 import { eq } from 'drizzle-orm'
@@ -34,14 +35,21 @@ export const me = makeSimpleEndpoint(async (req, res, next) => {
 
 export const updateProfile = makePostEndpoint(
   z.object({
-    phone: z.string().min(9).max(16),
+    phone: PhoneSchema.optional(),
+    fullName: FullNameSchema.optional(),
   }),
   async (req, res, next) => {
-    const { phone } = req.body
+    const { phone, fullName } = req.body
     const userId = req.user?.id!
 
+    const updateData: Partial<typeof users.$inferInsert> = {}
+
+    if (phone !== undefined) updateData.phone = phone
+    if (fullName !== undefined) updateData.fullName = fullName
+
     try {
-      await db.update(users).set({ phone }).where(eq(users.id, userId))
+      await db.update(users).set(updateData).where(eq(users.id, userId))
+
       res.sendStatus(204)
     } catch (err) {
       next(err)
