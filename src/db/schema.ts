@@ -38,5 +38,9 @@ export {
   default as cartItems,
   cartItemsRelations,
 } from '@profile/cart/cart.table'
+export {
+  default as addresses,
+  addressesRelations,
+} from '@profile/addresses/addresses.table'
 
 export { entityStatus }

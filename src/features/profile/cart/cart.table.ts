@@ -6,10 +6,10 @@ const cartItems = pgTable(
   'cart_items',
   {
     id: uuid().primaryKey().defaultRandom(),
-    userId: uuid()
+    userId: uuid('user_id')
       .references(() => users.id)
       .notNull(),
-    productId: uuid()
+    productId: uuid('product_id')
       .references(() => products.id)
       .notNull(),
     quantity: integer().notNull(),

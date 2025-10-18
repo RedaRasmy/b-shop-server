@@ -1,7 +1,7 @@
 import { boolean, pgTable, uuid, varchar } from 'drizzle-orm/pg-core'
 import { createdAt, updatedAt } from '../../db/timestamps'
 import { InferInsertModel, InferSelectModel, relations } from 'drizzle-orm'
-import { cartItems, reviews } from '../../db/schema'
+import { addresses, cartItems, reviews } from '../../db/schema'
 
 const users = pgTable('users', {
   id: uuid().primaryKey().defaultRandom(),
@@ -20,6 +20,7 @@ export default users
 export const usersRelations = relations(users, ({ many }) => ({
   reviews: many(reviews),
   cart: many(cartItems),
+  addresses : many(addresses)
 }))
 
 export type SUser = InferSelectModel<typeof users>
