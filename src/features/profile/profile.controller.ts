@@ -1,5 +1,8 @@
-import { db } from "@db/index"
-import { makeSimpleEndpoint } from "@utils/wrappers"
+import { db } from '@db/index'
+import { users } from '@db/schema'
+import { makePostEndpoint, makeSimpleEndpoint } from '@utils/wrappers'
+import { eq } from 'drizzle-orm'
+import z from 'zod'
 
 export const me = makeSimpleEndpoint(async (req, res, next) => {
   const user = req.user!
@@ -26,3 +29,20 @@ export const me = makeSimpleEndpoint(async (req, res, next) => {
     next(err)
   }
 })
+
+export const updateProfile = makePostEndpoint(
+  z.object({
+    phone: z.string().min(9).max(16),
+  }),
+  async (req, res, next) => {
+    const { phone } = req.body
+    const userId = req.user?.id!
+
+    try {
+      await db.update(users).set({ phone }).where(eq(users.id, userId))
+      res.sendStatus(204)
+    } catch (err) {
+      next(err)
+    }
+  },
+)
