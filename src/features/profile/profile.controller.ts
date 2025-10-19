@@ -3,34 +3,31 @@ import { db } from '@db/index'
 import { users } from '@db/schema'
 import { FullNameSchema, PhoneSchema } from '@profile/profile.validation'
 import { comparePassword, hashPassword } from '@utils/auth'
-import {
-  makeBodyEndpoint,
-  makeSimpleEndpoint,
-} from '@utils/wrappers'
+import { makeAuthEndpoint, makeBodyEndpoint } from '@utils/wrappers'
 import { eq } from 'drizzle-orm'
 import z from 'zod'
 
-export const me = makeSimpleEndpoint(async (req, res, next) => {
-  const user = req.user!
+export const me = makeAuthEndpoint(async (req, res, next) => {
+  const userId = req.user.id
 
   try {
-    const dbUser = await db.query.users.findFirst({
-      where: (users, { eq }) => eq(users.id, user.id),
+    const user = await db.query.users.findFirst({
+      where: (users, { eq }) => eq(users.id, userId),
       columns: {
         isEmailVerified: true,
+        id: true,
+        email: true,
+        fullName: true,
+        createdAt: true,
+        phone: true,
       },
     })
 
-    if (!dbUser) {
+    if (!user) {
       return res.status(404).json({ message: 'User not found' })
     }
 
-    res.status(200).json({
-      user: {
-        ...user,
-        isEmailVerified: dbUser.isEmailVerified,
-      },
-    })
+    res.status(200).json(user)
   } catch (err) {
     next(err)
   }
