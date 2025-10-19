@@ -20,6 +20,7 @@ export const me = makeAuthEndpoint(async (req, res, next) => {
         fullName: true,
         createdAt: true,
         phone: true,
+        role: true,
       },
     })
 
