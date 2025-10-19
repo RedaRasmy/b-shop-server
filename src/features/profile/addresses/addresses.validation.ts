@@ -5,4 +5,5 @@ export const InsertAddressSchema = createInsertSchema(addresses).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+  customerId : true
 })
