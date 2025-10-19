@@ -1,7 +1,13 @@
 import { db } from '@db/index'
 import { addresses } from '@db/schema'
 import { InsertAddressSchema } from '@profile/addresses/addresses.validation'
-import { makeAuthEndpoint, makeBodyEndpoint } from '@utils/wrappers'
+import {
+  makeAuthEndpoint,
+  makeBodyEndpoint,
+  makeByIdEndpoint,
+  makeUpdateEndpoint,
+} from '@utils/wrappers'
+import { and, eq } from 'drizzle-orm'
 
 /// POST
 
@@ -41,4 +47,39 @@ export const getAddresses = makeAuthEndpoint(async (req, res, next) => {
 
 /// PATCH
 
+export const updateAddress = makeUpdateEndpoint(
+  InsertAddressSchema.partial(),
+  async (req, res, next) => {
+    const userId = req.user?.id!
+    const id = req.params.id
+    const address = req.body
+
+    try {
+      await db
+        .update(addresses)
+        .set(address)
+        .where(and(eq(addresses.id, id), eq(addresses.customerId, userId)))
+
+      res.sendStatus(204)
+    } catch (err) {
+      next(err)
+    }
+  },
+)
+
 /// DELETE
+
+export const deleteAddress = makeByIdEndpoint(async (req, res, next) => {
+  const id = req.params.id
+  const userId = req.user?.id!
+
+  try {
+    await db
+      .delete(addresses)
+      .where(and(eq(addresses.id, id), eq(addresses.customerId, userId)))
+
+    res.sendStatus(204)
+  } catch (err) {
+    next(err)
+  }
+})
