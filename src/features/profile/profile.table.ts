@@ -23,5 +23,5 @@ export const usersRelations = relations(users, ({ many }) => ({
   addresses : many(addresses)
 }))
 
-export type SUser = InferSelectModel<typeof users>
 export type IUser = InferInsertModel<typeof users>
+export type SUser = InferSelectModel<typeof users>

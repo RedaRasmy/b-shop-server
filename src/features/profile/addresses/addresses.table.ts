@@ -1,4 +1,4 @@
-import { users } from '@db/schema'
+import { orders, users } from '@db/schema'
 import { createdAt, updatedAt } from '@db/timestamps'
 import { InferInsertModel, InferSelectModel, relations } from 'drizzle-orm'
 import { boolean, pgTable, uuid, varchar } from 'drizzle-orm/pg-core'
@@ -18,11 +18,12 @@ const addresses = pgTable('addresses', {
   updatedAt,
 })
 
-export const addressesRelations = relations(addresses, ({ one }) => ({
+export const addressesRelations = relations(addresses, ({ one , many }) => ({
   customer: one(users, {
     fields: [addresses.customerId],
     references: [users.id],
   }),
+  orders : many(orders)
 }))
 
 export default addresses
