@@ -26,7 +26,7 @@ export const paymentMethod = pgEnum('payment_method', ['COD', 'card'])
 
 const orders = pgTable('orders', {
   id: serial().primaryKey(),
-  userId: uuid('user_id').references(() => users.id).notNull(),
+  customerId: uuid('customer_id').references(() => users.id).notNull(),
   status: orderStatus().default('pending').notNull(),
   total: integer().notNull(),
   addressId: uuid('address_id').references(() => addresses.id).notNull(),
@@ -38,7 +38,7 @@ export default orders
 
 export const ordersRelations = relations(orders, ({ one, many }) => ({
   customer: one(users, {
-    fields: [orders.userId],
+    fields: [orders.customerId],
     references: [users.id],
   }),
   items: many(orderItems),
