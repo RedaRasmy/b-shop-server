@@ -17,12 +17,35 @@ export const addAddress = makeBodyEndpoint(
     const address = req.body
     const userId = req.user?.id!
     try {
-      const [row] = await db
-        .insert(addresses)
-        .values({ ...address, customerId: userId })
-        .returning()
+      if (address.isDefault) {
+        await db.transaction(async (tx) => {
+          // update the default one
+          await tx
+            .update(addresses)
+            .set({
+              isDefault: false,
+            })
+            .where(
+              and(
+                eq(addresses.customerId, userId),
+                eq(addresses.isDefault, true),
+              ),
+            )
+          const [row] = await tx
+            .insert(addresses)
+            .values({ ...address, customerId: userId })
+            .returning()
 
-      res.status(200).json(row)
+          res.status(200).json(row)
+        })
+      } else {
+        const [row] = await db
+          .insert(addresses)
+          .values({ ...address, customerId: userId })
+          .returning()
+
+        res.status(200).json(row)
+      }
     } catch (err) {
       next(err)
     }
