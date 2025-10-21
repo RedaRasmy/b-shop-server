@@ -1,7 +1,7 @@
 import { orders, users } from '@db/schema'
 import { createdAt, updatedAt } from '@db/timestamps'
 import { InferInsertModel, InferSelectModel, relations } from 'drizzle-orm'
-import { boolean, pgTable, uuid, varchar } from 'drizzle-orm/pg-core'
+import { boolean, index, pgTable, uuid, varchar } from 'drizzle-orm/pg-core'
 
 const addresses = pgTable('addresses', {
   id: uuid().primaryKey().defaultRandom(),
@@ -16,7 +16,9 @@ const addresses = pgTable('addresses', {
   isDefault: boolean('is_default').default(false).notNull(),
   createdAt,
   updatedAt,
-})
+},(table)=>[
+  index('customer_id_index').on(table.customerId)
+])
 
 export const addressesRelations = relations(addresses, ({ one , many }) => ({
   customer: one(users, {

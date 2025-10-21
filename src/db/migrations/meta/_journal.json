@@ -120,6 +120,13 @@
       "when": 1760891264661,
       "tag": "0016_nebulous_rattler",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1761061355041,
+      "tag": "0017_hesitant_mister_fear",
+      "breakpoints": true
     }
   ]
 }

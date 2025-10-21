@@ -1,0 +1,1 @@
+CREATE INDEX "customer_id_index" ON "addresses" USING btree ("customer_id");
