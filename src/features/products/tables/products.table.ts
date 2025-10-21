@@ -1,4 +1,11 @@
-import { pgTable, uuid, text, integer, varchar } from 'drizzle-orm/pg-core'
+import {
+  pgTable,
+  uuid,
+  text,
+  integer,
+  varchar,
+  numeric,
+} from 'drizzle-orm/pg-core'
 import { createdAt, updatedAt } from '../../../db/timestamps'
 import {
   relations,
@@ -12,7 +19,7 @@ const products = pgTable('products', {
   name: text().notNull(),
   slug: varchar({ length: 255 }).notNull().unique(),
   description: text().notNull(),
-  price: integer().notNull(),
+  price: numeric({ precision: 10, scale: 2 }).notNull(),
   stock: integer().notNull(),
   categoryId: uuid('category_id').references(() => categories.id, {
     onDelete: 'set null',
@@ -30,7 +37,7 @@ export const productsRelations = relations(products, ({ one, many }) => ({
   }),
   images: many(images),
   reviews: many(reviews),
-  cartItems : many(cartItems)
+  cartItems: many(cartItems),
 }))
 
 export type IProduct = InferInsertModel<typeof products>

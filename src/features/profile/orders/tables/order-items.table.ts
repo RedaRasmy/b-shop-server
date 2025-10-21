@@ -1,4 +1,4 @@
-import { pgTable, uuid, integer } from 'drizzle-orm/pg-core'
+import { pgTable, uuid, integer, numeric } from 'drizzle-orm/pg-core'
 import {
   relations,
   type InferInsertModel,
@@ -8,10 +8,17 @@ import { orders, products } from '@tables'
 
 const orderItems = pgTable('order_items', {
   id: uuid().primaryKey().defaultRandom(),
-  orderId: integer('order_id').references(() => orders.id).notNull(),
-  productId: uuid('product_id').references(() => products.id).notNull(),
+  orderId: integer('order_id')
+    .references(() => orders.id)
+    .notNull(),
+  productId: uuid('product_id')
+    .references(() => products.id)
+    .notNull(),
   quantity: integer().notNull().default(1),
-  priceAtPurchase: integer('price_at_purchase').notNull(),
+  priceAtPurchase: numeric('price_at_purchase', {
+    precision: 10,
+    scale: 2,
+  }).notNull(),
 })
 export default orderItems
 
