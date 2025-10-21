@@ -7,7 +7,7 @@ import {
   makeByIdEndpoint,
   makeUpdateEndpoint,
 } from '@utils/wrappers'
-import { and, eq } from 'drizzle-orm'
+import { and, desc, eq } from 'drizzle-orm'
 
 /// POST
 
@@ -35,11 +35,12 @@ export const getAddresses = makeAuthEndpoint(async (req, res, next) => {
   const userId = req.user.id
 
   try {
-    const addresses = await db.query.addresses.findMany({
+    const data = await db.query.addresses.findMany({
       where: (addresses, { eq }) => eq(addresses.customerId, userId),
+      orderBy: desc(addresses.createdAt),
     })
 
-    res.status(200).json(addresses)
+    res.status(200).json(data)
   } catch (err) {
     next(err)
   }
