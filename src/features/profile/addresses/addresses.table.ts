@@ -1,4 +1,4 @@
-import { orders, users } from '@db/schema'
+import { users } from '@db/schema'
 import { createdAt, updatedAt } from '@db/timestamps'
 import { InferInsertModel, InferSelectModel, relations } from 'drizzle-orm'
 import { boolean, index, pgTable, uuid, varchar } from 'drizzle-orm/pg-core'
@@ -25,7 +25,6 @@ export const addressesRelations = relations(addresses, ({ one , many }) => ({
     fields: [addresses.customerId],
     references: [users.id],
   }),
-  orders : many(orders)
 }))
 
 export default addresses
