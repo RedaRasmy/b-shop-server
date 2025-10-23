@@ -6,6 +6,7 @@ import { categoriesAdminRouter } from './features/categories/admin/router'
 import { productsAdminRouter } from './features/products/admin/router'
 import { authRouter } from '@auth/auth.router'
 import { profileRouter } from 'src/features/profile/profile.router'
+import { PublicOrdersRouter } from '@orders/orders.router'
 
 export const router = Router()
 
@@ -14,6 +15,7 @@ router.use('/products', productsRouter)
 router.use('/categories', categoriesRouter)
 router.use('/auth', authRouter)
 router.use('/me', requireAuth(), profileRouter)
+router.use('/orders', PublicOrdersRouter)
 
 // Admin Routes (Protected by Authorization)
 const adminRouter = Router()
