@@ -10,6 +10,7 @@ export const OrderInsertSchema = createInsertSchema(orders)
     customerId: true,
     status: true,
     guestToken: true,
+    total : true
   })
   .extend({
     items: z.array(
