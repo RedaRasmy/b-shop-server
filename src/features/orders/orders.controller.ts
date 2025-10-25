@@ -17,15 +17,22 @@ export const addOrder = makeBodyEndpoint(
       // get products
       const products = await db.query.products.findMany({
         where: (products, { inArray }) => inArray(products.id, productIds),
+        with: {
+          category: true,
+        },
       })
 
-      // check if all products exists
-      if (products.length !== productIds.length) {
-        const foundIds = products.map((p) => p.id)
-        const missingIds = productIds.filter((id) => !foundIds.includes(id))
+      
+      // check if all products exists and active
+
+      type Product = (typeof products)[number]
+      
+      const isInactive = (p: Product) =>
+        p.status === 'inactive' || p.category?.status === 'inactive'
+
+      if (products.length !== productIds.length || products.some(isInactive)) {
         return res.status(400).json({
           message: 'Some products not found',
-          missingProductIds: missingIds,
         })
       }
 
