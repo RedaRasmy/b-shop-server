@@ -1,0 +1,1 @@
+ALTER TABLE "orders" RENAME COLUMN "guestToken" TO "guest_token";

@@ -25,11 +25,11 @@ export {
   ordersRelations,
   orderStatus,
   paymentMethod,
-} from '@profile/orders/tables/orders.table'
+} from '@orders/tables/orders.table'
 export {
   default as orderItems,
   orderItemsRelations,
-} from '@profile/orders/tables/order-items.table'
+} from '@orders/tables/order-items.table'
 export {
   default as reviews,
   reviewsRelations,

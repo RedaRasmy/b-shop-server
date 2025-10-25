@@ -141,6 +141,20 @@
       "when": 1761083316429,
       "tag": "0019_talented_cloak",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1761411280984,
+      "tag": "0020_naive_swordsman",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1761411377692,
+      "tag": "0021_cute_chronomancer",
+      "breakpoints": true
     }
   ]
 }

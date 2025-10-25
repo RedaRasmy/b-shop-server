@@ -26,9 +26,8 @@ export const paymentMethod = pgEnum('payment_method', ['COD', 'card'])
 
 const orders = pgTable('orders', {
   id: serial().primaryKey(),
-  customerId: uuid('customer_id')
-    .references(() => users.id)
-    .notNull(),
+  customerId: uuid('customer_id').references(() => users.id),
+  guestToken: varchar('guest_token', { length: 255 }),
   status: orderStatus().default('pending').notNull(),
   total: numeric({ precision: 10, scale: 2 }).notNull(),
   paymentMethod: paymentMethod('payment_method').notNull(),
