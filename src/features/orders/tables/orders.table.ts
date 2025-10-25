@@ -28,7 +28,6 @@ export const orderStatus = pgEnum('order_status', [
 const orders = pgTable('orders', {
   id: serial().primaryKey(),
   customerId: uuid('customer_id').references(() => users.id),
-  guestToken: varchar('guest_token', { length: 255 }),
   status: orderStatus().default('pending').notNull(),
   total: numeric({ precision: 10, scale: 2 }).notNull(),
   // shipping infos
