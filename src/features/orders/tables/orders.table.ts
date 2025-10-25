@@ -22,7 +22,8 @@ export const orderStatus = pgEnum('order_status', [
   'canceled',
 ])
 
-export const paymentMethod = pgEnum('payment_method', ['COD', 'card'])
+// export const paymentMethod = pgEnum('payment_method', ['COD', 'card'])
+// Only COD for now 
 
 const orders = pgTable('orders', {
   id: serial().primaryKey(),
@@ -30,7 +31,6 @@ const orders = pgTable('orders', {
   guestToken: varchar('guest_token', { length: 255 }),
   status: orderStatus().default('pending').notNull(),
   total: numeric({ precision: 10, scale: 2 }).notNull(),
-  paymentMethod: paymentMethod('payment_method').notNull(),
   // shipping infos
   name: varchar('name', { length: 100 }).notNull(),
   phone: varchar('phone', { length: 20 }).notNull(),

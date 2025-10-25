@@ -24,7 +24,6 @@ export {
   default as orders,
   ordersRelations,
   orderStatus,
-  paymentMethod,
 } from '@orders/tables/orders.table'
 export {
   default as orderItems,
