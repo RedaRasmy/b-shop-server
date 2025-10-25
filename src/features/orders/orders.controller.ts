@@ -7,7 +7,7 @@ export const addOrder = makeBodyEndpoint(
   OrderInsertSchema,
   async (req, res, next) => {
     const userId = req.user?.id!
-    const orderData = req.body
+    const { items, ...orderData } = req.body
 
     try {
       const [order] = await db
