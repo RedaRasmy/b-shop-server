@@ -9,7 +9,6 @@ export const OrderInsertSchema = createInsertSchema(orders)
     updatedAt: true,
     customerId: true,
     status: true,
-    guestToken: true,
     total : true
   })
   .extend({
