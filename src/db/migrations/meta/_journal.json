@@ -169,6 +169,13 @@
       "when": 1761422094558,
       "tag": "0023_sour_rictor",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1761508761130,
+      "tag": "0024_tan_sasquatch",
+      "breakpoints": true
     }
   ]
 }
