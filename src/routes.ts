@@ -9,6 +9,7 @@ import { profileRouter } from 'src/features/profile/profile.router'
 import { PublicOrdersRouter } from '@orders/orders.router'
 import { optionalAuth } from '@mw/optional-auth'
 import { ordersAdminRouter } from '@orders/admin/router'
+import { customersAdminRouter } from '@profile/admin/router'
 
 export const router = Router()
 
@@ -19,12 +20,13 @@ router.use('/auth', authRouter)
 router.use('/me', requireAuth(), profileRouter)
 router.use('/orders', optionalAuth(), PublicOrdersRouter)
 
-// Admin Routes (Protected by Authorization)
+// Admin Routes (Protected)
 const adminRouter = Router()
 adminRouter.use(requireAuth('admin')) // Apply middleware to all admin routes
 
 adminRouter.use('/products', productsAdminRouter)
 adminRouter.use('/categories', categoriesAdminRouter)
-adminRouter.use('/orders',ordersAdminRouter)
+adminRouter.use('/orders', ordersAdminRouter)
+adminRouter.use('/customers', customersAdminRouter)
 
 router.use('/admin', adminRouter)
