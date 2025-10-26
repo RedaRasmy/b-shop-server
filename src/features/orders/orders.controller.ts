@@ -1,7 +1,7 @@
 import { db } from '@db/index'
 import { cartItems, orderItems, orders } from '@db/schema'
 import { OrderInsertSchema } from '@orders/orders.validation'
-import { makeBodyEndpoint } from '@utils/wrappers'
+import { makeBodyEndpoint, makeParamsEndpoint } from '@utils/wrappers'
 import { eq } from 'drizzle-orm'
 
 export const addOrder = makeBodyEndpoint(
@@ -22,11 +22,10 @@ export const addOrder = makeBodyEndpoint(
         },
       })
 
-      
       // check if all products exists and active
 
       type Product = (typeof products)[number]
-      
+
       const isInactive = (p: Product) =>
         p.status === 'inactive' || p.category?.status === 'inactive'
 
@@ -75,6 +74,32 @@ export const addOrder = makeBodyEndpoint(
         }
 
         res.status(201).json(order)
+      })
+    } catch (err) {
+      next(err)
+    }
+  },
+)
+
+export const getOrder = makeParamsEndpoint(
+  ['orderToken'],
+  async (req, res, next) => {
+    const orderToken = req.params.orderToken
+
+    try {
+      const order = await db.query.orders.findFirst({
+        where: (orders, { eq }) => eq(orders.orderToken, orderToken),
+      })
+
+      if (!order) {
+        return res.status(404).json({
+          message: 'Order not found',
+        })
+      }
+
+      res.status(200).json({
+        total: order.total,
+        id: order.id,
       })
     } catch (err) {
       next(err)
