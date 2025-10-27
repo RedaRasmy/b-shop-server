@@ -9,10 +9,7 @@ import {
   verifyRefreshToken,
 } from '../../utils/auth'
 import config from '@config/config'
-import {
-  makeBodyEndpoint,
-  makeSimpleEndpoint,
-} from '@utils/wrappers'
+import { makeBodyEndpoint, makeSimpleEndpoint } from '@utils/wrappers'
 import { EmailPasswordSchema } from '@auth/auth.validation'
 
 export const register = makeBodyEndpoint(
@@ -54,13 +51,10 @@ export const register = makeBodyEndpoint(
       })
 
       res.status(201).json({
-        user: {
-          id: user.id,
-          email: user.email,
-          isEmailVerified: user.isEmailVerified,
-          role: user.role,
-        },
-        message: 'User registered and logged in successfully',
+        id: user.id,
+        email: user.email,
+        isEmailVerified: user.isEmailVerified,
+        role: user.role,
       })
     } catch (err) {
       if (isUniqueConstraintError(err)) {
@@ -117,13 +111,10 @@ export const login = makeBodyEndpoint(
       })
 
       res.status(200).json({
-        user: {
-          id: user.id,
-          email: user.email,
-          isEmailVerified: user.isEmailVerified,
-          role: user.role,
-        },
-        message: 'User logged in successfully',
+        id: user.id,
+        email: user.email,
+        isEmailVerified: user.isEmailVerified,
+        role: user.role,
       })
     } catch (err) {
       next(err)
@@ -158,13 +149,10 @@ export const refresh = makeSimpleEndpoint(async (req, res, next) => {
     })
 
     res.status(200).json({
-      message: 'Access token regenerated successfully',
-      user: {
-        id: user.id,
-        email: user.email,
-        isEmailVerified: user.isEmailVerified,
-        role: user.role,
-      },
+      id: user.id,
+      email: user.email,
+      isEmailVerified: user.isEmailVerified,
+      role: user.role,
     })
   } catch (err) {
     next(err)
