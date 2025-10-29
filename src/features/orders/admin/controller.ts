@@ -1,9 +1,13 @@
 import { db } from '@db/index'
-import { AdminOrdersQuerySchema } from '@orders/admin/validation'
-import { makeQueryEndpoint } from '@utils/wrappers'
+import {
+  AdminOrdersQuerySchema,
+  UpdateOrderSchema,
+} from '@orders/admin/validation'
+import { makeQueryEndpoint, makeUpdateEndpoint } from '@utils/wrappers'
 import { orders } from '@db/schema'
 import { and, asc, count, desc, eq, ilike, or } from 'drizzle-orm'
 import { SOrder } from '@orders/tables/orders.table'
+import z from 'zod'
 
 export const getOrders = makeQueryEndpoint(
   AdminOrdersQuerySchema,
@@ -74,6 +78,35 @@ export const getOrders = makeQueryEndpoint(
         page,
         perPage,
       })
+    } catch (err) {
+      next(err)
+    }
+  },
+)
+
+export const updateOrder = makeUpdateEndpoint(
+  UpdateOrderSchema,
+  async (req, res, next) => {
+    const stringId = req.params.id
+    const { status } = req.body
+
+    try {
+      const { data: id, error } = z.coerce.number().safeParse(stringId)
+
+      if (!id) {
+        return res.status(400).json({
+          message: 'Invalid path param',
+          details: error?.issues,
+        })
+      }
+      await db
+        .update(orders)
+        .set({
+          status,
+        })
+        .where(eq(orders.id, id))
+
+      res.sendStatus(204)
     } catch (err) {
       next(err)
     }

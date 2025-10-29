@@ -26,3 +26,9 @@ export const AdminOrdersQuerySchema = z.object({
 })
 
 export type AdminOrdersQuery = z.infer<typeof AdminOrdersQuerySchema>
+
+// Update
+
+export const UpdateOrderSchema = z.object({
+  status: z.enum(['pending', 'processing', 'shipped', 'completed', 'canceled']),
+})
