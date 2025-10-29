@@ -36,6 +36,7 @@ const orders = pgTable(
     total: numeric({ precision: 10, scale: 2 }).notNull(),
     // shipping infos
     name: varchar('name', { length: 100 }).notNull(),
+    email: varchar({ length: 255 }).notNull(),
     phone: varchar('phone', { length: 20 }).notNull(),
     city: varchar('city', { length: 100 }).notNull(),
     postalCode: varchar('postal_code', { length: 20 }).notNull(),
