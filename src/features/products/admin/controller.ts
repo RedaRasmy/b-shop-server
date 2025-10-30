@@ -100,7 +100,7 @@ export const getProducts = makeQueryEndpoint(
         categoryId,
         sort = 'createdAt:desc',
         status,
-      } = req.query
+      } = req.validatedQuery
 
       // Filtering conditions
       const where = (products: any, { eq, ilike, and }: any) => {
