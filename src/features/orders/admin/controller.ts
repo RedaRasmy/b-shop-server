@@ -40,19 +40,16 @@ export const getOrders = makeQueryEndpoint(
         : desc(orders[field as keyof SOrder])
 
     try {
-      // Compute total only in first page
+      const [{ totalCount }] = await db
+        .select({ totalCount: count() })
+        .from(orders)
+        .where(where(orders, { eq, ilike, and, or }))
 
-      let total: number | null = null
-      let totalPages: number | null = null
-
-      if (page === 1) {
-        const [{ totalCount }] = await db
-          .select({ totalCount: count() })
-          .from(orders)
-          .where(where(orders, { eq, ilike, and, or }))
-        total = totalCount
-        totalPages = Math.ceil(totalCount / perPage)
-      }
+      // Pagination data
+      const total = totalCount
+      const totalPages = Math.ceil(totalCount / perPage)
+      const prevPage = page === 1 ? null : page - 1
+      const nextPage = page === totalPages ? null : page + 1
 
       const data = await db.query.orders.findMany({
         with: {
@@ -77,6 +74,8 @@ export const getOrders = makeQueryEndpoint(
         data,
         page,
         perPage,
+        prevPage,
+        nextPage,
       })
     } catch (err) {
       next(err)
