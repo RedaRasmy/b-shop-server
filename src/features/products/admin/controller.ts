@@ -136,18 +136,16 @@ export const getProducts = makeQueryEndpoint(
         orderBy,
       })
 
-      let total: number | null = null
-      let totalPages: number | null = null
+      const [{ totalCount }] = await db
+        .select({ totalCount: count() })
+        .from(products)
+        .where(where(products, { eq, ilike, and }))
 
-      // Only compute total when page = 1
-      if (page === 1) {
-        const [{ totalCount }] = await db
-          .select({ totalCount: count() })
-          .from(products)
-          .where(where(products, { eq, ilike, and }))
-        total = totalCount
-        totalPages = Math.ceil(totalCount / perPage)
-      }
+      // Pagination data
+      const total = totalCount
+      const totalPages = Math.ceil(totalCount / perPage)
+      const prevPage = page === 1 ? null : page - 1
+      const nextPage = page === totalPages ? null : page + 1
 
       res.json({
         data: filteredProducts.map((p) => ({
@@ -158,6 +156,8 @@ export const getProducts = makeQueryEndpoint(
         perPage,
         total,
         totalPages,
+        prevPage,
+        nextPage,
       })
     } catch (err) {
       logger.error(err, 'Failed to get products')
