@@ -22,7 +22,7 @@ export const AdminOrdersQuerySchema = z.object({
     .optional(),
 
   // Sorting
-  sort: getSortSchema(['customer', 'status', 'createdAt', 'total']),
+  sort: getSortSchema(['name', 'status', 'createdAt', 'total']),
 })
 
 export type AdminOrdersQuery = z.infer<typeof AdminOrdersQuerySchema>

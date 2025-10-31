@@ -16,17 +16,20 @@ export const getOrders = makeQueryEndpoint(
 
     // Build Where Clause
 
-    const where = (orders: any, { eq, ilike, and, or }: any) => {
+    const where = (orders: any, { eq, ilike, and }: any) => {
       const filters = []
 
+      const isNum = !isNaN(Number(search))
+
       if (status) filters.push(eq(orders.status, status))
-      if (search)
-        filters.push(
-          or(
-            ilike(orders.id, `%${search}%`),
-            ilike(orders.name, `%${search}%`),
-          ),
-        )
+
+      if (search) {
+        if (isNum) {
+          filters.push(eq(orders.id, Number(search)))
+        } else {
+          filters.push(ilike(orders.name, `%${search}%`))
+        }
+      }
 
       return and(...filters)
     }
@@ -43,7 +46,7 @@ export const getOrders = makeQueryEndpoint(
       const [{ totalCount }] = await db
         .select({ totalCount: count() })
         .from(orders)
-        .where(where(orders, { eq, ilike, and, or }))
+        .where(where(orders, { eq, ilike, and }))
 
       // Pagination data
       const total = totalCount
