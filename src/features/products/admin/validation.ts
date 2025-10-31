@@ -40,7 +40,7 @@ const SORTABLE_FIELDS = [
   'updatedAt',
 ]
 
-const SortSchema = getSortSchema(SORTABLE_FIELDS)
+const SortSchema = getSortSchema(SORTABLE_FIELDS).default('createdAt:desc')
 
 export const AdminProductsQuerySchema = z.object({
   // pagination

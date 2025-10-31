@@ -3,20 +3,16 @@ import products from './tables/products.table'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { getSortSchema } from '@utils/get-sort-schema'
 
-const SORTABLE_FIELDS = [
-  'price',
-  'createdAt'
-]
-
-const SortSchema = getSortSchema(SORTABLE_FIELDS)
-
+const SortSchema = getSortSchema(['price', 'createdAt']).default(
+  'createdAt:desc',
+)
 
 export const ProductsQuerySchema = z.object({
   page: z.coerce.number().int().min(1, 'Page must be at least 1').default(1),
   perPage: z.coerce
     .number()
     .int()
-    .min(1 , "Per page must be at least 1")
+    .min(1, 'Per page must be at least 1')
     .max(100, 'Per page must be at most 100')
     .default(20),
 
@@ -27,7 +23,6 @@ export const ProductsQuerySchema = z.object({
 })
 
 export type ProductsQuery = z.infer<typeof ProductsQuerySchema>
-
 
 ////
 

@@ -4,7 +4,7 @@ import z from "zod";
 
 const SortSchema = getSortSchema([
     'name' , 'status' , 'createdAt' ,'updatedAt'
-])
+]).default('createdAt:desc')
 
 export const AdminCategoriesQuerySchema = z.object({
     status : StatusSchema.optional(),
