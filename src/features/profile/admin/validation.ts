@@ -14,12 +14,10 @@ export const CustomersQuerySchema = z.object({
   // searching
   search: z.string().min(1, 'Search must not be empty').max(100).optional(),
 
-  // filters
-
-  status: z.enum(['VIP', 'active', 'new']).optional(),
-
   // Sorting
-  sort: getSortSchema(['orders', 'total', 'joinDate']).default('joinDate:desc'),
+  sort: getSortSchema(['orders', 'total', 'createdAt']).default(
+    'createdAt:desc',
+  ),
 })
 
 export type CustomersQuery = z.infer<typeof CustomersQuerySchema>
