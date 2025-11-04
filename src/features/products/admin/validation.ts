@@ -57,7 +57,9 @@ export const AdminProductsQuerySchema = z.object({
 
   // filters
   // categoryId: z.string().uuid('Invalid category ID').optional(),
-  categoryId: z.uuid('Invalid category ID').nullable().optional(),
+  categoryId: z
+    .union([z.uuid('Invalid category ID'), z.literal('__NULL__')])
+    .optional(),
   status: StatusSchema.optional(),
 
   // Sorting
