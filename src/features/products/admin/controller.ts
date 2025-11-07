@@ -130,7 +130,14 @@ export const getProducts = makeQueryEndpoint(
       // Fetch current page
       const filteredProducts = await db.query.products.findMany({
         where,
-        with: { images: true },
+        with: {
+          images: true,
+          category: {
+            columns: {
+              name: true,
+            },
+          },
+        },
         limit: perPage,
         offset: (page - 1) * perPage,
         orderBy,
@@ -148,9 +155,10 @@ export const getProducts = makeQueryEndpoint(
       const nextPage = page === totalPages ? null : page + 1
 
       res.json({
-        data: filteredProducts.map((p) => ({
+        data: filteredProducts.map(({ category, ...p }) => ({
           ...p,
           inventoryStatus: getInventoryStatus(p.stock),
+          categoryName: category?.name ?? null,
         })),
         page,
         perPage,
