@@ -5,6 +5,7 @@ import {
   integer,
   varchar,
   numeric,
+  boolean,
 } from 'drizzle-orm/pg-core'
 import { createdAt, updatedAt } from '../../../db/timestamps'
 import {
@@ -25,6 +26,7 @@ const products = pgTable('products', {
     onDelete: 'set null',
   }),
   status: entityStatus().notNull(),
+  isDeleted: boolean('is_deleted').notNull().default(false),
   createdAt,
   updatedAt,
 })
