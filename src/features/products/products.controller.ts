@@ -50,13 +50,6 @@ export const getProducts = makeQueryEndpoint(
         })
         .from(products)
         .where(where(products, { eq, ilike, and }))
-        .innerJoin(
-          categories,
-          and(
-            eq(categories.id, products.categoryId),
-            eq(categories.status, 'active'),
-          ),
-        )
         .leftJoin(reviews, eq(products.id, reviews.productId))
         .leftJoin(
           images,
@@ -70,13 +63,6 @@ export const getProducts = makeQueryEndpoint(
       const [{ totalCount }] = await db
         .select({ totalCount: count() })
         .from(products)
-        .innerJoin(
-          categories,
-          and(
-            eq(categories.id, products.categoryId),
-            eq(categories.status, 'active'),
-          ),
-        )
         .where(where(products, { eq, ilike, and }))
 
       // Pagination data
@@ -132,13 +118,6 @@ export const getProductsByIds = makeBodyEndpoint(
         })
         .from(products)
         .where(inArray(products.id, ids))
-        .innerJoin(
-          categories,
-          and(
-            eq(categories.id, products.categoryId),
-            eq(categories.status, 'active'),
-          ),
-        )
         .leftJoin(reviews, eq(products.id, reviews.productId))
         .leftJoin(
           images,
@@ -167,13 +146,18 @@ export const getProductBySlug = makeByIdEndpoint(async (req, res, next) => {
     /// NOTE : I used query instead of select because images and reviews are arrays
     // and select dont support this kind of joins
     const product = await db.query.products.findFirst({
-      where: (products, { eq }) => eq(products.slug, slug),
+      where: (products, { eq, and }) =>
+        and(eq(products.slug, slug), eq(products.isDeleted, false)),
       with: {
         images: true,
         reviews: {
           orderBy: desc(reviews.updatedAt),
         },
-        category: true,
+        category: {
+          columns: {
+            name: true,
+          },
+        },
       },
     })
 
@@ -184,8 +168,7 @@ export const getProductBySlug = makeByIdEndpoint(async (req, res, next) => {
       })
     }
 
-    const isActive =
-      product.status === 'active' && product.category?.status === 'active'
+    const isActive = product.status === 'active' && !!product.categoryId
 
     const {
       createdAt,

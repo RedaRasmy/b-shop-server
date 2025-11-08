@@ -6,6 +6,7 @@ export function buildProductFilters({ search, categoryId }: Pick<ProductsQuery,'
     const filters = [
       eq(products.status, 'active'),
       isNotNull(products.categoryId),
+      eq(products.isDeleted,false)
     ]
 
     if (categoryId) filters.push(eq(products.categoryId, categoryId))

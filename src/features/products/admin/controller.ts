@@ -104,7 +104,7 @@ export const getProducts = makeQueryEndpoint(
 
       // Filtering conditions
       const where = (products: any, { eq, ilike, and }: any) => {
-        const filters = []
+        const filters = [eq(products.isDeleted,false)]
         if (categoryId) {
           if (categoryId === '__NULL__') {
             // special case where category is deleted
