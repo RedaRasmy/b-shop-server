@@ -1,5 +1,5 @@
 import { db } from '@db/index'
-import { categories } from '@db/schema'
+import { categories, products } from '@db/schema'
 import { and, asc, desc, eq, ilike } from 'drizzle-orm'
 import { AdminCategoriesQuerySchema } from '@categories/admin/validation'
 import { ICategory } from '@categories/categories.table'
@@ -9,7 +9,10 @@ import {
   makeByIdEndpoint,
   makeUpdateEndpoint,
 } from '@utils/wrappers'
-import { InsertCategorySchema } from '@categories/categories.validation'
+import {
+  InsertCategorySchema,
+  UpdateCategorySchema,
+} from '@categories/categories.validation'
 import logger from 'src/logger'
 
 export const addCategory = makeBodyEndpoint(
@@ -110,15 +113,29 @@ export const getCategoryById = makeByIdEndpoint(async (req, res, next) => {
 })
 
 export const updateCategory = makeUpdateEndpoint(
-  InsertCategorySchema,
+  UpdateCategorySchema,
   async (req, res, next) => {
+    const category = req.body
+    const id = req.params.id
     try {
-      const categorie = await db
-        .update(categories)
-        .set(req.body)
-        .where(eq(categories.id, req.params.id))
-        .returning()
-      res.status(201).json(categorie)
+      await db.transaction(async (tx) => {
+        const newData = await tx
+          .update(categories)
+          .set(category)
+          .where(eq(categories.id, id))
+          .returning()
+
+        if (category.status === 'inactive') {
+          await tx
+            .update(products)
+            .set({
+              status: 'inactive',
+            })
+            .where(eq(products.categoryId, id))
+        }
+
+        res.status(200).json(newData)
+      })
     } catch {
       next({ message: 'Failed to update category', status: 500 })
     }
