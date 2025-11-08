@@ -283,7 +283,6 @@ export const updateProduct = makeUpdateEndpoint(
         })
       })
     } catch (error) {
-      logger.error(error, 'Failed to update product')
       next({ message: 'Failed to update product', status: 500 })
     }
   },
@@ -292,21 +291,39 @@ export const updateProduct = makeUpdateEndpoint(
 /// DELETE
 export const deleteProduct = makeByIdEndpoint(async (req, res, next) => {
   try {
-    const productId = req.params.id!
+    const productId = req.params.id
+
     await db.transaction(async (tx) => {
       const productImages = await tx.query.images.findMany({
         where: (images, { eq }) => eq(images.productId, productId),
       })
-      // delete images from cloudinary
-      await deleteMultipleImages(productImages.map((i) => i.publicId))
 
-      await tx.delete(products).where(eq(products.id, productId))
-      // images will be deleted automaticly (cascade)
+      // delete images from database ( keep main one )
+      await tx
+        .delete(images)
+        .where(
+          and(eq(images.productId, productId), eq(images.isPrimary, false)),
+        )
+
+      // Soft delete the product
+
+      await tx
+        .update(products)
+        .set({
+          isDeleted: true,
+        })
+        .where(eq(products.id, productId))
+
+      // delete images from cloudinary ( keep main one )
+      const imagesToDelete = productImages
+        .filter((img) => img.isPrimary === false)
+        .map((img) => img.publicId)
+
+      await deleteMultipleImages(imagesToDelete)
 
       res.status(200).json({ productId })
     })
   } catch (err) {
-    logger.error(err, 'Failed to delete product')
     next({ message: 'Failed to delete product', status: 500 })
   }
 })
