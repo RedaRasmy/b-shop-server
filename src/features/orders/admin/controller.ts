@@ -63,14 +63,11 @@ export const getOrders = makeQueryEndpoint(
       const prevPage = page === 1 ? null : page - 1
       const nextPage = page === totalPages ? null : page + 1
 
-      const data = await db.query.orders.findMany({
+      const result = await db.query.orders.findMany({
         with: {
           items: {
             columns: {
-              id: true,
-              productId: true,
-              priceAtPurchase: true,
-              quantity: true,
+              id: true
             },
           },
         },
@@ -79,6 +76,11 @@ export const getOrders = makeQueryEndpoint(
         offset: (page - 1) * perPage,
         limit: perPage,
       })
+
+      const data = result.map(({ items, ...order }) => ({
+        ...order,
+        itemCount: items.length,
+      }))
 
       res.json({
         total,
@@ -109,13 +111,42 @@ export const getOrder = makeByIdEndpoint(async (req, res, next) => {
             priceAtPurchase: true,
             quantity: true,
           },
+          with: {
+            product: {
+              columns: {
+                name: true,
+              },
+              with: {
+                images: {
+                  columns: {
+                    url: true,
+                    isPrimary: true,
+                  },
+                },
+              },
+            },
+          },
         },
       },
     })
     if (!order) {
       return res.sendStatus(404)
     }
-    res.status(200).json(order)
+    const { items, ...rest } = order
+
+    const data = {
+      ...rest,
+      items: items.map((item) => ({
+        id: item.id,
+        productId: item.productId,
+        priceAtPurchase: item.priceAtPurchase,
+        quantity: item.quantity,
+        name: item.product.name,
+        thumbnailUrl: item.product.images.find((img) => img.isPrimary)!.url,
+      })),
+    }
+
+    res.status(200).json(data)
   } catch (err) {
     next(err)
   }
