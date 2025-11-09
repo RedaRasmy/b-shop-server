@@ -3,7 +3,11 @@ import {
   AdminOrdersQuerySchema,
   UpdateOrderSchema,
 } from '@orders/admin/validation'
-import { makeQueryEndpoint, makeUpdateEndpoint } from '@utils/wrappers'
+import {
+  makeByIdEndpoint,
+  makeQueryEndpoint,
+  makeUpdateEndpoint,
+} from '@utils/wrappers'
 import { orders } from '@db/schema'
 import { and, asc, count, desc, eq, ilike, or } from 'drizzle-orm'
 import { SOrder } from '@orders/tables/orders.table'
@@ -90,6 +94,32 @@ export const getOrders = makeQueryEndpoint(
     }
   },
 )
+
+export const getOrder = makeByIdEndpoint(async (req, res, next) => {
+  const id = Number(req.params.id)
+
+  try {
+    const order = await db.query.orders.findFirst({
+      where: (orders, { eq }) => eq(orders.id, id),
+      with: {
+        items: {
+          columns: {
+            id: true,
+            productId: true,
+            priceAtPurchase: true,
+            quantity: true,
+          },
+        },
+      },
+    })
+    if (!order) {
+      return res.sendStatus(404)
+    }
+    res.status(200).json(order)
+  } catch (err) {
+    next(err)
+  }
+})
 
 export const updateOrder = makeUpdateEndpoint(
   UpdateOrderSchema,
