@@ -104,7 +104,7 @@ export const getProducts = makeQueryEndpoint(
 
       // Filtering conditions
       const where = (products: any, { eq, ilike, and }: any) => {
-        const filters = [eq(products.isDeleted,false)]
+        const filters = [eq(products.isDeleted, false)]
         if (categoryId) {
           if (categoryId === '__NULL__') {
             // special case where category is deleted
@@ -152,7 +152,7 @@ export const getProducts = makeQueryEndpoint(
       const total = totalCount
       const totalPages = Math.ceil(totalCount / perPage)
       const prevPage = page === 1 ? null : page - 1
-      const nextPage = page === totalPages ? null : page + 1
+      const nextPage = page === totalPages || totalPages === 0 ? null : page + 1
 
       res.json({
         data: filteredProducts.map(({ category, ...p }) => ({

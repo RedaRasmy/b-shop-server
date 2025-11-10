@@ -69,7 +69,7 @@ export const getProducts = makeQueryEndpoint(
       const total = totalCount
       const totalPages = Math.ceil(totalCount / perPage)
       const prevPage = page === 1 ? null : page - 1
-      const nextPage = page === totalPages ? null : page + 1
+      const nextPage = page === totalPages || totalPages === 0 ? null : page + 1
 
       // add isNew
       const data = filteredProducts.map(({ createdAt, stock, ...p }) => ({

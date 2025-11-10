@@ -40,7 +40,7 @@ export const getCustomers = makeQueryEndpoint(
       const total = totalCount
       const totalPages = Math.ceil(totalCount / perPage)
       const prevPage = page === 1 ? null : page - 1
-      const nextPage = page === totalPages ? null : page + 1
+      const nextPage = page === totalPages || totalPages === 0 ? null : page + 1
 
       const data = await db
         .select({
