@@ -1,6 +1,9 @@
 import { db } from '@db/index'
 import { addresses } from '@db/schema'
-import { InsertAddressSchema } from '@profile/addresses/addresses.validation'
+import {
+  InsertAddressSchema,
+  UpdateAddressSchema,
+} from '@profile/addresses/addresses.validation'
 import {
   makeAuthEndpoint,
   makeBodyEndpoint,
@@ -72,7 +75,7 @@ export const getAddresses = makeAuthEndpoint(async (req, res, next) => {
 /// PATCH
 
 export const updateAddress = makeUpdateEndpoint(
-  InsertAddressSchema.partial(),
+  UpdateAddressSchema,
   async (req, res, next) => {
     const userId = req.user?.id!
     const id = req.params.id
