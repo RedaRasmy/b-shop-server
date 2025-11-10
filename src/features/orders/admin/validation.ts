@@ -1,4 +1,6 @@
+import { orders } from '@db/schema'
 import { getSortSchema } from '@utils/get-sort-schema'
+import { createUpdateSchema } from 'drizzle-zod'
 import z from 'zod'
 
 /// Query
@@ -22,13 +24,17 @@ export const AdminOrdersQuerySchema = z.object({
     .optional(),
 
   // Sorting
-  sort: getSortSchema(['name', 'status', 'createdAt', 'total']).default('createdAt:desc'),
+  sort: getSortSchema(['name', 'status', 'createdAt', 'total']).default(
+    'createdAt:desc',
+  ),
 })
 
 export type AdminOrdersQuery = z.infer<typeof AdminOrdersQuerySchema>
 
 // Update
 
-export const UpdateOrderSchema = z.object({
-  status: z.enum(['pending', 'processing', 'shipped', 'completed', 'canceled']),
-})
+export const UpdateOrderSchema = createUpdateSchema(orders)
+  .pick({
+    status: true,
+  })
+  .required()
