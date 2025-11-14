@@ -422,4 +422,23 @@ type = {
 
 ## DELETE /api/me/addresses/:id
 
+# Profile/Orders
 
+## GET /api/me/orders
+
+### Response
+
+```ts
+type =  {
+    items: {
+        productName: string;
+        productId: string;
+        quantity: number;
+        priceAtPurchase: string;
+    }[];
+    id: number;
+    createdAt: Date;
+    status: "pending" | "processing" | "shipped" | "completed" | "canceled";
+    total: string;
+}[]
+```
