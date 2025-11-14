@@ -139,3 +139,105 @@ type = {
   }[]
 }[]
 ```
+
+# Products
+
+## GET /api/products
+
+### Query Params
+
+```ts
+type = {
+    page?: number ; // default 1
+    perPage?: number ; // default 20
+    sort?: string;
+    search?: string | undefined;
+    categoryId?: string | undefined;
+}
+```
+
+### Response
+
+```ts
+type = {
+  data :  {
+    isNew: boolean;
+    inventoryStatus: "Out of Stock" | "Low Stock" | "In Stock";
+    id: string;
+    slug: string;
+    name: string;
+    price: string;
+    categoryId: string | null;
+    reviewCount: number;
+    averageRating: number;
+    thumbnailUrl: string | null;
+  }[]
+  page : number
+  perPage : number
+  total : number
+  totalPages : number
+  prevPage : number | null
+  nextPage : number | null
+}
+```
+
+## GET /api/products/:slug
+
+### Response
+
+```ts
+type = {
+    inventoryStatus: "Out of Stock" | "Low Stock" | "In Stock";
+    isNew: boolean;
+    averageRating: number | null;
+    reviewCount: number;
+    categoryName: string;
+    images: {
+        url: string;
+        alt: string;
+        width: number | null;
+        height: number | null;
+        isPrimary: boolean;
+        size: number | null;
+    }[];
+    reviews: {
+        id: string;
+        rating: number;
+        comment: string | null;
+        date: Date;
+        edited: boolean;
+    }[];
+    name: string;
+    id: string;
+    slug: string;
+    description: string;
+    price: string;
+    categoryId: string | null;
+    isDeleted: boolean;
+}
+```
+
+## POST /api/products/bulk
+
+### Body
+
+```ts
+type = string[] // Ids
+```
+
+### Response
+
+```ts
+type =  {
+    isNew: boolean;
+    inventoryStatus: "Out of Stock" | "Low Stock" | "In Stock";
+    id: string;
+    slug: string;
+    name: string;
+    price: string;
+    categoryId: string | null;
+    reviewCount: number;
+    averageRating: number;
+    thumbnailUrl: string | null;
+}[]
+```
