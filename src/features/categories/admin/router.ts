@@ -8,7 +8,7 @@ router.get('/:id', adminController.getCategoryById)
 router.get('/:id/products', adminController.getCategoryProducts)
 
 router.post('/', adminController.addCategory)
-router.put('/:id', adminController.updateCategory)
+router.patch('/:id', adminController.updateCategory)
 router.delete('/:id', adminController.deleteCategory)
 
 export const categoriesAdminRouter = router
