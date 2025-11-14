@@ -442,3 +442,57 @@ type =  {
     total: string;
 }[]
 ```
+
+# Orders
+
+## POST /api/orders
+
+### Body
+
+```ts
+type = {
+    name: string;
+    email: string;
+    phone: string;
+    city: string;
+    postalCode: string;
+    addressLine1: string;
+    items: {
+        productId: string;
+        quantity?: number | undefined;
+    }[];
+    addressLine2?: string | null | undefined;
+}
+```
+
+### Response
+
+```ts
+type = {
+    id: number;
+    name: string;
+    orderToken: string;
+    email: string;
+    phone: string;
+    createdAt: Date;
+    updatedAt: Date;
+    customerId: string | null;
+    status: "pending" | "processing" | "shipped" | "completed" | "canceled";
+    total: string;
+    city: string;
+    postalCode: string;
+    addressLine1: string;
+    addressLine2: string | null;
+}
+```
+
+## GET /api/orders/:orderToken
+
+### Response
+
+```ts
+type = {
+  total: string;
+  id: number;
+}
+```
