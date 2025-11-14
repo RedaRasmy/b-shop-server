@@ -12,7 +12,7 @@ export const cartRouter = Router()
 
 cartRouter.get('/', getCart)
 cartRouter.post('/', addCartItem)
-cartRouter.put('/:id', updateCartItem)
+cartRouter.patch('/:id', updateCartItem)
 cartRouter.delete('/:id', deleteCartItem)
 cartRouter.delete('/', clearCart)
 cartRouter.post('/merge',mergeCart)
