@@ -351,3 +351,75 @@ type = {
     quantity: number; // int and >= 1
 }[]
 ```
+
+# Profile/Addresses
+
+## POST /api/me/addresses
+
+### Body
+
+```ts
+type = {
+    city: string;
+    postalCode: string;
+    addressLine1: string;
+    label: string;
+    addressLine2?: string | null | undefined;
+    isDefault?: boolean | undefined;
+}
+```
+
+### Response
+
+```ts
+type =  {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    customerId: string;
+    city: string;
+    postalCode: string;
+    addressLine1: string;
+    addressLine2: string | null;
+    label: string;
+    isDefault: boolean;
+}
+```
+
+## GET /api/me/addresses
+
+### Response
+
+```ts
+type =  {
+    id: string;
+    createdAt: Date;
+    updatedAt: Date;
+    customerId: string;
+    city: string;
+    postalCode: string;
+    addressLine1: string;
+    addressLine2: string | null;
+    label: string;
+    isDefault: boolean;
+}[]
+```
+
+## PATCH /api/me/addresses/:id
+
+### Body
+
+```ts
+type = {
+    city?: string | undefined;
+    postalCode?: string | undefined;
+    addressLine1?: string | undefined;
+    addressLine2?: string | null | undefined;
+    label?: string | undefined;
+    isDefault?: boolean | undefined;
+}
+```
+
+## DELETE /api/me/addresses/:id
+
+
