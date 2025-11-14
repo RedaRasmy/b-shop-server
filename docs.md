@@ -5,7 +5,7 @@
 ### Body
 
 ```ts
-type = {
+type Data = {
   email: string // valid email
   password: string // length >= 8
 }
@@ -14,7 +14,7 @@ type = {
 ### Response
 
 ```ts
-type = {
+type Data = {
   id: string // uuid
   email: string
   isEmailVerified: boolean
@@ -27,7 +27,7 @@ type = {
 ### Body
 
 ```ts
-type = {
+type Data = {
   email: string // valid email
   password: string // length >= 8
 }
@@ -36,7 +36,7 @@ type = {
 ### Response
 
 ```ts
-type = {
+type Data = {
   id: string // uuid
   email: string
   isEmailVerified: boolean
@@ -49,7 +49,7 @@ type = {
 ### Response
 
 ```ts
-type = {
+type Data = {
   id: string // uuid
   email: string
   isEmailVerified: boolean
@@ -74,15 +74,14 @@ type = {
 ### Response
 
 ```ts
-type = {
-    id: string
-    name: string
-    slug: string
-    description: string
-    createdAt: Date
-    updatedAt: Date
-  }[]
-
+type Data = {
+  id: string
+  name: string
+  slug: string
+  description: string
+  createdAt: Date
+  updatedAt: Date
+}[]
 ```
 
 ## GET /api/categories/:id
@@ -90,14 +89,14 @@ type = {
 ### Response
 
 ```ts
-type = {
-    id: string
-    name: string
-    slug: string
-    description: string
-    createdAt: Date
-    updatedAt: Date
-  }
+type Data = {
+  id: string
+  name: string
+  slug: string
+  description: string
+  createdAt: Date
+  updatedAt: Date
+}
 ```
 
 ## GET /api/categories/:id/products
@@ -105,7 +104,7 @@ type = {
 ### Response
 
 ```ts
-type = {
+type Data = {
   inventoryStatus: 'Out of Stock' | 'Low Stock' | 'In Stock'
   name: string
   id: string
@@ -147,37 +146,37 @@ type = {
 ### Query Params
 
 ```ts
-type = {
-    page?: number ; // default 1
-    perPage?: number ; // default 20
-    sort?: string;
-    search?: string | undefined;
-    categoryId?: string | undefined;
+type Query = {
+  page?: number // default 1
+  perPage?: number // default 20
+  sort?: string
+  search?: string | undefined
+  categoryId?: string | undefined
 }
 ```
 
 ### Response
 
 ```ts
-type = {
-  data :  {
-    isNew: boolean;
-    inventoryStatus: "Out of Stock" | "Low Stock" | "In Stock";
-    id: string;
-    slug: string;
-    name: string;
-    price: string;
-    categoryId: string | null;
-    reviewCount: number;
-    averageRating: number;
-    thumbnailUrl: string | null;
+type Data = {
+  data: {
+    isNew: boolean
+    inventoryStatus: 'Out of Stock' | 'Low Stock' | 'In Stock'
+    id: string
+    slug: string
+    name: string
+    price: string
+    categoryId: string | null
+    reviewCount: number
+    averageRating: number
+    thumbnailUrl: string | null
   }[]
-  page : number
-  perPage : number
-  total : number
-  totalPages : number
-  prevPage : number | null
-  nextPage : number | null
+  page: number
+  perPage: number
+  total: number
+  totalPages: number
+  prevPage: number | null
+  nextPage: number | null
 }
 ```
 
@@ -186,34 +185,34 @@ type = {
 ### Response
 
 ```ts
-type = {
-    inventoryStatus: "Out of Stock" | "Low Stock" | "In Stock";
-    isNew: boolean;
-    averageRating: number | null;
-    reviewCount: number;
-    categoryName: string;
-    images: {
-        url: string;
-        alt: string;
-        width: number | null;
-        height: number | null;
-        isPrimary: boolean;
-        size: number | null;
-    }[];
-    reviews: {
-        id: string;
-        rating: number;
-        comment: string | null;
-        date: Date;
-        edited: boolean;
-    }[];
-    name: string;
-    id: string;
-    slug: string;
-    description: string;
-    price: string;
-    categoryId: string | null;
-    isDeleted: boolean;
+type Data = {
+  inventoryStatus: 'Out of Stock' | 'Low Stock' | 'In Stock'
+  isNew: boolean
+  averageRating: number | null
+  reviewCount: number
+  categoryName: string
+  images: {
+    url: string
+    alt: string
+    width: number | null
+    height: number | null
+    isPrimary: boolean
+    size: number | null
+  }[]
+  reviews: {
+    id: string
+    rating: number
+    comment: string | null
+    date: Date
+    edited: boolean
+  }[]
+  name: string
+  id: string
+  slug: string
+  description: string
+  price: string
+  categoryId: string | null
+  isDeleted: boolean
 }
 ```
 
@@ -222,23 +221,23 @@ type = {
 ### Body
 
 ```ts
-type = string[] // Ids
+type Data = string[] // Ids
 ```
 
 ### Response
 
 ```ts
-type =  {
-    isNew: boolean;
-    inventoryStatus: "Out of Stock" | "Low Stock" | "In Stock";
-    id: string;
-    slug: string;
-    name: string;
-    price: string;
-    categoryId: string | null;
-    reviewCount: number;
-    averageRating: number;
-    thumbnailUrl: string | null;
+type Data = {
+  isNew: boolean
+  inventoryStatus: 'Out of Stock' | 'Low Stock' | 'In Stock'
+  id: string
+  slug: string
+  name: string
+  price: string
+  categoryId: string | null
+  reviewCount: number
+  averageRating: number
+  thumbnailUrl: string | null
 }[]
 ```
 
@@ -249,14 +248,14 @@ type =  {
 ### Response
 
 ```ts
-type =  {
-    id: string;
-    createdAt: Date;
-    email: string;
-    fullName: string | null;
-    role: string;
-    phone: string | null;
-    isEmailVerified: boolean;
+type Data = {
+  id: string
+  createdAt: Date
+  email: string
+  fullName: string | null
+  role: string
+  phone: string | null
+  isEmailVerified: boolean
 }
 ```
 
@@ -265,7 +264,7 @@ type =  {
 ### Body
 
 ```ts
-type = {
+type Data = {
   fullName?: string
   phone?: string
 }
@@ -276,7 +275,7 @@ type = {
 ### Body
 
 ```ts
-type = {
+type Data = {
   oldPassword: string
   newPassword: string
 }
@@ -289,18 +288,18 @@ type = {
 ### Response
 
 ```ts
-type = {
-    thumbnailUrl: string;
-    reviewCount: number;
-    isNew: boolean;
-    inventoryStatus: "Out of Stock" | "Low Stock" | "In Stock";
-    averageRating: number | null;
-    name: string;
-    id: string;
-    slug: string;
-    price: string;
-    categoryId: string | null;
-    quantity: number;
+type Data = {
+  thumbnailUrl: string
+  reviewCount: number
+  isNew: boolean
+  inventoryStatus: 'Out of Stock' | 'Low Stock' | 'In Stock'
+  averageRating: number | null
+  name: string
+  id: string
+  slug: string
+  price: string
+  categoryId: string | null
+  quantity: number
 }[]
 ```
 
@@ -309,21 +308,21 @@ type = {
 ### Body
 
 ```ts
-type = {
-  productId : string // uuid
-  quantity : number //  int and >= 1
+type Data = {
+  productId: string // uuid
+  quantity: number //  int and >= 1
 }
 ```
 
 ### Response
 
 ```ts
-type = {
-    id: string;
-    productId: string;
-    userId: string;
-    quantity: number;
-    addedAt: Date;
+type Data = {
+  id: string
+  productId: string
+  userId: string
+  quantity: number
+  addedAt: Date
 }
 ```
 
@@ -332,8 +331,8 @@ type = {
 ### Body
 
 ```ts
-type = {
-  quantity: number, //  int and >= 1
+type Data = {
+  quantity: number //  int and >= 1
 }
 ```
 
@@ -346,9 +345,9 @@ type = {
 ### Body
 
 ```ts
-type = {
-    productId: string; // uuid
-    quantity: number; // int and >= 1
+type Data = {
+  productId: string // uuid
+  quantity: number // int and >= 1
 }[]
 ```
 
@@ -359,30 +358,30 @@ type = {
 ### Body
 
 ```ts
-type = {
-    city: string;
-    postalCode: string;
-    addressLine1: string;
-    label: string;
-    addressLine2?: string | null | undefined;
-    isDefault?: boolean | undefined;
+type Data = {
+  city: string
+  postalCode: string
+  addressLine1: string
+  label: string
+  addressLine2?: string | null | undefined
+  isDefault?: boolean | undefined
 }
 ```
 
 ### Response
 
 ```ts
-type =  {
-    id: string;
-    createdAt: Date;
-    updatedAt: Date;
-    customerId: string;
-    city: string;
-    postalCode: string;
-    addressLine1: string;
-    addressLine2: string | null;
-    label: string;
-    isDefault: boolean;
+type Data = {
+  id: string
+  createdAt: Date
+  updatedAt: Date
+  customerId: string
+  city: string
+  postalCode: string
+  addressLine1: string
+  addressLine2: string | null
+  label: string
+  isDefault: boolean
 }
 ```
 
@@ -391,17 +390,17 @@ type =  {
 ### Response
 
 ```ts
-type =  {
-    id: string;
-    createdAt: Date;
-    updatedAt: Date;
-    customerId: string;
-    city: string;
-    postalCode: string;
-    addressLine1: string;
-    addressLine2: string | null;
-    label: string;
-    isDefault: boolean;
+type Data = {
+  id: string
+  createdAt: Date
+  updatedAt: Date
+  customerId: string
+  city: string
+  postalCode: string
+  addressLine1: string
+  addressLine2: string | null
+  label: string
+  isDefault: boolean
 }[]
 ```
 
@@ -410,13 +409,13 @@ type =  {
 ### Body
 
 ```ts
-type = {
-    city?: string | undefined;
-    postalCode?: string | undefined;
-    addressLine1?: string | undefined;
-    addressLine2?: string | null | undefined;
-    label?: string | undefined;
-    isDefault?: boolean | undefined;
+type Data = {
+  city?: string | undefined
+  postalCode?: string | undefined
+  addressLine1?: string | undefined
+  addressLine2?: string | null | undefined
+  label?: string | undefined
+  isDefault?: boolean | undefined
 }
 ```
 
@@ -429,17 +428,17 @@ type = {
 ### Response
 
 ```ts
-type =  {
-    items: {
-        productName: string;
-        productId: string;
-        quantity: number;
-        priceAtPurchase: string;
-    }[];
-    id: number;
-    createdAt: Date;
-    status: "pending" | "processing" | "shipped" | "completed" | "canceled";
-    total: string;
+type Data = {
+  items: {
+    productName: string
+    productId: string
+    quantity: number
+    priceAtPurchase: string
+  }[]
+  id: number
+  createdAt: Date
+  status: 'pending' | 'processing' | 'shipped' | 'completed' | 'canceled'
+  total: string
 }[]
 ```
 
@@ -450,39 +449,39 @@ type =  {
 ### Body
 
 ```ts
-type = {
-    name: string;
-    email: string;
-    phone: string;
-    city: string;
-    postalCode: string;
-    addressLine1: string;
-    items: {
-        productId: string;
-        quantity?: number | undefined;
-    }[];
-    addressLine2?: string | null | undefined;
+type Data = {
+  name: string
+  email: string
+  phone: string
+  city: string
+  postalCode: string
+  addressLine1: string
+  items: {
+    productId: string
+    quantity?: number | undefined
+  }[]
+  addressLine2?: string | null | undefined
 }
 ```
 
 ### Response
 
 ```ts
-type = {
-    id: number;
-    name: string;
-    orderToken: string;
-    email: string;
-    phone: string;
-    createdAt: Date;
-    updatedAt: Date;
-    customerId: string | null;
-    status: "pending" | "processing" | "shipped" | "completed" | "canceled";
-    total: string;
-    city: string;
-    postalCode: string;
-    addressLine1: string;
-    addressLine2: string | null;
+type Data = {
+  id: number
+  name: string
+  orderToken: string
+  email: string
+  phone: string
+  createdAt: Date
+  updatedAt: Date
+  customerId: string | null
+  status: 'pending' | 'processing' | 'shipped' | 'completed' | 'canceled'
+  total: string
+  city: string
+  postalCode: string
+  addressLine1: string
+  addressLine2: string | null
 }
 ```
 
@@ -491,8 +490,148 @@ type = {
 ### Response
 
 ```ts
-type = {
-  total: string;
-  id: number;
+type Data = {
+  total: string
+  id: number
 }
 ```
+
+# Admin/Categories
+
+## POST /api/admin/categories
+
+### Body
+
+```ts
+type Data = {
+  name: string
+  slug: string
+  description: string
+  status: 'active' | 'inactive'
+}
+```
+
+### Response
+
+```ts
+type Data = {
+  name: string
+  id: string
+  slug: string
+  description: string
+  status: 'active' | 'inactive'
+  createdAt: Date
+  updatedAt: Date
+}
+```
+
+## GET /api/admin/categories
+
+### Query Params
+
+```ts
+type Query = {
+  sort?: `${Field}:${Order}` // default createdAt:desc
+  status?: 'active' | 'inactive'
+  search?: string
+}
+
+type Field = 'name' | 'status' | 'createdAt' | 'updatedAt'
+type Order = 'asc' | 'desc'
+```
+
+### Response
+
+```ts
+type Data = {
+  productsCount: number
+  name: string
+  id: string
+  slug: string
+  description: string
+  status: 'active' | 'inactive'
+  createdAt: Date
+  updatedAt: Date
+}[]
+```
+
+## GET /api/admin/categories/:id
+
+### Response
+
+```ts
+type Data = {
+  name: string
+  id: string
+  slug: string
+  description: string
+  status: 'active' | 'inactive'
+  productsCount: number
+  createdAt: Date
+  updatedAt: Date
+}
+```
+
+## GET /api/admin/categories/:id/products
+
+### Response
+
+```ts
+type Data = {
+  name: string
+  id: string
+  slug: string
+  description: string
+  status: 'active' | 'inactive'
+  createdAt: Date
+  updatedAt: Date
+  price: string
+  stock: number
+  categoryId: string | null
+  isDeleted: boolean
+  images: {
+    id: string
+    createdAt: Date
+    updatedAt: Date
+    format: string | null
+    url: string
+    productId: string
+    publicId: string
+    alt: string
+    isPrimary: boolean
+    width: number | null
+    height: number | null
+    size: number | null
+  }[]
+}[]
+```
+
+## PATCH /api/admin/categories/:id
+
+### Body
+
+```ts
+type Data = {
+  name?: string
+  slug?: string
+  description?: string
+  status?: 'active' | 'inactive'
+}
+```
+
+### Response
+
+```ts
+type Data = {
+  id: string
+  name: string
+  slug: string
+  description: string
+  status: 'active' | 'inactive'
+  createdAt: Date
+  updatedAt: Date
+}[]
+```
+
+## DELETE /api/admin/categories/:id
+
