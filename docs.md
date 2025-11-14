@@ -241,3 +241,43 @@ type =  {
     thumbnailUrl: string | null;
 }[]
 ```
+
+# Profile (auth is required)
+
+## GET /api/me
+
+### Response
+
+```ts
+type =  {
+    id: string;
+    createdAt: Date;
+    email: string;
+    fullName: string | null;
+    role: string;
+    phone: string | null;
+    isEmailVerified: boolean;
+}
+```
+
+## PATCH /api/me
+
+### Body
+
+```ts
+type = {
+  fullName?: string
+  phone?: string
+}
+```
+
+## PATCH /api/me/password
+
+### Body
+
+```ts
+type = {
+  oldPassword: string
+  newPassword: string
+}
+```
