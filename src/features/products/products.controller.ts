@@ -7,6 +7,7 @@ import {
   makeByIdEndpoint,
   makeQueryEndpoint,
   makeBodyEndpoint,
+  makeParamsEndpoint,
 } from '@utils/wrappers'
 import { getInventoryStatus } from '@utils/get-inventory-status'
 import logger from 'src/logger'
@@ -139,89 +140,92 @@ export const getProductsByIds = makeBodyEndpoint(
   },
 )
 
-export const getProductBySlug = makeByIdEndpoint(async (req, res, next) => {
-  const isAdmin = req.user?.role === 'admin'
-  const slug = req.params.id
-  try {
-    /// NOTE : I used query instead of select because images and reviews are arrays
-    // and select dont support this kind of joins
-    const product = await db.query.products.findFirst({
-      where: (products, { eq, and }) =>
-        and(eq(products.slug, slug), eq(products.isDeleted, false)),
-      with: {
-        images: true,
-        reviews: {
-          orderBy: desc(reviews.updatedAt),
-        },
-        category: {
-          columns: {
-            name: true,
+export const getProductBySlug = makeParamsEndpoint(
+  ['slug'],
+  async (req, res, next) => {
+    const isAdmin = req.user?.role === 'admin'
+    const slug = req.params.slug
+    try {
+      /// NOTE : I used query instead of select because images and reviews are arrays
+      // and select dont support this kind of joins
+      const product = await db.query.products.findFirst({
+        where: (products, { eq, and }) =>
+          and(eq(products.slug, slug), eq(products.isDeleted, false)),
+        with: {
+          images: true,
+          reviews: {
+            orderBy: desc(reviews.updatedAt),
+          },
+          category: {
+            columns: {
+              name: true,
+            },
           },
         },
-      },
-    })
+      })
 
-    if (!product) {
-      /// 404 if not exist
-      return res.status(404).send({
+      if (!product) {
+        /// 404 if not exist
+        return res.status(404).send({
+          message: 'Product Not Found',
+        })
+      }
+
+      const isActive = product.status === 'active' && !!product.categoryId
+
+      const {
+        createdAt,
+        stock,
+        category,
+        status,
+        updatedAt,
+        images,
+        reviews: productReviews,
+        ...p
+      } = product
+
+      const reviewCount = product.reviews.length
+      const averageRating =
+        reviewCount === 0
+          ? null
+          : product.reviews.reduce((acc, review) => acc + review.rating, 0) /
+            reviewCount
+
+      const data = {
+        ...p,
+        inventoryStatus: getInventoryStatus(stock),
+        isNew: isNewProduct(createdAt),
+        averageRating,
+        reviewCount,
+        categoryName: category?.name || '(deleted)',
+        images: images.map((img) => ({
+          url: img.url,
+          alt: img.alt,
+          width: img.width,
+          height: img.height,
+          isPrimary: img.isPrimary,
+          size: img.size,
+        })),
+        reviews: productReviews.map((rev) => ({
+          id: rev.id,
+          rating: rev.rating,
+          comment: rev.comment,
+          date: rev.updatedAt,
+          edited: rev.updatedAt.getTime() !== rev.createdAt.getTime(),
+        })),
+      }
+
+      if (isActive || isAdmin) {
+        return res.status(200).json(data)
+      }
+
+      // if not admin and inactive
+      res.status(404).send({
         message: 'Product Not Found',
       })
+    } catch (err) {
+      logger.error(err, 'Failed to get product')
+      next({ message: 'Failed to fetch product', status: 500 })
     }
-
-    const isActive = product.status === 'active' && !!product.categoryId
-
-    const {
-      createdAt,
-      stock,
-      category,
-      status,
-      updatedAt,
-      images,
-      reviews: productReviews,
-      ...p
-    } = product
-
-    const reviewCount = product.reviews.length
-    const averageRating =
-      reviewCount === 0
-        ? null
-        : product.reviews.reduce((acc, review) => acc + review.rating, 0) /
-          reviewCount
-
-    const data = {
-      ...p,
-      inventoryStatus: getInventoryStatus(stock),
-      isNew: isNewProduct(createdAt),
-      averageRating,
-      reviewCount,
-      categoryName: category?.name || '(deleted)',
-      images: images.map((img) => ({
-        url: img.url,
-        alt: img.alt,
-        width: img.width,
-        height: img.height,
-        isPrimary: img.isPrimary,
-        size: img.size,
-      })),
-      reviews: productReviews.map((rev) => ({
-        id: rev.id,
-        rating: rev.rating,
-        comment: rev.comment,
-        date: rev.updatedAt,
-        edited: rev.updatedAt.getTime() !== rev.createdAt.getTime(),
-      })),
-    }
-
-    if (isActive || isAdmin) {
-      return res.status(200).json(data)
-    }
-
-    // if not admin and inactive
-    res.status(404).send({
-      message: 'Product Not Found',
-    })
-  } catch (err) {
-    logger.error(err, 'Failed to get product')
-    next({ message: 'Failed to fetch product', status: 500 })
-  }
-})
+  },
+)
