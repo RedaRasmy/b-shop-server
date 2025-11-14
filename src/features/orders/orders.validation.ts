@@ -9,7 +9,8 @@ export const OrderInsertSchema = createInsertSchema(orders)
     updatedAt: true,
     customerId: true,
     status: true,
-    total : true
+    total: true,
+    orderToken: true,
   })
   .extend({
     items: z.array(
