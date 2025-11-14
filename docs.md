@@ -281,3 +281,73 @@ type = {
   newPassword: string
 }
 ```
+
+# Profile/Cart
+
+## GET /api/me/cart
+
+### Response
+
+```ts
+type = {
+    thumbnailUrl: string;
+    reviewCount: number;
+    isNew: boolean;
+    inventoryStatus: "Out of Stock" | "Low Stock" | "In Stock";
+    averageRating: number | null;
+    name: string;
+    id: string;
+    slug: string;
+    price: string;
+    categoryId: string | null;
+    quantity: number;
+}[]
+```
+
+## POST /api/me/cart
+
+### Body
+
+```ts
+type = {
+  productId : string // uuid
+  quantity : number //  int and >= 1
+}
+```
+
+### Response
+
+```ts
+type = {
+    id: string;
+    productId: string;
+    userId: string;
+    quantity: number;
+    addedAt: Date;
+}
+```
+
+## PATCH /api/me/cart/:id
+
+### Body
+
+```ts
+type = {
+  quantity: number, //  int and >= 1
+}
+```
+
+## DELETE /api/me/cart/:id
+
+## DELETE /api/me/cart
+
+## POST /api/me/cart/merge
+
+### Body
+
+```ts
+type = {
+    productId: string; // uuid
+    quantity: number; // int and >= 1
+}[]
+```
