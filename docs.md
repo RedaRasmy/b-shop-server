@@ -635,6 +635,211 @@ type Data = {
 
 ## DELETE /api/admin/categories/:id
 
+# Admin/Products
+
+## POST /api/admin/products
+
+### FormData (multipart-formdata)
+
+- Image count must be between 1 and 5
+
+```ts
+type FormData = {
+  name: string
+  slug : string
+  price : string // stringified number
+  stock : string  // stringified number
+  categoryId : string
+  status : 'active' | 'inactive'
+  `images[${i}].file` : File
+  `images[${i}].alt` : string
+  `images[${i}].isPrimary` : 'true' | 'false'
+
+}
+```
+
+### Response
+
+```ts
+type Data = {
+  status: 'active' | 'inactive'
+  name: string
+  createdAt: Date
+  id: string
+  description: string
+  updatedAt: Date
+  slug: string
+  price: string
+  stock: number
+  categoryId: string | null
+  isDeleted: boolean
+  images: {
+    url: string
+    format: string | null
+    createdAt: Date
+    id: string
+    updatedAt: Date
+    productId: string
+    publicId: string
+    alt: string
+    isPrimary: boolean
+    width: number | null
+    height: number | null
+    size: number | null
+  }[]
+}
+```
+
+## PATCH /api/admin/products/:id
+
+### FormData (multipart-formdata)
+
+- Image count must be between 1 and 5
+
+```ts
+type FormData = {
+  name: string
+  slug : string
+  price : string // stringified number
+  stock : string  // stringified number
+  categoryId : string
+  status : 'active' | 'inactive'
+  `images[${i}].file` : File // or .id if it already exists
+  `images[${i}].alt` : string
+  `images[${i}].isPrimary` : 'true' | 'false'
+
+}
+```
+
+### Response
+
+```ts
+type Data = {
+  images: {
+    id: string
+    url: string
+    isPrimary: boolean
+    alt: string
+  }[]
+  id: string
+  name: string
+  slug: string
+  description: string
+  price: string
+  stock: number
+  categoryId: string | null
+  status: 'active' | 'inactive'
+  isDeleted: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+```
+
+## GET /api/admin/products
+
+### Query Params
+
+```ts
+type Query = {
+  page?: number // default 1
+  perPage?: number // default 10
+  sort?: `${Field}:${SortOrder}` // default createdAt:desc
+  search?: string
+  categoryId?: string // uuid or __NULL__
+  status?: 'active' | 'inactive'
+}
+
+type Field = 'name' | 'price' | 'stock' | 'status' | 'createdAt' | 'updatedAt'
+type SortOrder = 'asc' | 'desc'
+```
+
+### Response
+
+```ts
+type Data = {
+  data: {
+    inventoryStatus: 'Out of Stock' | 'Low Stock' | 'In Stock'
+    categoryName: string | null
+    slug: string
+    status: 'active' | 'inactive'
+    name: string
+    description: string
+    price: string
+    stock: number
+    categoryId: string | null
+    id: string
+    createdAt: Date
+    updatedAt: Date
+    isDeleted: boolean
+    images: {
+      format: string | null
+      id: string
+      alt: string
+      isPrimary: boolean
+      url: string
+      createdAt: Date
+      updatedAt: Date
+      productId: string
+      publicId: string
+      width: number | null
+      height: number | null
+      size: number | null
+    }[]
+  }[]
+  page: number
+  perPage: number
+  total: number
+  totalPages: number
+  prevPage: number | null
+  nextPage: number | null
+}
+```
+
+## GET /api/admin/products/:id
+
+### Response
+
+```ts
+type Data = {
+  slug: string
+  status: 'active' | 'inactive'
+  name: string
+  description: string
+  price: string
+  stock: number
+  categoryId: string | null
+  id: string
+  inventoryStatus: 'Out of Stock' | 'Low Stock' | 'In Stock'
+  createdAt: Date
+  updatedAt: Date
+  isDeleted: boolean
+  images: {
+    format: string | null
+    id: string
+    alt: string
+    isPrimary: boolean
+    url: string
+    createdAt: Date
+    updatedAt: Date
+    productId: string
+    publicId: string
+    width: number | null
+    height: number | null
+    size: number | null
+  }[]
+}
+```
+
+## DELETE /api/admin/products/:id
+
+### Response
+
+```ts
+type Data = {
+  productId: string
+}
+```
+
 # Admin/Orders
 
 ## GET /api/admin/orders
