@@ -63,10 +63,8 @@ export const addProduct = makeBodyEndpoint(
           .returning()
 
         res.status(201).json({
-          product: {
-            ...product,
-            images: insertedImages,
-          },
+          ...product,
+          images: insertedImages,
         })
       })
     } catch (error: any) {
