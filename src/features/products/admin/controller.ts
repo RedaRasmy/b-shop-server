@@ -265,19 +265,16 @@ export const updateProduct = makeUpdateEndpoint(
 
         // send response
         res.status(200).json({
-          message: 'Product updated successfully',
-          product: {
-            ...product!,
-            images: [
-              ...oldImages,
-              ...insertedImages.map((i) => ({
-                id: i.id,
-                url: i.url,
-                isPrimary: i.isPrimary,
-                alt: i.alt,
-              })),
-            ],
-          },
+          ...product!,
+          images: [
+            ...oldImages,
+            ...insertedImages.map((i) => ({
+              id: i.id,
+              url: i.url,
+              isPrimary: i.isPrimary,
+              alt: i.alt,
+            })),
+          ],
         })
       })
     } catch (error) {
