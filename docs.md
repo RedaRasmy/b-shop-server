@@ -635,3 +635,92 @@ type Data = {
 
 ## DELETE /api/admin/categories/:id
 
+# Admin/Orders
+
+## GET /api/admin/orders
+
+### Query Params
+
+```ts
+type Query = {
+  page?: number // default 1
+  perPage?: number // default 10
+  sort?: `${Field}:${SortOrder}` // default createdAt:desc
+  search?: string
+  status?: 'pending' | 'processing' | 'shipped' | 'completed' | 'canceled'
+}
+
+type Field = 'name' | 'status' | 'createdAt' | 'total'
+type SortOrder = 'asc' | 'desc'
+```
+
+### Resposne
+
+```ts
+type Data = {
+  data: {
+    itemCount: number
+    status: 'pending' | 'processing' | 'shipped' | 'completed' | 'canceled'
+    name: string
+    createdAt: Date
+    total: string
+    id: number
+    orderToken: string
+    email: string
+    phone: string
+    updatedAt: Date
+    customerId: string | null
+    city: string
+    postalCode: string
+    addressLine1: string
+    addressLine2: string | null
+  }[]
+  page: number
+  perPage: number
+  total: number
+  totalPages: number
+  prevPage: number | null
+  nextPage: number | null
+}
+```
+
+## GET /api/admin/orders/:id
+
+### Response
+
+```ts
+type Data = {
+  items: {
+    id: string
+    productId: string
+    priceAtPurchase: string
+    quantity: number
+    name: string
+    thumbnailUrl: string
+  }[]
+  status: 'pending' | 'processing' | 'shipped' | 'completed' | 'canceled'
+  name: string
+  createdAt: Date
+  total: string
+  id: number
+  orderToken: string
+  email: string
+  phone: string
+  updatedAt: Date
+  customerId: string | null
+  city: string
+  postalCode: string
+  addressLine1: string
+  addressLine2: string | null
+}
+```
+
+## PATCH /api/admin/orders/:id
+
+### Body
+
+```ts
+type Body = {
+  status: 'pending' | 'processing' | 'shipped' | 'completed' | 'canceled'
+}
+```
