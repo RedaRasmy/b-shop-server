@@ -20,7 +20,7 @@ router.get('/:id', adminController.getProductById)
 
 // UPDATE
 
-router.put(
+router.patch(
   '/:id',
   uploadProductImages(), // this put files in req.files (multer)
   handleNestedFiles, // this put req.files in req.body.images
