@@ -724,3 +724,43 @@ type Body = {
   status: 'pending' | 'processing' | 'shipped' | 'completed' | 'canceled'
 }
 ```
+
+# Admin/Customers
+
+## GET /api/admin/customers
+
+### Query Params
+
+```ts
+type Query = {
+  page?: number // default 1
+  perPage?: number // default 10
+  sort?: `${Field}:${SortOrder}` // default createdAt:desc
+  search?: string
+}
+
+type Field = 'orders' | 'total' | 'createdAt'
+type SortOrder = 'asc' | 'desc'
+```
+
+### Response
+
+```ts
+type Data = {
+  data: {
+    id: string
+    name: string | null
+    email: string
+    phone: string | null
+    joinedAt: Date
+    totalSpent: number
+    orderCount: number
+  }[]
+  page: number
+  perPage: number
+  total: number
+  totalPages: number
+  prevPage: number | null
+  nextPage: number | null
+}
+```
