@@ -57,6 +57,7 @@
     "typescript": "^5.9.2"
   },
   "_moduleAliases": {
+    "src" : "dist",
     "@lib": "dist/lib",
     "@mw": "dist/middlewares",
     "@utils": "dist/utils",
