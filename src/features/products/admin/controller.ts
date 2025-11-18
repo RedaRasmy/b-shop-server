@@ -9,7 +9,7 @@ import {
   AdminProductsQuerySchema,
 } from '@products/admin/validation'
 import { getInventoryStatus } from '@utils/get-inventory-status'
-import logger from 'src/logger'
+import logger from '@lib/logger'
 import {
   makeByIdEndpoint,
   makeQueryEndpoint,

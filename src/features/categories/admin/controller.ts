@@ -13,7 +13,7 @@ import {
   InsertCategorySchema,
   UpdateCategorySchema,
 } from '@categories/categories.validation'
-import logger from 'src/logger'
+import logger from '@lib/logger'
 
 export const addCategory = makeBodyEndpoint(
   InsertCategorySchema,

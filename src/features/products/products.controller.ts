@@ -10,7 +10,7 @@ import {
   makeParamsEndpoint,
 } from '@utils/wrappers'
 import { getInventoryStatus } from '@utils/get-inventory-status'
-import logger from 'src/logger'
+import logger from '@lib/logger'
 import { buildProductFilters } from '@products/utils/build-product-filters'
 import { isNewProduct } from '@products/utils/is-new'
 import z from 'zod'

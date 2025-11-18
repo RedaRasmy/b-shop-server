@@ -11,7 +11,7 @@ import {
   makeUpdateEndpoint,
 } from '@utils/wrappers'
 import { and, eq, sql } from 'drizzle-orm'
-import logger from 'src/logger'
+import logger from '@lib/logger'
 import z from 'zod'
 
 export const getCart = makeSimpleEndpoint(async (req, res, next) => {

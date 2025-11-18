@@ -1,7 +1,6 @@
 import config from '@config/config'
-import { slugify } from '@utils/slugify'
 import { v2 as cloudinary, type AdminAndResourceOptions } from 'cloudinary'
-import logger from 'src/logger'
+import logger from '@lib/logger'
 import { v4 as uuid } from 'uuid'
 
 cloudinary.config({
@@ -101,7 +100,7 @@ export const deleteImage = async (publicId: string) => {
     const result = await cloudinary.uploader.destroy(publicId)
     return result
   } catch (error) {
-    logger.error(error,"Failed to delete cloudinary image")
+    logger.error(error, 'Failed to delete cloudinary image')
     throw error
   }
 }
