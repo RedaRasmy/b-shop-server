@@ -2,7 +2,7 @@
   "name": "b-shop-server",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/server.js",
   "scripts": {
     "build": "tsc",
     "start": "node -r module-alias/register dist/server.js",
