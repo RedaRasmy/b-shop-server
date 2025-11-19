@@ -1,4 +1,4 @@
-import { cartItems } from '@db/schema'
+import { cartItems } from '../../../db/schema'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 
 export const InsertCartItemSchema = createInsertSchema(cartItems).omit({

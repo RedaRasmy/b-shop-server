@@ -1,4 +1,4 @@
-import { getOrders } from '@profile/orders/orders.controller'
+import { getOrders } from '../orders/orders.controller'
 import { Router } from 'express'
 
 const router = Router()

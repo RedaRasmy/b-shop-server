@@ -1,6 +1,6 @@
-import { StatusSchema } from '@db/enums'
-import { SlugSchema } from '@lib/zod-schemas'
-import { getSortSchema } from '@utils/get-sort-schema'
+import { StatusSchema } from '../../../db/enums'
+import { SlugSchema } from '../../../lib/zod-schemas'
+import { getSortSchema } from '../../../utils/get-sort-schema'
 import z from 'zod'
 
 /// Insert / Update

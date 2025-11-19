@@ -1,7 +1,7 @@
-import { db } from '@db/index'
-import { orders, users } from '@db/schema'
-import { CustomersQuerySchema } from '@profile/admin/validation'
-import { makeQueryEndpoint } from '@utils/wrappers'
+import { db } from '../../../db/index'
+import { orders, users } from '../../../db/schema'
+import { CustomersQuerySchema } from '../admin/validation'
+import { makeQueryEndpoint } from '../../../utils/wrappers'
 import { and, asc, count, desc, eq, ilike, or, sql } from 'drizzle-orm'
 
 export const getCustomers = makeQueryEndpoint(

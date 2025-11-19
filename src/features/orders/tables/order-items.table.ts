@@ -4,7 +4,7 @@ import {
   type InferInsertModel,
   type InferSelectModel,
 } from 'drizzle-orm'
-import { orders, products } from '@tables'
+import { orders, products } from '../../../db/schema'
 
 const orderItems = pgTable('order_items', {
   id: uuid().primaryKey().defaultRandom(),

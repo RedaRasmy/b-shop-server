@@ -1,5 +1,5 @@
 import { db } from '../../db'
-import { users } from '@tables'
+import { users } from '../../db/schema'
 import {
   comparePassword,
   generateAccessToken,
@@ -8,9 +8,9 @@ import {
   revokeRefreshToken,
   verifyRefreshToken,
 } from '../../utils/auth'
-import config from '@config/config'
-import { makeBodyEndpoint, makeSimpleEndpoint } from '@utils/wrappers'
-import { EmailPasswordSchema } from '@auth/auth.validation'
+import config from '../../config/config'
+import { makeBodyEndpoint, makeSimpleEndpoint } from '../../utils/wrappers'
+import { EmailPasswordSchema } from '../auth/auth.validation'
 
 export const register = makeBodyEndpoint(
   EmailPasswordSchema,

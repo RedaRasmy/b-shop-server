@@ -1,7 +1,7 @@
-import { db } from '@db/index'
-import { cartItems, orderItems, orders } from '@db/schema'
-import { OrderInsertSchema } from '@orders/orders.validation'
-import { makeBodyEndpoint, makeParamsEndpoint } from '@utils/wrappers'
+import { db } from '../../db/index'
+import { cartItems, orderItems, orders } from '../../db/schema'
+import { OrderInsertSchema } from './orders.validation'
+import { makeBodyEndpoint, makeParamsEndpoint } from '../../utils/wrappers'
 import { eq } from 'drizzle-orm'
 
 export const addOrder = makeBodyEndpoint(

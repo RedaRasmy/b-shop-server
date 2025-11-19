@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import * as adminController from './controller'
-import { uploadProductImages } from '@lib/upload'
-import { handleNestedFiles } from '@mw/handle-nested-files'
+import { uploadProductImages } from '../../../lib/upload'
+import { handleNestedFiles } from '../../../middlewares/handle-nested-files'
 
 const router = Router()
 

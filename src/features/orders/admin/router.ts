@@ -1,4 +1,4 @@
-import { getOrders, updateOrder , getOrder } from '@orders/admin/controller'
+import { getOrders, updateOrder , getOrder } from './controller'
 import { Router } from 'express'
 
 const router = Router()

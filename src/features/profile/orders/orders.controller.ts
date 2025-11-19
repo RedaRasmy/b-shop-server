@@ -1,6 +1,6 @@
-import { db } from '@db/index'
-import { orders } from '@db/schema'
-import { makeAuthEndpoint } from '@utils/wrappers'
+import { db } from '../../../db/index'
+import { orders } from '../../../db/schema'
+import { makeAuthEndpoint } from '../../../utils/wrappers'
 import { desc } from 'drizzle-orm'
 
 export const getOrders = makeAuthEndpoint(async (req, res, next) => {

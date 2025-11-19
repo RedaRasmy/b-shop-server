@@ -3,7 +3,7 @@ import {
   deleteAddress,
   getAddresses,
   updateAddress,
-} from '@profile/addresses/addresses.controllers'
+} from '../addresses/addresses.controllers'
 import { Router } from 'express'
 
 const router = Router()

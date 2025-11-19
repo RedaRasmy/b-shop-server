@@ -1,5 +1,5 @@
-import { StatusSchema } from "@db/enums";
-import { getSortSchema } from "@utils/get-sort-schema";
+import { StatusSchema } from "../../../db/enums";
+import { getSortSchema } from "../../../utils/get-sort-schema";
 import z from "zod";
 
 const SortSchema = getSortSchema([

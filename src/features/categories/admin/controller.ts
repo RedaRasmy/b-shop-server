@@ -1,19 +1,19 @@
-import { db } from '@db/index'
-import { categories, products } from '@db/schema'
+import { db } from '../../../db/index'
+import { categories, products } from '../../../db/schema'
 import { and, asc, desc, eq, ilike } from 'drizzle-orm'
-import { AdminCategoriesQuerySchema } from '@categories/admin/validation'
-import { ICategory } from '@categories/categories.table'
+import { AdminCategoriesQuerySchema } from '../../categories/admin/validation'
+import { ICategory } from '../../categories/categories.table'
 import {
   makeQueryEndpoint,
   makeBodyEndpoint,
   makeByIdEndpoint,
   makeUpdateEndpoint,
-} from '@utils/wrappers'
+} from '../../../utils/wrappers'
 import {
   InsertCategorySchema,
   UpdateCategorySchema,
-} from '@categories/categories.validation'
-import logger from '@lib/logger'
+} from '../../categories/categories.validation'
+import logger from '../../../lib/logger'
 
 export const addCategory = makeBodyEndpoint(
   InsertCategorySchema,

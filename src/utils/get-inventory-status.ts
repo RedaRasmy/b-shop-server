@@ -1,4 +1,4 @@
-import { LOW_STOCK } from '@config/constantes'
+import { LOW_STOCK } from "../config/constantes"
 
 export function getInventoryStatus(stock: number) {
   if (stock === 0) {

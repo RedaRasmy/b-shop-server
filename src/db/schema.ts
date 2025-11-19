@@ -1,4 +1,4 @@
-import { entityStatus } from '@db/enums'
+import { entityStatus } from './enums'
 
 export {
   default as images,
@@ -24,11 +24,11 @@ export {
   default as orders,
   ordersRelations,
   orderStatus,
-} from '@orders/tables/orders.table'
+} from '../features/orders/tables/orders.table'
 export {
   default as orderItems,
   orderItemsRelations,
-} from '@orders/tables/order-items.table'
+} from '../features/orders/tables/order-items.table'
 export {
   default as reviews,
   reviewsRelations,
@@ -36,10 +36,10 @@ export {
 export {
   default as cartItems,
   cartItemsRelations,
-} from '@profile/cart/cart.table'
+} from '../features/profile/cart/cart.table'
 export {
   default as addresses,
   addressesRelations,
-} from '@profile/addresses/addresses.table'
+} from '../features/profile/addresses/addresses.table'
 
 export { entityStatus }

@@ -4,7 +4,7 @@ import { notFound } from './middlewares/not-found'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import {router} from './routes'
-import config from '@config/config'
+import config from './config/config'
 
 const app = express()
 

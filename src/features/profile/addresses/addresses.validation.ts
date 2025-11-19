@@ -1,4 +1,4 @@
-import { addresses } from '@db/schema'
+import { addresses } from '../../../db/schema'
 import { createInsertSchema, createUpdateSchema } from 'drizzle-zod'
 
 export const InsertAddressSchema = createInsertSchema(addresses).omit({

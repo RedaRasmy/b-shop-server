@@ -1,21 +1,20 @@
 import products, { IProduct } from '../tables/products.table'
 import images, { IImage, SImage } from '../tables/product-images.table'
-import { deleteMultipleImages, uploadMultipleImages } from '@lib/cloudinary'
-import { db } from '@db/index'
-import { and, asc, count, desc, eq, ilike, inArray, isNull } from 'drizzle-orm'
 import {
-  AddProductSchema,
-  AdminProductsQuery,
-  AdminProductsQuerySchema,
-} from '@products/admin/validation'
-import { getInventoryStatus } from '@utils/get-inventory-status'
-import logger from '@lib/logger'
+  deleteMultipleImages,
+  uploadMultipleImages,
+} from '../../../lib/cloudinary'
+import { db } from '../../../db/index'
+import { and, asc, count, desc, eq, ilike, inArray, isNull } from 'drizzle-orm'
+import { AddProductSchema, AdminProductsQuerySchema } from '../admin/validation'
+import { getInventoryStatus } from '../../../utils/get-inventory-status'
+import logger from '../../../lib/logger'
 import {
   makeByIdEndpoint,
   makeQueryEndpoint,
   makeBodyEndpoint,
   makeUpdateEndpoint,
-} from '@utils/wrappers'
+} from '../../../utils/wrappers'
 
 /// ADD
 export const addProduct = makeBodyEndpoint(

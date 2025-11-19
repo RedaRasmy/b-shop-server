@@ -28,20 +28,20 @@
     "skipLibCheck": true,
 
     // Path aliases
-    "baseUrl": ".",
-    "paths": {
-      "@lib/*" : ["src/lib/*"],
-      "@mw/*": ["src/middlewares/*"],
-      "@utils/*": ["src/utils/*"],
-      "@db/*": ["src/db/*"],
-      "@tables": ["src/db/schema.ts"],
-      "@config/*": ["src/config/*"],
-      "@auth/*": ["src/features/auth/*"],
-      "@profile/*": ["src/features/profile/*"],
-      "@products/*": ["src/features/products/*"],
-      "@categories/*": ["src/features/categories/*"],
-      "@orders/*": ["src/features/orders/*"]
-    }
+    // "baseUrl": ".",
+    // "paths": {
+    //   "@lib/*" : ["src/lib/*"],
+    //   "@mw/*": ["src/middlewares/*"],
+    //   "@utils/*": ["src/utils/*"],
+    //   "@db/*": ["src/db/*"],
+    //   "@tables": ["src/db/schema.ts"],
+    //   "@config/*": ["src/config/*"],
+    //   "@auth/*": ["src/features/auth/*"],
+    //   "@profile/*": ["src/features/profile/*"],
+    //   "@products/*": ["src/features/products/*"],
+    //   "@categories/*": ["src/features/categories/*"],
+    //   "@orders/*": ["src/features/orders/*"]
+    // }
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"],

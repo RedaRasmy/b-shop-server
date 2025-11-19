@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import * as controller from './products.controller'
-import { optionalAuth } from '@mw/optional-auth'
+import { optionalAuth } from '../../middlewares/optional-auth'
 
 const router: Router = Router()
 

@@ -4,7 +4,7 @@ import crypto from 'crypto'
 import { db } from '../db'
 import { refreshTokens } from '../db/schema'
 import { eq } from 'drizzle-orm'
-import config from '@config/config'
+import config from '../config/config'
 
 export type DecodedTokenPayload = {
   id: string
@@ -70,10 +70,7 @@ export const generateTokens = async (
 
 // Verify Access Token
 export const verifyAccessToken = (token: string) => {
-  return jwt.verify(
-    token,
-    config.JWT_ACCESS_SECRET,
-  ) as DecodedTokenPayload
+  return jwt.verify(token, config.JWT_ACCESS_SECRET) as DecodedTokenPayload
 }
 
 // Verify Refresh Token

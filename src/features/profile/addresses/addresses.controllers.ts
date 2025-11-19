@@ -1,15 +1,15 @@
-import { db } from '@db/index'
-import { addresses } from '@db/schema'
+import { db } from '../../../db/index'
+import { addresses } from '../../../db/schema'
 import {
   InsertAddressSchema,
   UpdateAddressSchema,
-} from '@profile/addresses/addresses.validation'
+} from '../addresses/addresses.validation'
 import {
   makeAuthEndpoint,
   makeBodyEndpoint,
   makeByIdEndpoint,
   makeUpdateEndpoint,
-} from '@utils/wrappers'
+} from '../../../utils/wrappers'
 import { and, desc, eq } from 'drizzle-orm'
 
 /// POST

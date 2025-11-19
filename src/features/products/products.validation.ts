@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import products from './tables/products.table'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
-import { getSortSchema } from '@utils/get-sort-schema'
+import { getSortSchema } from '../../utils/get-sort-schema'
 
 const SortSchema = getSortSchema(['price', 'createdAt']).default(
   'createdAt:desc',

@@ -1,6 +1,6 @@
-import config from '@config/config'
+import config from '../config/config'
 import { v2 as cloudinary, type AdminAndResourceOptions } from 'cloudinary'
-import logger from '@lib/logger'
+import logger from '../lib/logger'
 import { v4 as uuid } from 'uuid'
 
 cloudinary.config({

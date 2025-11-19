@@ -1,4 +1,4 @@
-import { orderItems, orders } from '@db/schema'
+import { orderItems, orders } from '../../db/schema'
 import { createInsertSchema } from 'drizzle-zod'
 import z from 'zod'
 

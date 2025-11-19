@@ -1,5 +1,5 @@
-import { orders } from '@db/schema'
-import { getSortSchema } from '@utils/get-sort-schema'
+import { orders } from '../../../db/schema'
+import { getSortSchema } from '../../../utils/get-sort-schema'
 import { createUpdateSchema } from 'drizzle-zod'
 import z from 'zod'
 

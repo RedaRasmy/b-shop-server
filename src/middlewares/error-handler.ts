@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express'
-import logger from '@lib/logger'
+import logger from '../lib/logger'
 
 export interface AppError extends Error {
   status?: number

@@ -1,8 +1,8 @@
 import { Router } from 'express'
 import { me, updatePassword, updateProfile } from './profile.controller'
-import { cartRouter } from '@profile/cart/cart.router'
-import { addressesRouter } from '@profile/addresses/addresses.router'
-import { ordersRouter } from '@profile/orders/orders.router'
+import { cartRouter } from './cart/cart.router'
+import { addressesRouter } from './addresses/addresses.router'
+import { ordersRouter } from './orders/orders.router'
 
 const router: Router = Router()
 

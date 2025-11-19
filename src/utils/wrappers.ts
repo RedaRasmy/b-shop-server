@@ -1,4 +1,4 @@
-import { Prettify, ToRecord } from '@lib/types'
+import { Prettify, ToRecord } from '../lib/types'
 import type { NextFunction, Request, Response } from 'express'
 import { z } from 'zod'
 

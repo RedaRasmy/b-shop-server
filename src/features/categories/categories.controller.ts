@@ -2,8 +2,8 @@ import { db } from '../../db'
 import {
   makeByIdEndpoint,
   makeSimpleEndpoint,
-} from '@utils/wrappers'
-import { getInventoryStatus } from '@utils/get-inventory-status'
+} from '../../utils/wrappers'
+import { getInventoryStatus } from '../../utils/get-inventory-status'
 
 export const getCategories = makeSimpleEndpoint(async (req, res, next) => {
   try {

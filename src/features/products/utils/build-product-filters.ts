@@ -1,4 +1,4 @@
-import { ProductsQuery } from "@products/products.validation"
+import { ProductsQuery } from "../../products/products.validation"
 import { isNotNull } from "drizzle-orm"
 
 export function buildProductFilters({ search, categoryId }: Pick<ProductsQuery,'search'|'categoryId'>) {

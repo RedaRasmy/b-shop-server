@@ -13,7 +13,7 @@ import {
   type InferInsertModel,
   type InferSelectModel,
 } from 'drizzle-orm'
-import { entityStatus, categories, images, reviews, cartItems } from '@tables'
+import { entityStatus, categories, images, reviews, cartItems } from '../../../db/schema'
 
 const products = pgTable('products', {
   id: uuid().primaryKey().defaultRandom(),

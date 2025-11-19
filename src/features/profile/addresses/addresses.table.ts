@@ -1,5 +1,5 @@
-import { users } from '@db/schema'
-import { createdAt, updatedAt } from '@db/timestamps'
+import { users } from '../../../db/schema'
+import { createdAt, updatedAt } from '../../../db/timestamps'
 import { InferInsertModel, InferSelectModel, relations } from 'drizzle-orm'
 import { boolean, index, pgTable, uuid, varchar } from 'drizzle-orm/pg-core'
 

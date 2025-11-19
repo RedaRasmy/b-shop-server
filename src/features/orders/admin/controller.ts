@@ -1,16 +1,16 @@
-import { db } from '@db/index'
+import { db } from '../../../db/index'
 import {
   AdminOrdersQuerySchema,
   UpdateOrderSchema,
-} from '@orders/admin/validation'
+} from './validation'
 import {
   makeByIdEndpoint,
   makeQueryEndpoint,
   makeUpdateEndpoint,
-} from '@utils/wrappers'
-import { orders } from '@db/schema'
+} from '../../../utils/wrappers'
+import { orders } from '../../../db/schema'
 import { and, asc, count, desc, eq, ilike, or } from 'drizzle-orm'
-import { SOrder } from '@orders/tables/orders.table'
+import { SOrder } from '../tables/orders.table'
 import z from 'zod'
 
 export const getOrders = makeQueryEndpoint(

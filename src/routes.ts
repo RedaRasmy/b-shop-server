@@ -1,15 +1,15 @@
 import { Router } from 'express'
-import { requireAuth } from '@mw/require-auth'
-import { productsRouter } from '@products/products.router'
+import { requireAuth } from './middlewares/require-auth'
+import { productsRouter } from './features/products/products.router'
 import { categoriesRouter } from './features/categories/categories.router'
 import { categoriesAdminRouter } from './features/categories/admin/router'
 import { productsAdminRouter } from './features/products/admin/router'
-import { authRouter } from '@auth/auth.router'
-import { profileRouter } from 'src/features/profile/profile.router'
-import { PublicOrdersRouter } from '@orders/orders.router'
-import { optionalAuth } from '@mw/optional-auth'
-import { ordersAdminRouter } from '@orders/admin/router'
-import { customersAdminRouter } from '@profile/admin/router'
+import { authRouter } from './features/auth/auth.router'
+import { profileRouter } from './features/profile/profile.router'
+import { PublicOrdersRouter } from './features/orders/orders.router'
+import { optionalAuth } from './middlewares/optional-auth'
+import { ordersAdminRouter } from './features/orders/admin/router'
+import { customersAdminRouter } from './features/profile/admin/router'
 
 export const router = Router()
 

@@ -1,4 +1,4 @@
-import { getSortSchema } from '@utils/get-sort-schema'
+import { getSortSchema } from '../../../utils/get-sort-schema'
 import z from 'zod'
 
 export const CustomersQuerySchema = z.object({

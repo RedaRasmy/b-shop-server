@@ -1,4 +1,4 @@
-import { products, users } from '@db/schema'
+import { products, users } from '../../../db/schema'
 import { InferInsertModel, InferSelectModel, relations } from 'drizzle-orm'
 import { integer, pgTable, timestamp, unique, uuid } from 'drizzle-orm/pg-core'
 

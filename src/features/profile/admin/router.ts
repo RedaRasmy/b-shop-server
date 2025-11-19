@@ -1,4 +1,4 @@
-import { getCustomers } from '@profile/admin/controller'
+import { getCustomers } from '../admin/controller'
 import { Router } from 'express'
 
 const router = Router()

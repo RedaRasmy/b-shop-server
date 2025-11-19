@@ -7,13 +7,13 @@ import {
   numeric,
   uniqueIndex,
 } from 'drizzle-orm/pg-core'
-import { createdAt, updatedAt } from '@db/timestamps'
+import { createdAt, updatedAt } from '../../../db/timestamps'
 import {
   relations,
   type InferInsertModel,
   type InferSelectModel,
 } from 'drizzle-orm'
-import { orderItems, users } from '@tables'
+import { orderItems, users } from '../../../db/schema'
 
 export const orderStatus = pgEnum('order_status', [
   'pending',

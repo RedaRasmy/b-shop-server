@@ -1,18 +1,17 @@
-import { db } from '@db/index'
-import { categories, images, products, reviews } from '@tables'
+import { db } from '../../db/index'
+import {  images, products, reviews } from '../../db/schema'
 import { and, asc, count, desc, eq, ilike, inArray, sql } from 'drizzle-orm'
 import { IProduct } from './tables/products.table'
 import { ProductsQuerySchema } from './products.validation'
 import {
-  makeByIdEndpoint,
   makeQueryEndpoint,
   makeBodyEndpoint,
   makeParamsEndpoint,
-} from '@utils/wrappers'
-import { getInventoryStatus } from '@utils/get-inventory-status'
-import logger from '@lib/logger'
-import { buildProductFilters } from '@products/utils/build-product-filters'
-import { isNewProduct } from '@products/utils/is-new'
+} from '../../utils/wrappers'
+import { getInventoryStatus } from '../../utils/get-inventory-status'
+import logger from '../../lib/logger'
+import { buildProductFilters } from './utils/build-product-filters'
+import { isNewProduct } from './utils/is-new'
 import z from 'zod'
 
 export const getProducts = makeQueryEndpoint(
