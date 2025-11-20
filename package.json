@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/server.js",
-  "type": "module",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "node dist/server.js | npx pino-pretty ",
     "dev": "tsx src/server.ts | npx pino-pretty",
     "lint": "eslint 'src/**/*.ts'",
     "test": "jest",
