@@ -1,7 +1,7 @@
 import config from '../config/config'
 import { v2 as cloudinary, type AdminAndResourceOptions } from 'cloudinary'
 import logger from '../lib/logger'
-import { v4 as uuid } from 'uuid'
+// import { v4 as uuid } from 'uuid'
 
 cloudinary.config({
   cloud_name: config.CLOUDINARY_CLOUD_NAME,
@@ -42,7 +42,7 @@ export const uploadImageBuffer = async ({
 }): Promise<ProcessedUploadResult> => {
   const options = {
     folder: folder,
-    public_id: `${uuid()}`,
+    public_id: `${new Date()}`,
     resource_type: 'auto' as const,
     use_filename: true,
     unique_filename: false,
