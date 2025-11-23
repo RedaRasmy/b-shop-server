@@ -4,10 +4,13 @@ import { notFound } from './middlewares/not-found'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import { router } from './routes'
+import helmet from 'helmet'
 import config from './config/config'
+
 
 const app = express()
 
+app.use(helmet())
 app.use(cookieParser())
 app.use(
   cors({
