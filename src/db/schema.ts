@@ -19,7 +19,7 @@ export {
 export {
   default as refreshTokens,
   refreshTokensRelations,
-} from '../features/auth/auth.table'
+} from '../features/auth/tables/refresh-tokens'
 export {
   default as orders,
   ordersRelations,
@@ -41,5 +41,10 @@ export {
   default as addresses,
   addressesRelations,
 } from '../features/profile/addresses/addresses.table'
+
+export {
+  default as resetTokens,
+  resetTokensRelations,
+} from '../features/auth/tables/reset-tokens'
 
 export { entityStatus }

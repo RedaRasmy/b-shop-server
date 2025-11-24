@@ -1,8 +1,14 @@
-import { pgTable, serial, varchar, timestamp, index, uuid } from 'drizzle-orm/pg-core'
-import { users } from '../../db/schema'
-import { createdAt } from '../../db/timestamps'
+import {
+  pgTable,
+  serial,
+  varchar,
+  timestamp,
+  index,
+  uuid,
+} from 'drizzle-orm/pg-core'
+import { users } from '../../../db/schema'
+import { createdAt } from '../../../db/timestamps'
 import { relations } from 'drizzle-orm'
-
 
 const refreshTokens = pgTable(
   'refresh_tokens',
@@ -22,13 +28,11 @@ const refreshTokens = pgTable(
   }),
 )
 
-
 export default refreshTokens
 
-
-export const refreshTokensRelations = relations(refreshTokens,({one})=>({
-    user: one(users,{
-        fields : [refreshTokens.userId],
-        references : [users.id]
-    })
+export const refreshTokensRelations = relations(refreshTokens, ({ one }) => ({
+  user: one(users, {
+    fields: [refreshTokens.userId],
+    references: [users.id],
+  }),
 }))
