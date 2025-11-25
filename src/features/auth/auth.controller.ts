@@ -1,5 +1,5 @@
 import { db } from '../../db'
-import { users } from '../../db/schema'
+import { resetTokens, users } from '../../db/schema'
 import {
   comparePassword,
   generateAccessToken,
@@ -9,8 +9,13 @@ import {
   verifyRefreshToken,
 } from '../../utils/auth'
 import config from '../../config/config'
-import { makeBodyEndpoint, makeSimpleEndpoint } from '../../utils/wrappers'
+import {
+  makeBodyEndpoint,
+  makeSimpleEndpoint,
+} from '../../utils/wrappers'
 import { EmailPasswordSchema } from '../auth/auth.validation'
+import z from 'zod'
+import { eq } from 'drizzle-orm'
 
 export const register = makeBodyEndpoint(
   EmailPasswordSchema,
@@ -189,3 +194,39 @@ function isUniqueConstraintError(error: unknown): boolean {
 
   return false
 }
+
+export const resetPassword = makeBodyEndpoint(
+  z.object({
+    token: z.string(),
+    password: z.string().min(8),
+  }),
+  async (req, res, next) => {
+    const { token, password } = req.body
+
+    try {
+      await db.transaction(async (tx) => {
+        const resetToken = await tx.query.resetTokens.findFirst({
+          where: (tokens, { eq }) => eq(tokens.token, token),
+        })
+
+        if (!resetToken || resetToken.expiresAt <= new Date()) {
+          return res.sendStatus(403)
+        }
+
+        const newPasswordHash = await hashPassword(password)
+
+        await tx
+          .update(users)
+          .set({
+            password: newPasswordHash,
+          })
+          .where(eq(users.id, resetToken.userId))
+
+        await tx.delete(resetTokens).where(eq(resetTokens.id, resetToken.id))
+      })
+      res.sendStatus(200)
+    } catch (err) {
+      next(err)
+    }
+  },
+)
