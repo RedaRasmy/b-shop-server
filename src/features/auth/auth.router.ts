@@ -7,7 +7,7 @@ router.post('/register',  register)
 router.post('/login', login)
 router.post('/logout', logout)
 router.post('/refresh', refresh)
-// router.post("/forgot-password")
+router.post("/forgot-password")
 router.post('/reset-password',resetPassword)
 
 export const authRouter = router

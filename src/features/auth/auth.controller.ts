@@ -9,10 +9,7 @@ import {
   verifyRefreshToken,
 } from '../../utils/auth'
 import config from '../../config/config'
-import {
-  makeBodyEndpoint,
-  makeSimpleEndpoint,
-} from '../../utils/wrappers'
+import { makeBodyEndpoint, makeSimpleEndpoint } from '../../utils/wrappers'
 import { EmailPasswordSchema } from '../auth/auth.validation'
 import z from 'zod'
 import { eq } from 'drizzle-orm'
@@ -194,6 +191,20 @@ function isUniqueConstraintError(error: unknown): boolean {
 
   return false
 }
+
+export const forgotPassword = makeBodyEndpoint(
+  z.object({
+    email : z.email()
+  }),
+  async (req, res, next) => {
+    const {email} = req.body
+
+    try {
+    } catch (err) {
+      next(err)
+    }
+  },
+)
 
 export const resetPassword = makeBodyEndpoint(
   z.object({
