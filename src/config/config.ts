@@ -14,6 +14,7 @@ const configSchema = z.object({
   CLOUDINARY_API_KEY: z.string().min(1),
   CLOUDINARY_API_SECRET: z.string().min(1),
   CLOUDINARY_URL: z.string().min(1),
+  MAILGUN_API_KEY: z.string().min(1),
 })
 
 type Config = Partial<z.input<typeof configSchema>>
@@ -28,6 +29,7 @@ const config: Config = {
   CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
   CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
   CLOUDINARY_URL: process.env.CLOUDINARY_URL,
+  MAILGUN_API_KEY: process.env.MAILGUN_API_KEY,
 }
 
 export default configSchema.parse(config)
