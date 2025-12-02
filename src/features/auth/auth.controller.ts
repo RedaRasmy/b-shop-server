@@ -250,10 +250,12 @@ export const resetPassword = makeBodyEndpoint(
   async (req, res, next) => {
     const { token, password } = req.body
 
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex')
+
     try {
       await db.transaction(async (tx) => {
         const resetToken = await tx.query.resetTokens.findFirst({
-          where: (tokens, { eq }) => eq(tokens.token, token),
+          where: (tokens, { eq }) => eq(tokens.token, hashedToken),
         })
 
         if (!resetToken || resetToken.expiresAt <= new Date()) {
