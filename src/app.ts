@@ -5,10 +5,11 @@ import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import { router } from './routes'
 import helmet from 'helmet'
-import config from './config/config'
-
+import { limiter } from './lib/limiter'
 
 const app = express()
+
+app.use(limiter)
 
 app.use(helmet())
 app.use(cookieParser())
