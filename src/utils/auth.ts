@@ -6,7 +6,7 @@ import { refreshTokens } from '../db/schema'
 import { eq } from 'drizzle-orm'
 import config from '../config/config'
 
-export type DecodedTokenPayload = {
+export type AccessTokenPayload = {
   id: string
   role: string
   email: string
@@ -25,13 +25,13 @@ export const comparePassword = async (
 
 // Generate Access Token (short-lived)
 export const generateAccessToken = (
-  userId: string,
+  id: string,
   email: string,
   role: string,
 ): string => {
   return jwt.sign(
     {
-      id: userId,
+      id,
       role,
       email,
     },
@@ -57,19 +57,19 @@ const generateRefreshToken = async (userId: string) => {
 
 // Generate both tokens at once
 export const generateTokens = async (
-  userId: string,
+  id: string,
   email: string,
   role: string,
 ) => {
   return {
-    accessToken: generateAccessToken(userId, email, role),
-    refreshToken: await generateRefreshToken(userId),
+    accessToken: generateAccessToken(id, email, role),
+    refreshToken: await generateRefreshToken(id),
   }
 }
 
 // Verify Access Token
 export const verifyAccessToken = (token: string) => {
-  return jwt.verify(token, config.JWT_ACCESS_SECRET) as DecodedTokenPayload
+  return jwt.verify(token, config.JWT_ACCESS_SECRET) as AccessTokenPayload
 }
 
 // Verify Refresh Token
