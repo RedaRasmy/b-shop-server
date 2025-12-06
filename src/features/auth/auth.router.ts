@@ -4,10 +4,10 @@ import {
   logout,
   refresh,
   register,
-  resetPassword,
-  forgotPassword,
-  sendVerifyEmail,
-  verifyEmail
+  // resetPassword,
+  // forgotPassword,
+  // sendVerifyEmail,
+  // verifyEmail
 } from './auth.controller'
 import { getLimiter } from '../../lib/limiter'
 
@@ -21,9 +21,9 @@ router.post('/register', register)
 router.post('/login', getLimiter(15, 10), login)
 router.post('/logout', logout)
 router.post('/refresh', refresh)
-router.post('/forgot-password', getLimiter(60, 5), forgotPassword)
-router.post('/reset-password', resetPassword)
-router.post('/verify-email',sendVerifyEmail)
-router.post('/verify-email/verify',verifyEmail)
+// router.post('/forgot-password', getLimiter(60, 5), forgotPassword)
+// router.post('/reset-password', resetPassword)
+// router.post('/verify-email',sendVerifyEmail)
+// router.post('/verify-email/verify',verifyEmail)
 
 export const authRouter = router

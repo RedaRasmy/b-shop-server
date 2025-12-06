@@ -11,10 +11,10 @@ import {
 import config from '../../config/config'
 import { makeBodyEndpoint, makeSimpleEndpoint } from '../../utils/wrappers'
 import { EmailPasswordSchema } from '../auth/auth.validation'
-import z from 'zod'
-import { eq } from 'drizzle-orm'
-import { mailgun } from '../../lib/mailgun'
-import crypto from 'crypto'
+// import z from 'zod'
+// import { eq } from 'drizzle-orm'
+// import { mailgun } from '../../lib/mailgun'
+// import crypto from 'crypto'
 
 export const register = makeBodyEndpoint(
   EmailPasswordSchema,
@@ -194,118 +194,118 @@ function isUniqueConstraintError(error: unknown): boolean {
   return false
 }
 
-export const forgotPassword = makeBodyEndpoint(
-  z.object({
-    email: z.email(),
-  }),
-  async (req, res, next) => {
-    const { email } = req.body
+// export const forgotPassword = makeBodyEndpoint(
+//   z.object({
+//     email: z.email(),
+//   }),
+//   async (req, res, next) => {
+//     const { email } = req.body
 
-    try {
-      // check user existence
-      const user = await db.query.users.findFirst({
-        where: (users, { eq }) => eq(users.email, email),
-      })
-      if (!user) {
-        return res.sendStatus(404)
-      }
+//     try {
+//       // check user existence
+//       const user = await db.query.users.findFirst({
+//         where: (users, { eq }) => eq(users.email, email),
+//       })
+//       if (!user) {
+//         return res.sendStatus(404)
+//       }
 
-      // create, hash and store token
+//       // create, hash and store token
 
-      const resetToken = crypto.randomBytes(32).toString('hex')
+//       const resetToken = crypto.randomBytes(32).toString('hex')
 
-      const hashedToken = crypto
-        .createHash('sha256')
-        .update(resetToken)
-        .digest('hex')
+//       const hashedToken = crypto
+//         .createHash('sha256')
+//         .update(resetToken)
+//         .digest('hex')
 
-      await db.insert(resetTokens).values({
-        token: hashedToken,
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60), // 1 hour
-        userId: user.id,
-      })
+//       await db.insert(resetTokens).values({
+//         token: hashedToken,
+//         expiresAt: new Date(Date.now() + 1000 * 60 * 60), // 1 hour
+//         userId: user.id,
+//       })
 
-      // send email
+//       // send email
 
-      const resetLink = `${config.FRONTEND_URL}/reset-password?token=${resetToken}`
+//       const resetLink = `${config.FRONTEND_URL}/reset-password?token=${resetToken}`
 
-      await mailgun.messages.create(config.MAILGUN_DOMAIN, {
-        from: config.MAILGUN_FROM,
-        to: [email],
-        subject: 'Reset Password',
-        text: `Click here to reset your password: ${resetLink}`,
-      })
-      res.sendStatus(200)
-    } catch (err) {
-      next(err)
-    }
-  },
-)
+//       await mailgun.messages.create(config.MAILGUN_DOMAIN, {
+//         from: config.MAILGUN_FROM,
+//         to: [email],
+//         subject: 'Reset Password',
+//         text: `Click here to reset your password: ${resetLink}`,
+//       })
+//       res.sendStatus(200)
+//     } catch (err) {
+//       next(err)
+//     }
+//   },
+// )
 
-export const resetPassword = makeBodyEndpoint(
-  z.object({
-    token: z.string(),
-    password: z.string().min(8),
-  }),
-  async (req, res, next) => {
-    const { token, password } = req.body
+// export const resetPassword = makeBodyEndpoint(
+//   z.object({
+//     token: z.string(),
+//     password: z.string().min(8),
+//   }),
+//   async (req, res, next) => {
+//     const { token, password } = req.body
 
-    const hashedToken = crypto.createHash('sha256').update(token).digest('hex')
+//     const hashedToken = crypto.createHash('sha256').update(token).digest('hex')
 
-    try {
-      await db.transaction(async (tx) => {
-        const resetToken = await tx.query.resetTokens.findFirst({
-          where: (tokens, { eq }) => eq(tokens.token, hashedToken),
-        })
+//     try {
+//       await db.transaction(async (tx) => {
+//         const resetToken = await tx.query.resetTokens.findFirst({
+//           where: (tokens, { eq }) => eq(tokens.token, hashedToken),
+//         })
 
-        if (!resetToken || resetToken.expiresAt <= new Date()) {
-          return res.sendStatus(403)
-        }
+//         if (!resetToken || resetToken.expiresAt <= new Date()) {
+//           return res.sendStatus(403)
+//         }
 
-        const newPasswordHash = await hashPassword(password)
+//         const newPasswordHash = await hashPassword(password)
 
-        await tx
-          .update(users)
-          .set({
-            password: newPasswordHash,
-          })
-          .where(eq(users.id, resetToken.userId))
+//         await tx
+//           .update(users)
+//           .set({
+//             password: newPasswordHash,
+//           })
+//           .where(eq(users.id, resetToken.userId))
 
-        await tx.delete(resetTokens).where(eq(resetTokens.id, resetToken.id))
-      })
-      res.sendStatus(200)
-    } catch (err) {
-      next(err)
-    }
-  },
-)
+//         await tx.delete(resetTokens).where(eq(resetTokens.id, resetToken.id))
+//       })
+//       res.sendStatus(200)
+//     } catch (err) {
+//       next(err)
+//     }
+//   },
+// )
 
-// Email verification
+// // Email verification
 
-export const sendVerifyEmail = makeBodyEndpoint(
-  z.object({
-    email: z.email(),
-  }),
-  async (req, res, next) => {
-    const { email } = req.body
+// export const sendVerifyEmail = makeBodyEndpoint(
+//   z.object({
+//     email: z.email(),
+//   }),
+//   async (req, res, next) => {
+//     const { email } = req.body
 
-    try {
-    } catch (err) {
-      next(err)
-    }
-  },
-)
+//     try {
+//     } catch (err) {
+//       next(err)
+//     }
+//   },
+// )
 
-export const verifyEmail = makeBodyEndpoint(
-  z.object({
-    token: z.string().min(1),
-  }),
-  async (req, res, next) => {
-    const { token } = req.body
+// export const verifyEmail = makeBodyEndpoint(
+//   z.object({
+//     token: z.string().min(1),
+//   }),
+//   async (req, res, next) => {
+//     const { token } = req.body
 
-    try {
-    } catch (err) {
-      next(err)
-    }
-  },
-)
+//     try {
+//     } catch (err) {
+//       next(err)
+//     }
+//   },
+// )
