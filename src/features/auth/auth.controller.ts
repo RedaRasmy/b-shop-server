@@ -279,3 +279,33 @@ export const resetPassword = makeBodyEndpoint(
     }
   },
 )
+
+// Email verification
+
+export const sendVerifyEmail = makeBodyEndpoint(
+  z.object({
+    email: z.email(),
+  }),
+  async (req, res, next) => {
+    const { email } = req.body
+
+    try {
+    } catch (err) {
+      next(err)
+    }
+  },
+)
+
+export const verifyEmail = makeBodyEndpoint(
+  z.object({
+    token: z.string().min(1),
+  }),
+  async (req, res, next) => {
+    const { token } = req.body
+
+    try {
+    } catch (err) {
+      next(err)
+    }
+  },
+)
