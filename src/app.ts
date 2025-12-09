@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser'
 import { router } from './routes'
 import helmet from 'helmet'
 import { limiter } from './lib/limiter'
+import config from './config/config'
 
 const app = express()
 
@@ -13,9 +14,12 @@ app.use(limiter)
 
 app.use(helmet())
 app.use(cookieParser())
+
+const allowedOrigins = config.FRONTEND_URL.split(',')
+console.log(allowedOrigins)
 app.use(
   cors({
-    origin: true,
+    origin: allowedOrigins,
     credentials: true,
   }),
 )
