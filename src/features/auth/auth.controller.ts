@@ -21,14 +21,14 @@ const accessTokenOptions: CookieOptions = {
   httpOnly: true,
   secure: true,
   maxAge: 15 * 60 * 1000, // 15min,
-  sameSite: config.nodeEnv === 'production' ? 'none' : 'lax',
+  sameSite: 'none',
 }
 
 const refreshTokenOptions: CookieOptions = {
   httpOnly: true,
   secure: true,
   maxAge: 30 * 24 * 60 * 60 * 1000, // 30days,
-  sameSite: config.nodeEnv === 'production' ? 'none' : 'lax',
+  sameSite: 'none',
   path: '/api/auth/refresh',
 }
 
