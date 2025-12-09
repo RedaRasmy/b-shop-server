@@ -11,10 +11,26 @@ import {
 import config from '../../config/config'
 import { makeBodyEndpoint, makeSimpleEndpoint } from '../../utils/wrappers'
 import { EmailPasswordSchema } from '../auth/auth.validation'
+import { CookieOptions } from 'express'
 // import z from 'zod'
 // import { eq } from 'drizzle-orm'
 // import { mailgun } from '../../lib/mailgun'
 // import crypto from 'crypto'
+
+const accessTokenOptions: CookieOptions = {
+  httpOnly: true,
+  secure: true,
+  maxAge: 15 * 60 * 1000, // 15min,
+  sameSite: config.nodeEnv === 'production' ? 'none' : 'lax',
+}
+
+const refreshTokenOptions: CookieOptions = {
+  httpOnly: true,
+  secure: true,
+  maxAge: 30 * 24 * 60 * 60 * 1000, // 30days,
+  sameSite: config.nodeEnv === 'production' ? 'none' : 'lax',
+  path: '/api/auth/refresh',
+}
 
 export const register = makeBodyEndpoint(
   EmailPasswordSchema,
@@ -40,19 +56,8 @@ export const register = makeBodyEndpoint(
         user.role,
       )
 
-      res.cookie('accessToken', accessToken, {
-        httpOnly: true,
-        secure: config.nodeEnv === 'production',
-        maxAge: 15 * 60 * 1000, // 15min,
-        sameSite: config.nodeEnv === 'production' ? 'none' : 'lax',
-      })
-      res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: config.nodeEnv === 'production',
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30days,
-        sameSite: config.nodeEnv === 'production' ? 'none' : 'lax',
-        path: '/api/auth/refresh',
-      })
+      res.cookie('accessToken', accessToken, accessTokenOptions)
+      res.cookie('refreshToken', refreshToken, refreshTokenOptions)
 
       res.status(201).json({
         id: user.id,
@@ -100,19 +105,8 @@ export const login = makeBodyEndpoint(
         user.role,
       )
 
-      res.cookie('accessToken', accessToken, {
-        httpOnly: true,
-        secure: config.nodeEnv === 'production',
-        maxAge: 15 * 60 * 1000, // 15min,
-        sameSite: config.nodeEnv === 'production' ? 'none' : 'lax',
-      })
-      res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: config.nodeEnv === 'production',
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30days,
-        sameSite: config.nodeEnv === 'production' ? 'none' : 'lax',
-        path: '/api/auth/refresh',
-      })
+      res.cookie('accessToken', accessToken, accessTokenOptions)
+      res.cookie('refreshToken', refreshToken, refreshTokenOptions)
 
       res.status(200).json({
         id: user.id,
@@ -145,12 +139,7 @@ export const refresh = makeSimpleEndpoint(async (req, res, next) => {
     const user = session.user
     const accessToken = generateAccessToken(user.id, user.email, user.role)
 
-    res.cookie('accessToken', accessToken, {
-      httpOnly: true,
-      secure: config.nodeEnv === 'production',
-      maxAge: 15 * 60 * 1000, // 15min,
-      sameSite: config.nodeEnv === 'production' ? 'none' : 'lax',
-    })
+    res.cookie('accessToken', accessToken, accessTokenOptions)
 
     res.status(200).json({
       id: user.id,
