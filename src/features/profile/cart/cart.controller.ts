@@ -60,13 +60,8 @@ export const getCart = makeSimpleEndpoint(async (req, res, next) => {
       orderBy: (cartItems, { desc }) => desc(cartItems.addedAt),
     })
 
-    const shouldBeActive = ({
-      product: { status, category },
-    }: (typeof cart)[number]) =>
-      status === 'active' && category && category.status === 'active'
-
     const data = cart
-      .filter(shouldBeActive)
+      .filter(({ product }) => product.status === 'active')
       .map(
         ({
           product: {
