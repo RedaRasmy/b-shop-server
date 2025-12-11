@@ -6,6 +6,7 @@ import {
   varchar,
   numeric,
   boolean,
+  index,
 } from 'drizzle-orm/pg-core'
 import { createdAt, updatedAt } from '../../../db/timestamps'
 import {
@@ -13,23 +14,33 @@ import {
   type InferInsertModel,
   type InferSelectModel,
 } from 'drizzle-orm'
-import { entityStatus, categories, images, reviews, cartItems } from '../../../db/schema'
+import {
+  entityStatus,
+  categories,
+  images,
+  reviews,
+  cartItems,
+} from '../../../db/schema'
 
-const products = pgTable('products', {
-  id: uuid().primaryKey().defaultRandom(),
-  name: text().notNull(),
-  slug: varchar({ length: 255 }).notNull().unique(),
-  description: text().notNull(),
-  price: numeric({ precision: 10, scale: 2 }).notNull(),
-  stock: integer().notNull(),
-  categoryId: uuid('category_id').references(() => categories.id, {
-    onDelete: 'set null',
-  }),
-  status: entityStatus().notNull(),
-  isDeleted: boolean('is_deleted').notNull().default(false),
-  createdAt,
-  updatedAt,
-})
+const products = pgTable(
+  'products',
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    name: text().notNull(),
+    slug: varchar({ length: 255 }).notNull().unique(),
+    description: text().notNull(),
+    price: numeric({ precision: 10, scale: 2 }).notNull(),
+    stock: integer().notNull(),
+    categoryId: uuid('category_id').references(() => categories.id, {
+      onDelete: 'set null',
+    }),
+    status: entityStatus().notNull(),
+    isDeleted: boolean('is_deleted').notNull().default(false),
+    createdAt,
+    updatedAt,
+  },
+  (table) => [index('product_category_id_idx').on(table.categoryId)],
+)
 export default products
 
 export const productsRelations = relations(products, ({ one, many }) => ({

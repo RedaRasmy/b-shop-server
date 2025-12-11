@@ -197,6 +197,13 @@
       "when": 1764010949079,
       "tag": "0027_flawless_mojo",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1765487660254,
+      "tag": "0028_short_mephistopheles",
+      "breakpoints": true
     }
   ]
 }
