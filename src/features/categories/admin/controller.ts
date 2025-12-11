@@ -143,18 +143,27 @@ export const updateCategory = makeUpdateEndpoint(
 )
 
 export const deleteCategory = makeByIdEndpoint(async (req, res, next) => {
+  const categoryId = req.params.id
   try {
-    const result = await db
-      .delete(categories)
-      .where(eq(categories.id, req.params.id))
+    await db.transaction(async (tx) => {
+      const result = await tx
+        .delete(categories)
+        .where(eq(categories.id, categoryId))
 
-    if (result.rowCount === 0) {
-      return res.status(404).json({
-        message: 'Category not found',
-      })
-    }
-
-    res.status(204).send()
+      if (result.rowCount === 0) {
+        res.status(404).json({
+          message: 'Category not found',
+        })
+      } else {
+        await tx
+          .update(products)
+          .set({
+            status: 'inactive',
+          })
+          .where(eq(products.categoryId, categoryId))
+        res.status(204).send()
+      }
+    })
   } catch {
     next({ message: 'Failed to delete category', status: 500 })
   }
