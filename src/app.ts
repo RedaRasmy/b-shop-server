@@ -16,7 +16,6 @@ app.use(helmet())
 app.use(cookieParser())
 
 const allowedOrigins = config.FRONTEND_URL.split(',')
-console.log(allowedOrigins)
 app.use(
   cors({
     origin: allowedOrigins,
