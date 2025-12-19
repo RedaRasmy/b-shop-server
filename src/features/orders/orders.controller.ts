@@ -22,6 +22,15 @@ export const addOrder = makeBodyEndpoint(
         },
       })
 
+      // Check out-of-stock case
+      const outOfStock = products.some((p) => p.stock === 0)
+
+      if (outOfStock) {
+        return res.status(400).json({
+          message: 'One or more products is out of stock!',
+        })
+      }
+
       // check if all products exists and active
 
       type Product = (typeof products)[number]
