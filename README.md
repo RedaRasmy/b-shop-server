@@ -21,6 +21,7 @@ A RESTful backend service for an e-commerce platform, built with Node.js, Expres
 ```bash
 git clone https://github.com/redarasmy/b-shop-server.git
 cd b-shop-server
+cp .env.example .env
 pnpm install
 pnpm dev
 ```
