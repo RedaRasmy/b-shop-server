@@ -7,7 +7,7 @@
     /* Modules */
     "module": "commonjs",
     "target": "es2020",
-    "moduleResolution": "node",
+    // "moduleResolution": "node",
 
     /* Node environment */
     "lib": ["esnext"],
@@ -25,7 +25,7 @@
 
     /* Compatibility */
     "esModuleInterop": true,
-    "skipLibCheck": true,
+    "skipLibCheck": true
 
     // Path aliases
     // "baseUrl": ".",
