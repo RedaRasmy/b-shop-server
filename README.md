@@ -16,12 +16,52 @@ A RESTful backend service for an e-commerce platform, built with Node.js, Expres
 
 ## 📄 Read Docs [here](./docs.md)
 
-## ⚙️ Quick Start
+## Getting Started
+
+### Prerequisites
+
+- Node.js 22+
+- Docker
+- pnpm
+
+### Installation
+
+1. **Clone the repository**
 
 ```bash
 git clone https://github.com/redarasmy/b-shop-server.git
 cd b-shop-server
-cp .env.example .env
+```
+
+2. **Install dependencies**
+
+```bash
 pnpm install
+```
+
+3. **Set up environment variables**
+
+```bash
+cp .env.example .env
+```
+
+You can generate a jwt secret with the command below:
+
+```bash
+openssl rand --base64 64
+```
+
+4. **Set up the database**
+
+```bash
+docker compose up -d
+pnpm db:push
+```
+
+5. **Run the app**
+
+```bash
 pnpm dev
 ```
+
+The server will be running at `http://localhost:3000`.
