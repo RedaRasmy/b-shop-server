@@ -12,6 +12,7 @@ import config from '../../config/config'
 import { makeBodyEndpoint, makeSimpleEndpoint } from '../../utils/wrappers'
 import { EmailPasswordSchema } from '../auth/auth.validation'
 import { CookieOptions } from 'express'
+import { count } from 'drizzle-orm'
 // import z from 'zod'
 // import { eq } from 'drizzle-orm'
 // import { mailgun } from '../../lib/mailgun'
@@ -32,6 +33,8 @@ const refreshTokenOptions: CookieOptions = {
   path: '/api/auth/refresh',
 }
 
+let hasAdmin: boolean | null = null
+
 export const register = makeBodyEndpoint(
   EmailPasswordSchema,
   async (req, res, next) => {
@@ -40,15 +43,19 @@ export const register = makeBodyEndpoint(
     try {
       const hashedPassword = await hashPassword(password)
 
+      if (hasAdmin === null) {
+        const [userCount] = await db.select({ count: count() }).from(users)
+        hasAdmin = userCount.count > 0
+      }
+
       const [user] = await db
         .insert(users)
         .values({
           email,
           password: hashedPassword,
+          role: hasAdmin ? 'user' : 'admin',
         })
         .returning()
-
-      if (!user) throw new Error('Failed to insert user') // just to satisfy TS
 
       const { accessToken, refreshToken } = await generateTokens(
         user.id,
