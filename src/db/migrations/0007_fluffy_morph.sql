@@ -1,1 +1,0 @@
-ALTER TABLE "product_images" ALTER COLUMN "public_id" SET NOT NULL;
