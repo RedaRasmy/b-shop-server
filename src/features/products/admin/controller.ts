@@ -1,5 +1,6 @@
 import products, { IProduct } from '../tables/products.table'
 import images, { IImage, SImage } from '../tables/product-images.table'
+import { featuredProducts } from '../../../db/schema'
 import {
   deleteMultipleImages,
   uploadMultipleImages,
@@ -34,6 +35,12 @@ export const addProduct = makeBodyEndpoint(
           .insert(products)
           .values(productData)
           .returning()
+
+        if (productData.isFeatured) {
+          await tx.insert(featuredProducts).values({
+            productId: product.id,
+          })
+        }
 
         // Upload files to Cloudinary first
         const uploadedFiles = await uploadMultipleImages(

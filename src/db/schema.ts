@@ -42,7 +42,7 @@ export {
 } from '../features/products/tables/products.table'
 
 export {
-  default as featuredProduct,
+  default as featuredProducts,
   featuredProductsRelations,
 } from '../features/products/tables/featured-products.table'
 

@@ -654,7 +654,7 @@ type FormData = {
   `images[${i}].file` : File
   `images[${i}].alt` : string
   `images[${i}].isPrimary` : 'true' | 'false'
-
+  isFeatured : boolean
 }
 ```
 

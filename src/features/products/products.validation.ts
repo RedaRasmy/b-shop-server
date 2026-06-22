@@ -19,6 +19,8 @@ export const ProductsQuerySchema = z.object({
   search: z.string().min(1, 'Search must not be empty').max(100).optional(),
   categoryId: z.uuid('Invalid category ID').optional(),
 
+  featured: z.boolean().optional().default(false),
+
   sort: SortSchema,
 })
 

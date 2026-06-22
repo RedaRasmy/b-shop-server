@@ -25,6 +25,7 @@ export const AddProductSchema = z.object({
   categoryId: z.uuid('Category ID is required and must be an UUID'),
   status: StatusSchema,
   images: z.array(ImageSchema).min(1, 'At least 1 product image is required'),
+  isFeatured: z.boolean(),
 })
 
 export type AddProduct = z.infer<typeof AddProductSchema>
@@ -56,11 +57,12 @@ export const AdminProductsQuerySchema = z.object({
   search: z.string().min(1, 'Search must not be empty').max(100).optional(),
 
   // filters
-  // categoryId: z.string().uuid('Invalid category ID').optional(),
   categoryId: z
     .union([z.uuid('Invalid category ID'), z.literal('__NULL__')])
     .optional(),
   status: StatusSchema.optional(),
+
+  featured: z.boolean().optional().default(false),
 
   // Sorting
   sort: SortSchema,
