@@ -25,7 +25,7 @@ export const AddProductSchema = z.object({
   categoryId: z.uuid('Category ID is required and must be an UUID'),
   status: StatusSchema,
   images: z.array(ImageSchema).min(1, 'At least 1 product image is required'),
-  isFeatured: z.boolean(),
+  isFeatured: z.coerce.boolean(),
 })
 
 export type AddProduct = z.infer<typeof AddProductSchema>
