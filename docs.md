@@ -747,6 +747,7 @@ type Query = {
   search?: string
   categoryId?: string // uuid or __NULL__
   status?: 'active' | 'inactive'
+  featured?: boolean
 }
 
 type Field = 'name' | 'price' | 'stock' | 'status' | 'createdAt' | 'updatedAt'
@@ -771,6 +772,7 @@ type Data = {
     createdAt: Date
     updatedAt: Date
     isDeleted: boolean
+    isFeatured: boolean
     images: {
       format: string | null
       id: string

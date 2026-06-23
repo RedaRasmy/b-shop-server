@@ -6,7 +6,18 @@ import {
   uploadMultipleImages,
 } from '../../../lib/cloudinary'
 import { db } from '../../../db/index'
-import { and, asc, count, desc, eq, ilike, inArray, isNull } from 'drizzle-orm'
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  exists,
+  notExists,
+  ilike,
+  inArray,
+  isNull,
+} from 'drizzle-orm'
 import { AddProductSchema, AdminProductsQuerySchema } from '../admin/validation'
 import { getInventoryStatus } from '../../../utils/get-inventory-status'
 import logger from '../../../lib/logger'
@@ -22,6 +33,7 @@ export const addProduct = makeBodyEndpoint(
   AddProductSchema,
   async (req, res, next) => {
     const { images: productImages, ...productData } = req.body
+    console.log('isFeatured:', productData.isFeatured)
     try {
       // Check if all files exists
       if (productImages.some((p) => !p.file)) {
@@ -104,6 +116,7 @@ export const getProducts = makeQueryEndpoint(
         categoryId,
         sort = 'createdAt:desc',
         status,
+        featured,
       } = req.validatedQuery
 
       // Filtering conditions
@@ -119,6 +132,27 @@ export const getProducts = makeQueryEndpoint(
         }
         if (search) filters.push(ilike(products.name, `%${search}%`))
         if (status) filters.push(eq(products.status, status))
+
+        if (featured) {
+          filters.push(
+            exists(
+              db
+                .select()
+                .from(featuredProducts)
+                .where(eq(featuredProducts.productId, products.id)),
+            ),
+          )
+        }
+        if (featured === false) {
+          filters.push(
+            notExists(
+              db
+                .select()
+                .from(featuredProducts)
+                .where(eq(featuredProducts.productId, products.id)),
+            ),
+          )
+        }
         return filters.length ? and(...filters) : undefined
       }
 
@@ -141,6 +175,7 @@ export const getProducts = makeQueryEndpoint(
               name: true,
             },
           },
+          featured: true,
         },
         limit: perPage,
         offset: (page - 1) * perPage,
@@ -159,10 +194,11 @@ export const getProducts = makeQueryEndpoint(
       const nextPage = page === totalPages || totalPages === 0 ? null : page + 1
 
       res.json({
-        data: filteredProducts.map(({ category, ...p }) => ({
+        data: filteredProducts.map(({ category, featured, ...p }) => ({
           ...p,
           inventoryStatus: getInventoryStatus(p.stock),
           categoryName: category?.name ?? null,
+          isFeatured: featured !== null,
         })),
         page,
         perPage,

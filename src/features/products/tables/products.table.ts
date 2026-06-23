@@ -20,6 +20,7 @@ import {
   images,
   reviews,
   cartItems,
+  featuredProducts,
 } from '../../../db/schema'
 
 const products = pgTable(
@@ -51,6 +52,7 @@ export const productsRelations = relations(products, ({ one, many }) => ({
   images: many(images),
   reviews: many(reviews),
   cartItems: many(cartItems),
+  featured: one(featuredProducts),
 }))
 
 export type IProduct = InferInsertModel<typeof products>

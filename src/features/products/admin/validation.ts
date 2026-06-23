@@ -13,6 +13,14 @@ const ImageSchema = z.object({
   file: z.any().optional(),
 })
 
+const BooleanSchema = z.preprocess((val) => {
+  if (typeof val === 'string') {
+    if (val.toLowerCase() === 'true') return true
+    if (val.toLowerCase() === 'false') return false
+  }
+  return val
+}, z.boolean())
+
 export const AddProductSchema = z.object({
   name: z.string().min(1, 'Product name is required'),
   slug: SlugSchema,
@@ -25,13 +33,7 @@ export const AddProductSchema = z.object({
   categoryId: z.uuid('Category ID is required and must be an UUID'),
   status: StatusSchema,
   images: z.array(ImageSchema).min(1, 'At least 1 product image is required'),
-  isFeatured: z.preprocess((val) => {
-    if (typeof val === 'string') {
-      if (val.toLowerCase() === 'true') return true
-      if (val.toLowerCase() === 'false') return false
-    }
-    return val
-  }, z.boolean()),
+  isFeatured: BooleanSchema,
 })
 
 export type AddProduct = z.infer<typeof AddProductSchema>
@@ -68,7 +70,7 @@ export const AdminProductsQuerySchema = z.object({
     .optional(),
   status: StatusSchema.optional(),
 
-  featured: z.boolean().optional().default(false),
+  featured: BooleanSchema.optional(),
 
   // Sorting
   sort: SortSchema,

@@ -11,9 +11,11 @@ const featuredProducts = pgTable(
   'featured_products',
   {
     id: uuid().primaryKey().defaultRandom(),
-    productId: uuid('product_id').references(() => products.id, {
-      onDelete: 'cascade',
-    }),
+    productId: uuid('product_id')
+      .references(() => products.id, {
+        onDelete: 'cascade',
+      })
+      .notNull(),
     createdAt,
     updatedAt,
   },
