@@ -291,15 +291,26 @@ export const updateProduct = makeUpdateEndpoint(
             }),
           )
 
-          insertedImages = await db
+          insertedImages = await tx
             .insert(images)
             .values(imagesData)
             .returning()
         }
 
-        /// update the product row
+        if (productData.isFeatured) {
+          await tx
+            .insert(featuredProducts)
+            .values({ productId })
+            .onConflictDoNothing()
+        } else {
+          await tx
+            .delete(featuredProducts)
+            .where(eq(featuredProducts.productId, productId))
+        }
 
-        const [product] = await db
+        // update the product row
+
+        const [product] = await tx
           .update(products)
           .set(productData)
           .where(eq(products.id, productId))
@@ -307,7 +318,7 @@ export const updateProduct = makeUpdateEndpoint(
 
         // send response
         res.status(200).json({
-          ...product!,
+          ...product,
           images: [
             ...oldImages,
             ...insertedImages.map((i) => ({
@@ -317,6 +328,7 @@ export const updateProduct = makeUpdateEndpoint(
               alt: i.alt,
             })),
           ],
+          isFeatured: productData.isFeatured,
         })
       })
     } catch (error) {

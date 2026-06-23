@@ -707,7 +707,7 @@ type FormData = {
   `images[${i}].file` : File // or .id if it already exists
   `images[${i}].alt` : string
   `images[${i}].isPrimary` : 'true' | 'false'
-
+  isFeatured : boolean
 }
 ```
 
@@ -732,6 +732,7 @@ type Data = {
   isDeleted: boolean
   createdAt: Date
   updatedAt: Date
+  isFeatured: boolean
 }
 ```
 
