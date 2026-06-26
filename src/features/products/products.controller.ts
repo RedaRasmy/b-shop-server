@@ -149,7 +149,7 @@ export const getProductBySlug = makeParamsEndpoint(
       /// NOTE : I used query instead of select because images and reviews are arrays
       // and select dont support this kind of joins
       const product = await db.query.products.findFirst({
-        where: (products, { eq, and }) =>
+        where: (products) =>
           and(eq(products.slug, slug), eq(products.isDeleted, false)),
         with: {
           images: true,

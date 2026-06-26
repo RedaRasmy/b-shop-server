@@ -62,7 +62,7 @@ export const getAddresses = makeAuthEndpoint(async (req, res, next) => {
 
   try {
     const data = await db.query.addresses.findMany({
-      where: (addresses, { eq }) => eq(addresses.customerId, userId),
+      where: (addresses) => eq(addresses.customerId, userId),
       orderBy: desc(addresses.createdAt),
     })
 

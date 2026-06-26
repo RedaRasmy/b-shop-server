@@ -1,14 +1,12 @@
 import { db } from '../../db'
-import {
-  makeByIdEndpoint,
-  makeSimpleEndpoint,
-} from '../../utils/wrappers'
+import { makeByIdEndpoint, makeSimpleEndpoint } from '../../utils/wrappers'
 import { getInventoryStatus } from '../../utils/get-inventory-status'
+import { and, eq } from 'drizzle-orm'
 
 export const getCategories = makeSimpleEndpoint(async (req, res, next) => {
   try {
     const result = await db.query.categories.findMany({
-      where: (categories, { eq }) => eq(categories.status, 'active'),
+      where: (categories) => eq(categories.status, 'active'),
     })
 
     // remove status column
@@ -24,7 +22,7 @@ export const getCategoryById = makeByIdEndpoint(async (req, res, next) => {
   const id = req.params.id
   try {
     const result = await db.query.categories.findFirst({
-      where: (categories, { eq, and }) =>
+      where: (categories) =>
         and(eq(categories.id, id), eq(categories.status, 'active')),
     })
 
@@ -47,7 +45,7 @@ export const getCategoryProducts = makeByIdEndpoint(async (req, res, next) => {
   const id = req.params.id
   try {
     const products = await db.query.products.findMany({
-      where: (products, { eq }) => eq(products.categoryId, id),
+      where: (products) => eq(products.categoryId, id),
       with: {
         images: true,
         reviews: true,

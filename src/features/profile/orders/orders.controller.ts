@@ -1,14 +1,14 @@
 import { db } from '../../../db/index'
 import { orders } from '../../../db/schema'
 import { makeAuthEndpoint } from '../../../utils/wrappers'
-import { desc } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 
 export const getOrders = makeAuthEndpoint(async (req, res, next) => {
   const userId = req.user.id
 
   try {
     const customerOrders = await db.query.orders.findMany({
-      where: (orders, { eq }) => eq(orders.customerId, userId),
+      where: (orders) => eq(orders.customerId, userId),
       columns: {
         id: true,
         status: true,

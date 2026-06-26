@@ -12,7 +12,7 @@ import config from '../../config/config'
 import { makeBodyEndpoint, makeSimpleEndpoint } from '../../utils/wrappers'
 import { EmailPasswordSchema } from '../auth/auth.validation'
 import { CookieOptions } from 'express'
-import { count } from 'drizzle-orm'
+import { count, eq } from 'drizzle-orm'
 // import z from 'zod'
 // import { eq } from 'drizzle-orm'
 // import { mailgun } from '../../lib/mailgun'
@@ -90,7 +90,7 @@ export const login = makeBodyEndpoint(
     try {
       // verify email & password
       const user = await db.query.users.findFirst({
-        where: (users, { eq }) => eq(users.email, email),
+        where: (users) => eq(users.email, email),
       })
 
       if (!user) {

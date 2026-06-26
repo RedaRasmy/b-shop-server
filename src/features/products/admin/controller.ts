@@ -217,7 +217,7 @@ export const getProducts = makeQueryEndpoint(
 export const getProductById = makeByIdEndpoint(async (req, res, next) => {
   try {
     const product = await db.query.products.findFirst({
-      where: (products, { eq }) => eq(products.id, req.params.id!),
+      where: (products) => eq(products.id, req.params.id!),
       with: {
         images: true,
       },
@@ -249,7 +249,7 @@ export const updateProduct = makeUpdateEndpoint(
       await db.transaction(async (tx) => {
         // get products images
         const existingImages = await tx.query.images.findMany({
-          where: (images, { eq }) => eq(images.productId, productId),
+          where: (images) => eq(images.productId, productId),
         })
 
         // Delete images from Cloudinary
@@ -344,7 +344,7 @@ export const deleteProduct = makeByIdEndpoint(async (req, res, next) => {
 
     await db.transaction(async (tx) => {
       const productImages = await tx.query.images.findMany({
-        where: (images, { eq }) => eq(images.productId, productId),
+        where: (images) => eq(images.productId, productId),
       })
 
       // delete images from database ( keep main one )

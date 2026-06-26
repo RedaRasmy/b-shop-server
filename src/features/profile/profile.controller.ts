@@ -12,7 +12,7 @@ export const me = makeAuthEndpoint(async (req, res, next) => {
 
   try {
     const user = await db.query.users.findFirst({
-      where: (users, { eq }) => eq(users.id, userId),
+      where: (users) => eq(users.id, userId),
       columns: {
         isEmailVerified: true,
         id: true,
@@ -70,7 +70,7 @@ export const updatePassword = makeBodyEndpoint(
       // validate old password
 
       const user = await db.query.users.findFirst({
-        where: (users, { eq }) => eq(users.id, userId),
+        where: (users) => eq(users.id, userId),
       })
 
       if (!user) {

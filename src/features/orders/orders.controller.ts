@@ -97,7 +97,7 @@ export const getOrder = makeParamsEndpoint(
 
     try {
       const order = await db.query.orders.findFirst({
-        where: (orders, { eq }) => eq(orders.orderToken, orderToken),
+        where: (orders) => eq(orders.orderToken, orderToken),
       })
 
       if (!order) {

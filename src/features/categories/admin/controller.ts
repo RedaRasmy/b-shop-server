@@ -91,7 +91,7 @@ export const getCategories = makeQueryEndpoint(
 export const getCategoryById = makeByIdEndpoint(async (req, res, next) => {
   try {
     const result = await db.query.categories.findFirst({
-      where: (categories, { eq }) => eq(categories.id, req.params.id),
+      where: (categories) => eq(categories.id, req.params.id),
       with: {
         products: {
           columns: {
@@ -173,7 +173,7 @@ export const getCategoryProducts = makeByIdEndpoint(async (req, res, next) => {
   try {
     const categoryId = req.params.id
     const products = await db.query.products.findMany({
-      where: (products, { eq }) => eq(products.categoryId, categoryId),
+      where: (products) => eq(products.categoryId, categoryId),
       with: {
         images: true,
       },

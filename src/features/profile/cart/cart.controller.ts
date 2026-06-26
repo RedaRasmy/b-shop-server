@@ -18,7 +18,7 @@ export const getCart = makeSimpleEndpoint(async (req, res, next) => {
   const userId = req.user?.id!
   try {
     const cart = await db.query.cartItems.findMany({
-      where: (cartItems, { eq }) => eq(cartItems.userId, userId),
+      where: (cartItems) => eq(cartItems.userId, userId),
       columns: {
         id: true,
         addedAt: true,
@@ -39,7 +39,7 @@ export const getCart = makeSimpleEndpoint(async (req, res, next) => {
           },
           with: {
             images: {
-              where: (images, { eq }) => eq(images.isPrimary, true),
+              where: (images) => eq(images.isPrimary, true),
               columns: {
                 url: true,
               },
@@ -106,7 +106,7 @@ export const addCartItem = makeBodyEndpoint(
     try {
       // Check if product already in cart
       const existing = await db.query.cartItems.findFirst({
-        where: (cartItems, { and, eq }) =>
+        where: (cartItems) =>
           and(
             eq(cartItems.userId, userId),
             eq(cartItems.productId, data.productId),

@@ -102,7 +102,7 @@ export const getOrder = makeByIdEndpoint(async (req, res, next) => {
 
   try {
     const order = await db.query.orders.findFirst({
-      where: (orders, { eq }) => eq(orders.id, id),
+      where: (orders) => eq(orders.id, id),
       with: {
         items: {
           columns: {

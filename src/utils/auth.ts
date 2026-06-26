@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 import crypto from 'crypto'
 import { db } from '../db'
 import { refreshTokens } from '../db/schema'
-import { eq } from 'drizzle-orm'
+import { and, eq, gt } from 'drizzle-orm'
 import config from '../config/config'
 
 export type AccessTokenPayload = {
@@ -75,7 +75,7 @@ export const verifyAccessToken = (token: string) => {
 // Verify Refresh Token
 export const verifyRefreshToken = async (token: string) => {
   const refreshToken = await db.query.refreshTokens.findFirst({
-    where: (refreshTokens, { and, eq, gt }) =>
+    where: (refreshTokens) =>
       and(
         eq(refreshTokens.token, token),
         gt(refreshTokens.expiresAt, new Date()), // Not expired
