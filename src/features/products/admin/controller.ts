@@ -363,6 +363,10 @@ export const deleteProduct = makeByIdEndpoint(async (req, res, next) => {
         })
         .where(eq(products.id, productId))
 
+      await tx
+        .delete(featuredProducts)
+        .where(eq(featuredProducts.productId, productId))
+
       // delete images from cloudinary ( keep main one )
       const imagesToDelete = productImages
         .filter((img) => img.isPrimary === false)
