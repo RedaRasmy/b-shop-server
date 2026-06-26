@@ -2,6 +2,7 @@ import { z } from 'zod'
 import products from './tables/products.table'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { getSortSchema } from '../../utils/get-sort-schema'
+import { BooleanSchema } from './admin/validation'
 
 const SortSchema = getSortSchema(['price', 'createdAt']).default(
   'createdAt:desc',
@@ -19,7 +20,7 @@ export const ProductsQuerySchema = z.object({
   search: z.string().min(1, 'Search must not be empty').max(100).optional(),
   categoryId: z.uuid('Invalid category ID').optional(),
 
-  featured: z.boolean().optional().default(false),
+  featured: BooleanSchema.optional(),
 
   sort: SortSchema,
 })

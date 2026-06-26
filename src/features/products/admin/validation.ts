@@ -13,7 +13,7 @@ const ImageSchema = z.object({
   file: z.any().optional(),
 })
 
-const BooleanSchema = z.preprocess((val) => {
+export const BooleanSchema = z.preprocess((val) => {
   if (typeof val === 'string') {
     if (val.toLowerCase() === 'true') return true
     if (val.toLowerCase() === 'false') return false

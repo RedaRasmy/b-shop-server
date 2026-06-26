@@ -152,6 +152,7 @@ type Query = {
   sort?: string
   search?: string | undefined
   categoryId?: string | undefined
+  featured?: boolean
 }
 ```
 

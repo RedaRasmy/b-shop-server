@@ -1,5 +1,5 @@
 import { db } from '../../db/index'
-import {  images, products, reviews } from '../../db/schema'
+import { images, products, reviews } from '../../db/schema'
 import { and, asc, count, desc, eq, ilike, inArray, sql } from 'drizzle-orm'
 import { IProduct } from './tables/products.table'
 import { ProductsQuerySchema } from './products.validation'
@@ -18,9 +18,10 @@ export const getProducts = makeQueryEndpoint(
   ProductsQuerySchema,
   async (req, res, next) => {
     try {
-      const { page, perPage, search, categoryId, sort } = req.validatedQuery
+      const { page, perPage, search, categoryId, sort, featured } =
+        req.validatedQuery
 
-      const where = buildProductFilters({ search, categoryId })
+      const where = buildProductFilters({ search, categoryId, featured })
 
       // Sorting
       let orderBy: any
