@@ -38,3 +38,7 @@ export const UpdateOrderSchema = createUpdateSchema(orders)
     status: true,
   })
   .required()
+
+export const OrderIdParam = z.object({
+  id: z.coerce.number(),
+})

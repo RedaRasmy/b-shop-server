@@ -3,13 +3,12 @@ import { db } from '../../db/index'
 import { users } from '../../db/schema'
 import { FullNameSchema, PhoneSchema } from './profile.validation'
 import { comparePassword, hashPassword } from '../../utils/auth'
-import { makeAuthEndpoint, makeBodyEndpoint } from '../../utils/wrappers'
 import { eq } from 'drizzle-orm'
 import z from 'zod'
+import { makeEndpoint } from 'express-zod-endpoint'
 
-export const me = makeAuthEndpoint(async (req, res, next) => {
-  const userId = req.user.id
-
+export const me = makeEndpoint(async (req, res, next) => {
+  const userId = req.user!.id
   try {
     const user = await db.query.users.findFirst({
       where: (users) => eq(users.id, userId),
@@ -34,11 +33,13 @@ export const me = makeAuthEndpoint(async (req, res, next) => {
   }
 })
 
-export const updateProfile = makeBodyEndpoint(
-  z.object({
-    phone: PhoneSchema.optional(),
-    fullName: FullNameSchema.optional(),
-  }),
+export const updateProfile = makeEndpoint(
+  {
+    body: z.object({
+      phone: PhoneSchema.optional(),
+      fullName: FullNameSchema.optional(),
+    }),
+  },
   async (req, res, next) => {
     const { phone, fullName } = req.body
     const userId = req.user?.id!
@@ -58,11 +59,13 @@ export const updateProfile = makeBodyEndpoint(
   },
 )
 
-export const updatePassword = makeBodyEndpoint(
-  z.object({
-    oldPassword: PasswordSchema,
-    newPassword: PasswordSchema,
-  }),
+export const updatePassword = makeEndpoint(
+  {
+    body: z.object({
+      oldPassword: PasswordSchema,
+      newPassword: PasswordSchema,
+    }),
+  },
   async (req, res, next) => {
     const userId = req.user?.id!
     const { oldPassword, newPassword } = req.body

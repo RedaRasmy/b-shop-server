@@ -3,20 +3,19 @@ import { categories, products } from '../../../db/schema'
 import { and, asc, desc, eq, ilike } from 'drizzle-orm'
 import { AdminCategoriesQuerySchema } from '../../categories/admin/validation'
 import { ICategory } from '../../categories/categories.table'
-import {
-  makeQueryEndpoint,
-  makeBodyEndpoint,
-  makeByIdEndpoint,
-  makeUpdateEndpoint,
-} from '../../../utils/wrappers'
+
 import {
   InsertCategorySchema,
   UpdateCategorySchema,
 } from '../../categories/categories.validation'
 import logger from '../../../lib/logger'
+import { makeEndpoint } from 'express-zod-endpoint'
+import { IdParam } from '../../../lib/zod-schemas'
 
-export const addCategory = makeBodyEndpoint(
-  InsertCategorySchema,
+export const addCategory = makeEndpoint(
+  {
+    body: InsertCategorySchema,
+  },
   async (req, res, next) => {
     try {
       const [category] = await db
@@ -30,11 +29,13 @@ export const addCategory = makeBodyEndpoint(
   },
 )
 
-export const getCategories = makeQueryEndpoint(
-  AdminCategoriesQuerySchema,
+export const getCategories = makeEndpoint(
+  {
+    query: AdminCategoriesQuerySchema,
+  },
   async (req, res, next) => {
     try {
-      const { sort = 'createdAt:desc', status, search } = req.validatedQuery
+      const { sort = 'createdAt:desc', status, search } = req.query
 
       const conditions = []
 
@@ -88,32 +89,38 @@ export const getCategories = makeQueryEndpoint(
   },
 )
 
-export const getCategoryById = makeByIdEndpoint(async (req, res, next) => {
-  try {
-    const result = await db.query.categories.findFirst({
-      where: (categories) => eq(categories.id, req.params.id),
-      with: {
-        products: {
-          columns: {
-            id: true,
+export const getCategoryById = makeEndpoint(
+  { params: IdParam },
+  async (req, res, next) => {
+    try {
+      const result = await db.query.categories.findFirst({
+        where: (categories) => eq(categories.id, req.params.id),
+        with: {
+          products: {
+            columns: {
+              id: true,
+            },
           },
         },
-      },
-    })
+      })
 
-    const { products, ...category } = result!
+      const { products, ...category } = result!
 
-    res.status(200).json({
-      ...category,
-      productsCount: products.length,
-    })
-  } catch {
-    next({ message: 'Failed to fetch category', status: 500 })
-  }
-})
+      res.status(200).json({
+        ...category,
+        productsCount: products.length,
+      })
+    } catch {
+      next({ message: 'Failed to fetch category', status: 500 })
+    }
+  },
+)
 
-export const updateCategory = makeUpdateEndpoint(
-  UpdateCategorySchema,
+export const updateCategory = makeEndpoint(
+  {
+    body: UpdateCategorySchema,
+    params: IdParam,
+  },
   async (req, res, next) => {
     const category = req.body
     const id = req.params.id
@@ -142,47 +149,53 @@ export const updateCategory = makeUpdateEndpoint(
   },
 )
 
-export const deleteCategory = makeByIdEndpoint(async (req, res, next) => {
-  const categoryId = req.params.id
-  try {
-    await db.transaction(async (tx) => {
-      const result = await tx
-        .delete(categories)
-        .where(eq(categories.id, categoryId))
-
-      if (result.rowCount === 0) {
-        res.status(404).json({
-          message: 'Category not found',
-        })
-      } else {
-        await tx
-          .update(products)
-          .set({
-            status: 'inactive',
-          })
-          .where(eq(products.categoryId, categoryId))
-        res.status(204).send()
-      }
-    })
-  } catch {
-    next({ message: 'Failed to delete category', status: 500 })
-  }
-})
-
-export const getCategoryProducts = makeByIdEndpoint(async (req, res, next) => {
-  try {
+export const deleteCategory = makeEndpoint(
+  { params: IdParam },
+  async (req, res, next) => {
     const categoryId = req.params.id
-    const products = await db.query.products.findMany({
-      where: (products) => eq(products.categoryId, categoryId),
-      with: {
-        images: true,
-      },
-    })
-    res.status(200).json(products)
-  } catch {
-    next({
-      message: 'Failed to fetch category products',
-      status: 500,
-    })
-  }
-})
+    try {
+      await db.transaction(async (tx) => {
+        const result = await tx
+          .delete(categories)
+          .where(eq(categories.id, categoryId))
+
+        if (result.rowCount === 0) {
+          res.status(404).json({
+            message: 'Category not found',
+          })
+        } else {
+          await tx
+            .update(products)
+            .set({
+              status: 'inactive',
+            })
+            .where(eq(products.categoryId, categoryId))
+          res.status(204).send()
+        }
+      })
+    } catch {
+      next({ message: 'Failed to delete category', status: 500 })
+    }
+  },
+)
+
+export const getCategoryProducts = makeEndpoint(
+  { params: IdParam },
+  async (req, res, next) => {
+    try {
+      const categoryId = req.params.id
+      const products = await db.query.products.findMany({
+        where: (products) => eq(products.categoryId, categoryId),
+        with: {
+          images: true,
+        },
+      })
+      res.status(200).json(products)
+    } catch {
+      next({
+        message: 'Failed to fetch category products',
+        status: 500,
+      })
+    }
+  },
+)

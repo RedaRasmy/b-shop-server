@@ -2,24 +2,21 @@ import { db } from '../../db/index'
 import { images, products, reviews } from '../../db/schema'
 import { and, asc, count, desc, eq, ilike, inArray, sql } from 'drizzle-orm'
 import { IProduct } from './tables/products.table'
-import { ProductsQuerySchema } from './products.validation'
-import {
-  makeQueryEndpoint,
-  makeBodyEndpoint,
-  makeParamsEndpoint,
-} from '../../utils/wrappers'
+import { ProductsQuerySchema, SlugParam } from './products.validation'
 import { getInventoryStatus } from '../../utils/get-inventory-status'
 import logger from '../../lib/logger'
 import { buildProductFilters } from './utils/build-product-filters'
 import { isNewProduct } from './utils/is-new'
 import z from 'zod'
+import { makeEndpoint } from 'express-zod-endpoint'
 
-export const getProducts = makeQueryEndpoint(
-  ProductsQuerySchema,
+export const getProducts = makeEndpoint(
+  {
+    query: ProductsQuerySchema,
+  },
   async (req, res, next) => {
     try {
-      const { page, perPage, search, categoryId, sort, featured } =
-        req.validatedQuery
+      const { page, perPage, search, categoryId, sort, featured } = req.query
 
       const where = buildProductFilters({ search, categoryId, featured })
 
@@ -94,8 +91,10 @@ export const getProducts = makeQueryEndpoint(
   },
 )
 
-export const getProductsByIds = makeBodyEndpoint(
-  z.array(z.string()),
+export const getProductsByIds = makeEndpoint(
+  {
+    body: z.array(z.string()),
+  },
   async (req, res, next) => {
     const ids = req.body
 
@@ -140,8 +139,10 @@ export const getProductsByIds = makeBodyEndpoint(
   },
 )
 
-export const getProductBySlug = makeParamsEndpoint(
-  ['slug'],
+export const getProductBySlug = makeEndpoint(
+  {
+    params: SlugParam,
+  },
   async (req, res, next) => {
     const isAdmin = req.user?.role === 'admin'
     const slug = req.params.slug

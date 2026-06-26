@@ -21,16 +21,14 @@ import {
 import { AddProductSchema, AdminProductsQuerySchema } from '../admin/validation'
 import { getInventoryStatus } from '../../../utils/get-inventory-status'
 import logger from '../../../lib/logger'
-import {
-  makeByIdEndpoint,
-  makeQueryEndpoint,
-  makeBodyEndpoint,
-  makeUpdateEndpoint,
-} from '../../../utils/wrappers'
+import { makeEndpoint } from 'express-zod-endpoint'
+import { IdParam } from '../../../lib/zod-schemas'
 
 /// ADD
-export const addProduct = makeBodyEndpoint(
-  AddProductSchema,
+export const addProduct = makeEndpoint(
+  {
+    body: AddProductSchema,
+  },
   async (req, res, next) => {
     const { images: productImages, ...productData } = req.body
     console.log('isFeatured:', productData.isFeatured)
@@ -105,8 +103,10 @@ export const addProduct = makeBodyEndpoint(
 
 /// GET
 
-export const getProducts = makeQueryEndpoint(
-  AdminProductsQuerySchema,
+export const getProducts = makeEndpoint(
+  {
+    query: AdminProductsQuerySchema,
+  },
   async (req, res, next) => {
     try {
       const {
@@ -117,7 +117,7 @@ export const getProducts = makeQueryEndpoint(
         sort = 'createdAt:desc',
         status,
         featured,
-      } = req.validatedQuery
+      } = req.query
 
       // Filtering conditions
       const where = (products: any, { eq, ilike, and }: any) => {
@@ -214,31 +214,40 @@ export const getProducts = makeQueryEndpoint(
   },
 )
 
-export const getProductById = makeByIdEndpoint(async (req, res, next) => {
-  try {
-    const product = await db.query.products.findFirst({
-      where: (products) => eq(products.id, req.params.id!),
-      with: {
-        images: true,
-      },
-    })
-    if (!product) {
-      return res.status(404).send({
-        message: 'Product Not Found',
+export const getProductById = makeEndpoint(
+  {
+    params: IdParam,
+  },
+  async (req, res, next) => {
+    try {
+      const product = await db.query.products.findFirst({
+        where: (products) => eq(products.id, req.params.id!),
+        with: {
+          images: true,
+        },
       })
+      if (!product) {
+        return res.status(404).send({
+          message: 'Product Not Found',
+        })
+      }
+      res.status(200).json({
+        ...product,
+        inventoryStatus: getInventoryStatus(product.stock),
+      })
+    } catch (err) {
+      logger.error(err, 'Failed to get product')
+      next({ message: 'Failed to fetch product', status: 500 })
     }
-    res
-      .status(200)
-      .json({ ...product, inventoryStatus: getInventoryStatus(product.stock) })
-  } catch (err) {
-    logger.error(err, 'Failed to get product')
-    next({ message: 'Failed to fetch product', status: 500 })
-  }
-})
+  },
+)
 
 // UPDATE
-export const updateProduct = makeUpdateEndpoint(
-  AddProductSchema,
+export const updateProduct = makeEndpoint(
+  {
+    body: AddProductSchema,
+    params: IdParam,
+  },
   async (req, res, next) => {
     const productId = req.params.id
     const { images: productImages, ...productData } = req.body
@@ -338,45 +347,48 @@ export const updateProduct = makeUpdateEndpoint(
 )
 
 /// DELETE
-export const deleteProduct = makeByIdEndpoint(async (req, res, next) => {
-  try {
-    const productId = req.params.id
+export const deleteProduct = makeEndpoint(
+  { params: IdParam },
+  async (req, res, next) => {
+    try {
+      const productId = req.params.id
 
-    await db.transaction(async (tx) => {
-      const productImages = await tx.query.images.findMany({
-        where: (images) => eq(images.productId, productId),
-      })
-
-      // delete images from database ( keep main one )
-      await tx
-        .delete(images)
-        .where(
-          and(eq(images.productId, productId), eq(images.isPrimary, false)),
-        )
-
-      // Soft delete the product
-
-      await tx
-        .update(products)
-        .set({
-          isDeleted: true,
+      await db.transaction(async (tx) => {
+        const productImages = await tx.query.images.findMany({
+          where: (images) => eq(images.productId, productId),
         })
-        .where(eq(products.id, productId))
 
-      await tx
-        .delete(featuredProducts)
-        .where(eq(featuredProducts.productId, productId))
+        // delete images from database ( keep main one )
+        await tx
+          .delete(images)
+          .where(
+            and(eq(images.productId, productId), eq(images.isPrimary, false)),
+          )
 
-      // delete images from cloudinary ( keep main one )
-      const imagesToDelete = productImages
-        .filter((img) => img.isPrimary === false)
-        .map((img) => img.publicId)
+        // Soft delete the product
 
-      await deleteMultipleImages(imagesToDelete)
+        await tx
+          .update(products)
+          .set({
+            isDeleted: true,
+          })
+          .where(eq(products.id, productId))
 
-      res.status(200).json({ productId })
-    })
-  } catch (err) {
-    next({ message: 'Failed to delete product', status: 500 })
-  }
-})
+        await tx
+          .delete(featuredProducts)
+          .where(eq(featuredProducts.productId, productId))
+
+        // delete images from cloudinary ( keep main one )
+        const imagesToDelete = productImages
+          .filter((img) => img.isPrimary === false)
+          .map((img) => img.publicId)
+
+        await deleteMultipleImages(imagesToDelete)
+
+        res.status(200).json({ productId })
+      })
+    } catch (err) {
+      next({ message: 'Failed to delete product', status: 500 })
+    }
+  },
+)

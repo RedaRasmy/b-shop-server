@@ -27,6 +27,10 @@ export const ProductsQuerySchema = z.object({
 
 export type ProductsQuery = z.infer<typeof ProductsQuerySchema>
 
+export const SlugParam = z.object({
+  slug: z.string(),
+})
+
 ////
 
 export const insertProductSchema = createInsertSchema(products)

@@ -4,17 +4,13 @@ import { isNewProduct } from '../../products/utils/is-new'
 import { InsertCartItemSchema } from '../cart/cart.validation'
 import { formatNumber } from '../../../utils/format-number'
 import { getInventoryStatus } from '../../../utils/get-inventory-status'
-import {
-  makeByIdEndpoint,
-  makeBodyEndpoint,
-  makeSimpleEndpoint,
-  makeUpdateEndpoint,
-} from '../../../utils/wrappers'
 import { and, eq, sql } from 'drizzle-orm'
 import logger from '../../../lib/logger'
 import z from 'zod'
+import { makeEndpoint } from 'express-zod-endpoint'
+import { IdParam } from '../../../lib/zod-schemas'
 
-export const getCart = makeSimpleEndpoint(async (req, res, next) => {
+export const getCart = makeEndpoint(async (req, res, next) => {
   const userId = req.user?.id!
   try {
     const cart = await db.query.cartItems.findMany({
@@ -98,8 +94,10 @@ export const getCart = makeSimpleEndpoint(async (req, res, next) => {
   }
 })
 
-export const addCartItem = makeBodyEndpoint(
-  InsertCartItemSchema,
+export const addCartItem = makeEndpoint(
+  {
+    body: InsertCartItemSchema,
+  },
   async (req, res, next) => {
     const data = req.body
     const userId = req.user?.id!
@@ -133,8 +131,11 @@ export const addCartItem = makeBodyEndpoint(
   },
 )
 
-export const updateCartItem = makeUpdateEndpoint(
-  InsertCartItemSchema.omit({ productId: true }),
+export const updateCartItem = makeEndpoint(
+  {
+    body: InsertCartItemSchema.omit({ productId: true }),
+    params: IdParam,
+  },
   async (req, res, next) => {
     const productId = req.params.id
     const quantity = req.body.quantity
@@ -156,24 +157,27 @@ export const updateCartItem = makeUpdateEndpoint(
   },
 )
 
-export const deleteCartItem = makeByIdEndpoint(async (req, res, next) => {
-  const productId = req.params.id
-  const userId = req.user?.id!
+export const deleteCartItem = makeEndpoint(
+  { params: IdParam },
+  async (req, res, next) => {
+    const productId = req.params.id
+    const userId = req.user?.id!
 
-  try {
-    await db
-      .delete(cartItems)
-      .where(
-        and(eq(cartItems.productId, productId), eq(cartItems.userId, userId)),
-      )
-    res.status(204).send()
-  } catch (err) {
-    logger.error(err)
-    next(err)
-  }
-})
+    try {
+      await db
+        .delete(cartItems)
+        .where(
+          and(eq(cartItems.productId, productId), eq(cartItems.userId, userId)),
+        )
+      res.status(204).send()
+    } catch (err) {
+      logger.error(err)
+      next(err)
+    }
+  },
+)
 
-export const clearCart = makeSimpleEndpoint(async (req, res, next) => {
+export const clearCart = makeEndpoint(async (req, res, next) => {
   const userId = req.user?.id!
   try {
     await db.delete(cartItems).where(eq(cartItems.userId, userId))
@@ -184,15 +188,17 @@ export const clearCart = makeSimpleEndpoint(async (req, res, next) => {
   }
 })
 
-export const mergeCart = makeBodyEndpoint(
-  z
-    .array(
-      z.object({
-        productId: z.uuid(),
-        quantity: z.number().int().min(1),
-      }),
-    )
-    .min(1, 'At least one item is required'),
+export const mergeCart = makeEndpoint(
+  {
+    body: z
+      .array(
+        z.object({
+          productId: z.uuid(),
+          quantity: z.number().int().min(1),
+        }),
+      )
+      .min(1, 'At least one item is required'),
+  },
   async (req, res, next) => {
     const userId = req.user?.id!
     const items = req.body

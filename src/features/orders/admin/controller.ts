@@ -1,22 +1,20 @@
 import { db } from '../../../db/index'
 import {
   AdminOrdersQuerySchema,
+  OrderIdParam,
   UpdateOrderSchema,
 } from './validation'
-import {
-  makeByIdEndpoint,
-  makeQueryEndpoint,
-  makeUpdateEndpoint,
-} from '../../../utils/wrappers'
 import { orders } from '../../../db/schema'
 import { and, asc, count, desc, eq, ilike, or } from 'drizzle-orm'
 import { SOrder } from '../tables/orders.table'
-import z from 'zod'
+import { makeEndpoint } from 'express-zod-endpoint'
 
-export const getOrders = makeQueryEndpoint(
-  AdminOrdersQuerySchema,
+export const getOrders = makeEndpoint(
+  {
+    query: AdminOrdersQuerySchema,
+  },
   async (req, res, next) => {
-    const { page, perPage, sort, search, status } = req.validatedQuery
+    const { page, perPage, sort, search, status } = req.query
 
     // Build Where Clause
 
@@ -97,76 +95,74 @@ export const getOrders = makeQueryEndpoint(
   },
 )
 
-export const getOrder = makeByIdEndpoint(async (req, res, next) => {
-  const id = Number(req.params.id)
+export const getOrder = makeEndpoint(
+  { params: OrderIdParam },
+  async (req, res, next) => {
+    const id = req.params.id
 
-  try {
-    const order = await db.query.orders.findFirst({
-      where: (orders) => eq(orders.id, id),
-      with: {
-        items: {
-          columns: {
-            id: true,
-            productId: true,
-            priceAtPurchase: true,
-            quantity: true,
-          },
-          with: {
-            product: {
-              columns: {
-                name: true,
-              },
-              with: {
-                images: {
-                  columns: {
-                    url: true,
-                    isPrimary: true,
+    try {
+      const order = await db.query.orders.findFirst({
+        where: (orders) => eq(orders.id, id),
+        with: {
+          items: {
+            columns: {
+              id: true,
+              productId: true,
+              priceAtPurchase: true,
+              quantity: true,
+            },
+            with: {
+              product: {
+                columns: {
+                  name: true,
+                },
+                with: {
+                  images: {
+                    columns: {
+                      url: true,
+                      isPrimary: true,
+                    },
                   },
                 },
               },
             },
           },
         },
-      },
-    })
-    if (!order) {
-      return res.sendStatus(404)
+      })
+      if (!order) {
+        return res.sendStatus(404)
+      }
+      const { items, ...rest } = order
+
+      const data = {
+        ...rest,
+        items: items.map((item) => ({
+          id: item.id,
+          productId: item.productId,
+          priceAtPurchase: item.priceAtPurchase,
+          quantity: item.quantity,
+          name: item.product.name,
+          thumbnailUrl: item.product.images.find((img) => img.isPrimary)!.url,
+        })),
+      }
+
+      res.status(200).json(data)
+    } catch (err) {
+      next(err)
     }
-    const { items, ...rest } = order
+  },
+)
 
-    const data = {
-      ...rest,
-      items: items.map((item) => ({
-        id: item.id,
-        productId: item.productId,
-        priceAtPurchase: item.priceAtPurchase,
-        quantity: item.quantity,
-        name: item.product.name,
-        thumbnailUrl: item.product.images.find((img) => img.isPrimary)!.url,
-      })),
-    }
-
-    res.status(200).json(data)
-  } catch (err) {
-    next(err)
-  }
-})
-
-export const updateOrder = makeUpdateEndpoint(
-  UpdateOrderSchema,
+export const updateOrder = makeEndpoint(
+  {
+    body: UpdateOrderSchema,
+    params: OrderIdParam,
+  },
   async (req, res, next) => {
-    const stringId = req.params.id
+    const id = req.params.id
     const { status } = req.body
 
     try {
-      const { data: id, error } = z.coerce.number().safeParse(stringId)
-
-      if (!id) {
-        return res.status(400).json({
-          message: 'Invalid path param',
-          details: error?.issues,
-        })
-      }
       await db
         .update(orders)
         .set({

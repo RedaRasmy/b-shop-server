@@ -1,11 +1,14 @@
+import z from 'zod'
 import { db } from '../../db/index'
 import { cartItems, orderItems, orders } from '../../db/schema'
 import { OrderInsertSchema } from './orders.validation'
-import { makeBodyEndpoint, makeParamsEndpoint } from '../../utils/wrappers'
 import { eq } from 'drizzle-orm'
+import { makeEndpoint } from 'express-zod-endpoint'
 
-export const addOrder = makeBodyEndpoint(
-  OrderInsertSchema,
+export const addOrder = makeEndpoint(
+  {
+    body: OrderInsertSchema,
+  },
   async (req, res, next) => {
     const userId = req.user?.id
 
@@ -90,8 +93,12 @@ export const addOrder = makeBodyEndpoint(
   },
 )
 
-export const getOrder = makeParamsEndpoint(
-  ['orderToken'],
+export const getOrder = makeEndpoint(
+  {
+    params: z.object({
+      orderToken: z.string(),
+    }),
+  },
   async (req, res, next) => {
     const orderToken = req.params.orderToken
 

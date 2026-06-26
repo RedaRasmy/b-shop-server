@@ -1,10 +1,10 @@
+import { makeEndpoint } from 'express-zod-endpoint'
 import { db } from '../../../db/index'
 import { orders } from '../../../db/schema'
-import { makeAuthEndpoint } from '../../../utils/wrappers'
 import { desc, eq } from 'drizzle-orm'
 
-export const getOrders = makeAuthEndpoint(async (req, res, next) => {
-  const userId = req.user.id
+export const getOrders = makeEndpoint(async (req, res, next) => {
+  const userId = req.user!.id
 
   try {
     const customerOrders = await db.query.orders.findMany({

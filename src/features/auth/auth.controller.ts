@@ -9,7 +9,7 @@ import {
   verifyRefreshToken,
 } from '../../utils/auth'
 import config from '../../config/config'
-import { makeBodyEndpoint, makeSimpleEndpoint } from '../../utils/wrappers'
+import { makeEndpoint } from 'express-zod-endpoint'
 import { EmailPasswordSchema } from '../auth/auth.validation'
 import { CookieOptions } from 'express'
 import { count, eq } from 'drizzle-orm'
@@ -35,8 +35,10 @@ const refreshTokenOptions: CookieOptions = {
 
 let hasAdmin: boolean | null = null
 
-export const register = makeBodyEndpoint(
-  EmailPasswordSchema,
+export const register = makeEndpoint(
+  {
+    body: EmailPasswordSchema,
+  },
   async (req, res, next) => {
     const { email, password } = req.body
 
@@ -82,8 +84,10 @@ export const register = makeBodyEndpoint(
   },
 )
 
-export const login = makeBodyEndpoint(
-  EmailPasswordSchema,
+export const login = makeEndpoint(
+  {
+    body: EmailPasswordSchema,
+  },
   async (req, res, next) => {
     const { email, password } = req.body
 
@@ -127,7 +131,7 @@ export const login = makeBodyEndpoint(
   },
 )
 
-export const refresh = makeSimpleEndpoint(async (req, res, next) => {
+export const refresh = makeEndpoint(async (req, res, next) => {
   const refreshToken = req.cookies.refreshToken
 
   try {
@@ -159,7 +163,7 @@ export const refresh = makeSimpleEndpoint(async (req, res, next) => {
   }
 })
 
-export const logout = makeSimpleEndpoint(async (req, res, next) => {
+export const logout = makeEndpoint(async (req, res, next) => {
   const refreshToken = req.cookies.refreshToken
 
   try {
@@ -190,10 +194,10 @@ function isUniqueConstraintError(error: unknown): boolean {
   return false
 }
 
-// export const forgotPassword = makeBodyEndpoint(
-//   z.object({
+// export const forgotPassword = makeEndpoint(
+//   {body:z.object({
 //     email: z.email(),
-//   }),
+//   })},
 //   async (req, res, next) => {
 //     const { email } = req.body
 
@@ -238,11 +242,11 @@ function isUniqueConstraintError(error: unknown): boolean {
 //   },
 // )
 
-// export const resetPassword = makeBodyEndpoint(
-//   z.object({
+// export const resetPassword = makeEndpoint(
+//   {body: z.object({
 //     token: z.string(),
 //     password: z.string().min(8),
-//   }),
+//   })},
 //   async (req, res, next) => {
 //     const { token, password } = req.body
 
@@ -278,10 +282,10 @@ function isUniqueConstraintError(error: unknown): boolean {
 
 // // Email verification
 
-// export const sendVerifyEmail = makeBodyEndpoint(
-//   z.object({
+// export const sendVerifyEmail = makeEndpoint(
+//   {body:z.object({
 //     email: z.email(),
-//   }),
+//   })},
 //   async (req, res, next) => {
 //     const { email } = req.body
 
@@ -292,10 +296,10 @@ function isUniqueConstraintError(error: unknown): boolean {
 //   },
 // )
 
-// export const verifyEmail = makeBodyEndpoint(
-//   z.object({
+// export const verifyEmail = makeEndpoint(
+//   {body:z.object({
 //     token: z.string().min(1),
-//   }),
+//   })},
 //   async (req, res, next) => {
 //     const { token } = req.body
 

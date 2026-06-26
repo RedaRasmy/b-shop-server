@@ -8,3 +8,7 @@ export const SlugSchema = z
     /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
     'Slug must contain only lowercase letters, numbers, and hyphens, and cannot start or end with a hyphen.',
   )
+
+export const IdParam = z.object({
+  id: z.string(),
+})

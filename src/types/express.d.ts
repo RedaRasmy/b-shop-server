@@ -10,7 +10,6 @@ declare module 'express' {
       role: string;
       email: string;
     };
-    validatedQuery?: any;
   }
 }
 

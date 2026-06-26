@@ -1,14 +1,16 @@
+import { makeEndpoint } from 'express-zod-endpoint'
 import { db } from '../../../db/index'
 import { orders, users } from '../../../db/schema'
 import { CustomersQuerySchema } from '../admin/validation'
-import { makeQueryEndpoint } from '../../../utils/wrappers'
 import { and, asc, count, desc, eq, ilike, or, sql } from 'drizzle-orm'
 
-export const getCustomers = makeQueryEndpoint(
-  CustomersQuerySchema,
+export const getCustomers = makeEndpoint(
+  {
+    query: CustomersQuerySchema,
+  },
   async (req, res, next) => {
     try {
-      const { page, perPage, search, sort } = req.validatedQuery
+      const { page, perPage, search, sort } = req.query
 
       // Build Where Clause
 

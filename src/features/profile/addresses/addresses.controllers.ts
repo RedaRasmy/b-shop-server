@@ -4,18 +4,16 @@ import {
   InsertAddressSchema,
   UpdateAddressSchema,
 } from '../addresses/addresses.validation'
-import {
-  makeAuthEndpoint,
-  makeBodyEndpoint,
-  makeByIdEndpoint,
-  makeUpdateEndpoint,
-} from '../../../utils/wrappers'
 import { and, desc, eq } from 'drizzle-orm'
+import { makeEndpoint } from 'express-zod-endpoint'
+import { IdParam } from '../../../lib/zod-schemas'
 
 /// POST
 
-export const addAddress = makeBodyEndpoint(
-  InsertAddressSchema,
+export const addAddress = makeEndpoint(
+  {
+    body: InsertAddressSchema,
+  },
   async (req, res, next) => {
     const address = req.body
     const userId = req.user?.id!
@@ -57,8 +55,8 @@ export const addAddress = makeBodyEndpoint(
 
 /// GET
 
-export const getAddresses = makeAuthEndpoint(async (req, res, next) => {
-  const userId = req.user.id
+export const getAddresses = makeEndpoint(async (req, res, next) => {
+  const userId = req.user!.id
 
   try {
     const data = await db.query.addresses.findMany({
@@ -74,8 +72,11 @@ export const getAddresses = makeAuthEndpoint(async (req, res, next) => {
 
 /// PATCH
 
-export const updateAddress = makeUpdateEndpoint(
-  UpdateAddressSchema,
+export const updateAddress = makeEndpoint(
+  {
+    body: UpdateAddressSchema,
+    params: IdParam,
+  },
   async (req, res, next) => {
     const userId = req.user?.id!
     const id = req.params.id
@@ -96,17 +97,20 @@ export const updateAddress = makeUpdateEndpoint(
 
 /// DELETE
 
-export const deleteAddress = makeByIdEndpoint(async (req, res, next) => {
-  const id = req.params.id
-  const userId = req.user?.id!
+export const deleteAddress = makeEndpoint(
+  { params: IdParam },
+  async (req, res, next) => {
+    const id = req.params.id
+    const userId = req.user?.id!
 
-  try {
-    await db
-      .delete(addresses)
-      .where(and(eq(addresses.id, id), eq(addresses.customerId, userId)))
+    try {
+      await db
+        .delete(addresses)
+        .where(and(eq(addresses.id, id), eq(addresses.customerId, userId)))
 
-    res.sendStatus(204)
-  } catch (err) {
-    next(err)
-  }
-})
+      res.sendStatus(204)
+    } catch (err) {
+      next(err)
+    }
+  },
+)
