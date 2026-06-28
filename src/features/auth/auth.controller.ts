@@ -55,7 +55,7 @@ export const register = makeEndpoint(
         .values({
           email,
           password: hashedPassword,
-          role: hasAdmin ? 'user' : 'admin',
+          role: hasAdmin ? 'customer' : 'admin',
         })
         .returning()
 
