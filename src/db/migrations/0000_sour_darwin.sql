@@ -36,7 +36,7 @@ CREATE TABLE "categories" (
 --> statement-breakpoint
 CREATE TABLE "featured_products" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"product_id" uuid,
+	"product_id" uuid NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );

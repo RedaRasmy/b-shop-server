@@ -55,7 +55,7 @@ openssl rand --base64 64
 
 ```bash
 docker compose up -d
-pnpm db:push
+pnpm db:migrate
 ```
 
 5. **Run the app**
